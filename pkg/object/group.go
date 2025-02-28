@@ -19,7 +19,7 @@ package object
 import "time"
 
 type Group struct {
-	ID       string `json:"id" gorm:"primaryKey"`
+	ID       string `json:"id" gorm:"primaryKey;type:char(25)"`
 	TenantID string `json:"tenant_id"`
 
 	CreatedAt time.Time `json:"createdAt"`
@@ -28,7 +28,7 @@ type Group struct {
 	ParentGroupID *string `json:"parent_group_id"`
 	ParentGroup   *Group  `json:"-"`
 
-	DisplayName string `json:"displayName"`
+	DisplayName string `json:"displayName;type:varchar(100)"`
 
 	Enabled bool `json:"enabled"`
 }

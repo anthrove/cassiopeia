@@ -50,5 +50,5 @@ func GetEngine() (*gorm.DB, error) {
 
 func Migrate(engine *gorm.DB) error {
 
-	return engine.AutoMigrate(&object.Tenant{}, &object.Group{})
+	return engine.AutoMigrate(&object.Tenant{}, &object.Group{}, &object.User{})
 }

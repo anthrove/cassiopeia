@@ -23,13 +23,13 @@ import (
 )
 
 type Tenant struct {
-	ID string `json:"id" gorm:"primaryKey"`
+	ID string `json:"id" gorm:"primaryKey;type:char(25)"`
 
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	DisplayName  string `json:"display_name"`
-	PasswordType string `json:"password_type"`
+	DisplayName  string `json:"display_name;type:varchar(100)"`
+	PasswordType string `json:"password_type;type:varchar(100)"`
 
 	Groups []Group `json:"groups"`
 }
