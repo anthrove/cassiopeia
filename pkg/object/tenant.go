@@ -14,34 +14,16 @@
  * limitations under the License.
  */
 
-package repository
+package object
 
-import (
-	"github.com/anthrove/identity/pkg/object"
-	_ "github.com/lib/pq"
+import "time"
 
-	"github.com/anthrove/identity/internal/config"
-	"github.com/caarlos0/env/v11"
-	"xorm.io/xorm"
-)
+type Tenant struct {
+	ID string `json:"id" xorm:"char(25) pk notnull 'id'"`
 
-func GetEngine() (*xorm.Engine, error) {
-	dbConfig, err := env.ParseAs[config.Database]()
+	CreatedAt time.Time `json:"createdAt" xorm:"created"`
+	UpdatedAt time.Time `json:"updatedAt" xorm:"updated"`
 
-	if err != nil {
-		return nil, err
-	}
-
-	engine, err := xorm.NewEngine(dbConfig.Driver, dbConfig.DataSource)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return engine, nil
-}
-
-func Migrate(engine *xorm.Engine) error {
-
-	return engine.Sync(new(object.Tenant))
+	DisplayName  string `json:"display_name"`
+	PasswordType string `json:"password_type"`
 }
