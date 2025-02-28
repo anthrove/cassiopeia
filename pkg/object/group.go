@@ -16,33 +16,19 @@
 
 package object
 
-import (
-	gonanoid "github.com/matoous/go-nanoid/v2"
-	"gorm.io/gorm"
-	"time"
-)
+import "time"
 
-type Tenant struct {
-	ID string `json:"id" gorm:"primaryKey"`
+type Group struct {
+	ID       string `json:"id" gorm:"primaryKey"`
+	TenantID string `json:"tenant_id"`
 
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 
-	DisplayName  string `json:"display_name"`
-	PasswordType string `json:"password_type"`
+	ParentGroupID *string `json:"parent_group_id"`
+	ParentGroup   *Group  `json:"-"`
 
-	Groups []Group `json:"groups"`
-}
+	DisplayName string `json:"displayName"`
 
-func (base *Tenant) BeforeCreate(db *gorm.DB) error {
-	if base.ID == "" {
-		id, err := gonanoid.New(25)
-		if err != nil {
-			return err
-		}
-
-		base.ID = id
-	}
-
-	return nil
+	Enabled bool `json:"enabled"`
 }

@@ -17,31 +17,38 @@
 package repository
 
 import (
-	"github.com/anthrove/identity/pkg/object"
-	_ "github.com/lib/pq"
-
+	"errors"
 	"github.com/anthrove/identity/internal/config"
+	"github.com/anthrove/identity/pkg/object"
 	"github.com/caarlos0/env/v11"
-	"xorm.io/xorm"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-func GetEngine() (*xorm.Engine, error) {
+func GetEngine() (*gorm.DB, error) {
 	dbConfig, err := env.ParseAs[config.Database]()
 
 	if err != nil {
 		return nil, err
 	}
 
-	engine, err := xorm.NewEngine(dbConfig.Driver, dbConfig.DataSource)
+	var db *gorm.DB
+
+	switch dbConfig.Driver {
+	case "postgres":
+		db, err = gorm.Open(postgres.Open(dbConfig.DataSource), &gorm.Config{})
+	default:
+		return nil, errors.New("unknown database driver: " + dbConfig.Driver)
+	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return engine, nil
+	return db, nil
 }
 
-func Migrate(engine *xorm.Engine) error {
+func Migrate(engine *gorm.DB) error {
 
-	return engine.Sync(new(object.Tenant))
+	return engine.AutoMigrate(&object.Tenant{}, &object.Group{})
 }
