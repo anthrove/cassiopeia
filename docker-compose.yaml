@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "anthrove"
+      POSTGRES_USER: "anthrove"
+      POSTGRES_DB: "anthrove"    
