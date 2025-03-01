@@ -22,6 +22,8 @@ import (
 	"time"
 )
 
+// Tenant represents a tenant entity in the system.
+// It contains information about the tenant such as its ID, timestamps, display name, password type, and associated groups.
 type Tenant struct {
 	ID string `json:"id" gorm:"primaryKey;type:char(25)"`
 
@@ -34,6 +36,14 @@ type Tenant struct {
 	Groups []Group `json:"groups,omitempty"`
 }
 
+// BeforeCreate is a GORM hook that is called before a new tenant record is inserted into the database.
+// It generates a unique ID for the tenant if it is not already set.
+//
+// Parameters:
+//   - db: a gorm.DB instance representing the database connection.
+//
+// Returns:
+//   - An error if there is any issue generating the unique ID.
 func (base *Tenant) BeforeCreate(db *gorm.DB) error {
 	if base.ID == "" {
 		id, err := gonanoid.New(25)
@@ -47,11 +57,15 @@ func (base *Tenant) BeforeCreate(db *gorm.DB) error {
 	return nil
 }
 
+// CreateTenant represents the data required to create a new tenant.
+// It includes the display name and password type, both of which are required and have a maximum length of 100 characters.
 type CreateTenant struct {
 	DisplayName  string `json:"display_name" validate:"required,max=100"`
 	PasswordType string `json:"password_type" validate:"required,max=100"`
 }
 
+// UpdateTenant represents the data required to update an existing tenant.
+// It includes the display name and password type, both of which are required and have a maximum length of 100 characters.
 type UpdateTenant struct {
 	DisplayName  string `json:"display_name" validate:"required,max=100"`
 	PasswordType string `json:"password_type" validate:"required,max=100"`

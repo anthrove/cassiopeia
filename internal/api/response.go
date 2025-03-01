@@ -16,6 +16,8 @@
 
 package api
 
+// HttpResponse represents a standard HTTP response structure.
+// It contains a data field for successful responses and an error field for error messages.
 type HttpResponse struct {
 	Data  any    `json:"data,omitempty"`
 	Error string `json:"error,omitempty"`

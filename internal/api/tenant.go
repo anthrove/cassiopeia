@@ -16,13 +16,18 @@
 
 package api
 
-import "C"
 import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
+// createTenant handles the HTTP POST request to create a new tenant.
+// It binds the request body to a CreateTenant object, validates it, and calls the service to create the tenant.
+// If successful, it returns the created tenant; otherwise, it returns an error response.
+//
+// Parameters:
+//   - c: a gin.Context instance representing the context of the HTTP request.
 func (ir IdentityRoutes) createTenant(c *gin.Context) {
 	var body object.CreateTenant
 	err := c.ShouldBind(&body)
@@ -48,6 +53,12 @@ func (ir IdentityRoutes) createTenant(c *gin.Context) {
 	})
 }
 
+// updateTenant handles the HTTP PUT request to update an existing tenant.
+// It binds the request body to an UpdateTenant object, validates it, and calls the service to update the tenant.
+// If successful, it returns an empty response; otherwise, it returns an error response.
+//
+// Parameters:
+//   - c: a gin.Context instance representing the context of the HTTP request.
 func (ir IdentityRoutes) updateTenant(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 

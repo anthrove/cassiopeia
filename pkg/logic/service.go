@@ -24,10 +24,19 @@ import (
 // use a single instance of Validate, it caches struct info
 var validate *validator.Validate
 
+// IdentityService provides methods to interact with the identity database.
 type IdentityService struct {
 	db *gorm.DB
 }
 
+// NewIdentityService initializes a new IdentityService with the given database connection.
+// It also sets up the validator instance used for validating structs.
+//
+// Parameters:
+//   - db: a gorm.DB instance representing the database connection.
+//
+// Returns:
+//   - An initialized IdentityService instance.
 func NewIdentityService(db *gorm.DB) IdentityService {
 	validate = validator.New(validator.WithRequiredStructEnabled())
 

@@ -26,6 +26,17 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+// CreateTenant creates a new tenant in the system.
+// It validates the input data using the validator package and returns an error if validation fails.
+// If validation passes, it calls the repository to create the tenant in the database.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - createTenant: object containing the details of the tenant to be created.
+//
+// Returns:
+//   - Tenant object if creation is successful.
+//   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.CreateTenant) (object.Tenant, error) {
 	err := validate.Struct(createTenant)
 
@@ -40,6 +51,17 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 	return repository.CreateTenant(ctx, is.db, createTenant)
 }
 
+// UpdateTenant updates an existing tenant's information in the system.
+// It validates the input data using the validator package and returns an error if validation fails.
+// If validation passes, it calls the repository to update the tenant in the database.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - tenantID: unique identifier of the tenant to be updated.
+//   - updateTenant: object containing the updated details of the tenant.
+//
+// Returns:
+//   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, updateTenant object.UpdateTenant) error {
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")

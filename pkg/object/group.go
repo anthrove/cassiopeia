@@ -22,6 +22,8 @@ import (
 	"time"
 )
 
+// Group represents a group entity in the system.
+// It contains information about the group such as its ID, tenant ID, timestamps, parent group, display name, and status.
 type Group struct {
 	ID       string `json:"id" gorm:"primaryKey;type:char(25)"`
 	TenantID string `json:"tenant_id"`
@@ -37,6 +39,14 @@ type Group struct {
 	Enabled bool `json:"enabled"`
 }
 
+// BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.
+// It generates a unique ID for the group if it is not already set.
+//
+// Parameters:
+//   - db: a gorm.DB instance representing the database connection.
+//
+// Returns:
+//   - An error if there is any issue generating the unique ID.
 func (base *Group) BeforeCreate(db *gorm.DB) error {
 	if base.ID == "" {
 		id, err := gonanoid.New(25)
