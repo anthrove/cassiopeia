@@ -16,7 +16,6 @@
 
 package api
 
-import "C"
 import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
