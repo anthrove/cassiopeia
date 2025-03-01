@@ -45,3 +45,15 @@ func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenan
 
 	return err
 }
+
+func KillTenant(ctx context.Context, db *gorm.DB, tenantID string) error {
+	return db.WithContext(ctx).Delete(&object.Tenant{}, tenantID).Error
+}
+
+func RetrieveTenant(ctx context.Context, db *gorm.DB, tenantID string) (object.Tenant, error) {
+
+}
+
+func RetrieveTenants(ctx context.Context, db *gorm.DB) ([]object.Tenant, error) {
+
+}
