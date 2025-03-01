@@ -14,38 +14,24 @@
  * limitations under the License.
  */
 
-package object
+package util
 
 import (
-	gonanoid "github.com/matoous/go-nanoid/v2"
-	"gorm.io/gorm"
-	"time"
+	"fmt"
+	"github.com/go-playground/validator/v10"
+	"strings"
 )
 
-type Group struct {
-	ID       string `json:"id" gorm:"primaryKey;type:char(25)"`
-	TenantID string `json:"tenant_id"`
+func ConvertValidationError(err validator.ValidationErrors) error {
+	fields := make([]string, 0, len(err))
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-
-	ParentGroupID *string `json:"parent_group_id"`
-	ParentGroup   *Group  `json:"-"`
-
-	DisplayName string `json:"displayName;type:varchar(100)"`
-
-	Enabled bool `json:"enabled"`
-}
-
-func (base *Group) BeforeCreate(db *gorm.DB) error {
-	if base.ID == "" {
-		id, err := gonanoid.New(25)
-		if err != nil {
-			return err
+	for _, e := range err {
+		if e == nil {
+			continue
 		}
 
-		base.ID = id
+		fields = append(fields, e.StructNamespace())
 	}
 
-	return nil
+	return fmt.Errorf("the following fields are not valid: %s", strings.Join(fields, ", "))
 }

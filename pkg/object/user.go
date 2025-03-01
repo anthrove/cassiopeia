@@ -17,6 +17,7 @@
 package object
 
 import (
+	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
 	"time"
 )
@@ -38,4 +39,17 @@ type User struct {
 	PasswordType  string `json:"password_type;type:varchar(100)"`
 
 	Groups []Group `json:"groups" gorm:"many2many:user_groups;"`
+}
+
+func (base *User) BeforeCreate(db *gorm.DB) error {
+	if base.ID == "" {
+		id, err := gonanoid.New(25)
+		if err != nil {
+			return err
+		}
+
+		base.ID = id
+	}
+
+	return nil
 }

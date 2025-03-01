@@ -14,37 +14,20 @@
  * limitations under the License.
  */
 
-package main
+package api
 
 import (
-	"github.com/anthrove/identity/internal/api"
 	"github.com/anthrove/identity/pkg/logic"
-	"github.com/anthrove/identity/pkg/repository"
 	"github.com/gin-gonic/gin"
-	"log"
 )
 
-func main() {
-	engine, err := repository.GetEngine()
+type IdentityRoutes struct {
+	service logic.IdentityService
+}
 
-	if err != nil {
-		log.Panic("Problem while connecting to database: ", err)
-	}
+func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
+	identityRoutes := &IdentityRoutes{service}
 
-	err = repository.Migrate(engine)
-
-	if err != nil {
-		log.Panic("Problem while migrating database: ", err)
-	}
-
-	service := logic.NewIdentityService(engine)
-
-	router := gin.Default()
-	api.SetupRoutes(router)
-	err = router.Run(":8080")
-
-	if err != nil {
-		log.Panic("Problem while running server: ", err)
-		return
-	}
+	v1 := r.Group("/api/v1")
+	v1.POST("tenant", identityRoutes.createTenant)
 }

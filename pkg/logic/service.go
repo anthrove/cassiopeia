@@ -14,38 +14,24 @@
  * limitations under the License.
  */
 
-package object
+package logic
 
 import (
-	gonanoid "github.com/matoous/go-nanoid/v2"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
-	"time"
 )
 
-type Group struct {
-	ID       string `json:"id" gorm:"primaryKey;type:char(25)"`
-	TenantID string `json:"tenant_id"`
+// use a single instance of Validate, it caches struct info
+var validate *validator.Validate
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
-
-	ParentGroupID *string `json:"parent_group_id"`
-	ParentGroup   *Group  `json:"-"`
-
-	DisplayName string `json:"displayName;type:varchar(100)"`
-
-	Enabled bool `json:"enabled"`
+type IdentityService struct {
+	db *gorm.DB
 }
 
-func (base *Group) BeforeCreate(db *gorm.DB) error {
-	if base.ID == "" {
-		id, err := gonanoid.New(25)
-		if err != nil {
-			return err
-		}
+func NewIdentityService(db *gorm.DB) IdentityService {
+	validate = validator.New(validator.WithRequiredStructEnabled())
 
-		base.ID = id
+	return IdentityService{
+		db: db,
 	}
-
-	return nil
 }

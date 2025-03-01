@@ -46,3 +46,13 @@ func (base *Tenant) BeforeCreate(db *gorm.DB) error {
 
 	return nil
 }
+
+type CreateTenant struct {
+	DisplayName  string `json:"display_name" validate:"required,max=100"`
+	PasswordType string `json:"password_type" validate:"required,max=100"`
+}
+
+type UpdateTenant struct {
+	DisplayName  string `json:"display_name" validate:"required,max=100"`
+	PasswordType string `json:"password_type" validate:"required,max=100"`
+}
