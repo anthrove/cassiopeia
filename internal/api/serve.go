@@ -38,5 +38,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1 := r.Group("/api/v1")
 	v1.POST("/tenant", identityRoutes.createTenant)
+	v1.GET("/tenant", Pagination(), identityRoutes.findTenants)
+	v1.GET("/tenant/:tenant_id", identityRoutes.findTenant)
 	v1.PUT("/tenant/:tenant_id", identityRoutes.updateTenant)
+	v1.DELETE("/tenant/:tenant_id", identityRoutes.killTenant)
 }

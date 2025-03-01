@@ -78,3 +78,15 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 
 	return repository.UpdateTenant(ctx, is.db, tenantID, updateTenant)
 }
+
+func (is IdentityService) KillTenant(ctx context.Context, tenantID string) error {
+	return repository.KillTenant(ctx, is.db, tenantID)
+}
+
+func (is IdentityService) FindTenant(ctx context.Context, tenantID string) (object.Tenant, error) {
+	return repository.FindTenant(ctx, is.db, tenantID)
+}
+
+func (is IdentityService) FindTenants(ctx context.Context, pagination object.Pagination) ([]object.Tenant, error) {
+	return repository.FindTenants(ctx, is.db, pagination)
+}

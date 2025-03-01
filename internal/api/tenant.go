@@ -17,6 +17,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -83,5 +84,63 @@ func (ir IdentityRoutes) updateTenant(c *gin.Context) {
 
 	c.JSON(http.StatusOK, HttpResponse{
 		Data: gin.H{},
+	})
+}
+
+func (ir IdentityRoutes) killTenant(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
+
+	err := ir.service.KillTenant(c, tenantID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
+func (ir IdentityRoutes) findTenant(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
+
+	tenant, err := ir.service.FindTenant(c, tenantID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: tenant,
+	})
+}
+
+func (ir IdentityRoutes) findTenants(c *gin.Context) {
+	pagination, ok := c.Get("pagination")
+	if !ok {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: "pagination parameter is missing",
+		})
+		return
+	}
+
+	paginationObj, ok := pagination.(object.Pagination)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("pagination parameter cant be converted to object.Pagination"))
+		return
+	}
+
+	tenants, err := ir.service.FindTenants(c, paginationObj)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: tenants,
 	})
 }

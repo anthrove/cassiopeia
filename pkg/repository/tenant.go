@@ -47,13 +47,17 @@ func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenan
 }
 
 func KillTenant(ctx context.Context, db *gorm.DB, tenantID string) error {
-	return db.WithContext(ctx).Delete(&object.Tenant{}, tenantID).Error
+	return db.WithContext(ctx).Delete(&object.Tenant{}, "id = ?", tenantID).Error
 }
 
-func RetrieveTenant(ctx context.Context, db *gorm.DB, tenantID string) (object.Tenant, error) {
-
+func FindTenant(ctx context.Context, db *gorm.DB, tenantID string) (object.Tenant, error) {
+	var tenant object.Tenant
+	err := db.WithContext(ctx).Take(&tenant, "id = ?", tenantID).Error
+	return tenant, err
 }
 
-func RetrieveTenants(ctx context.Context, db *gorm.DB) ([]object.Tenant, error) {
-
+func FindTenants(ctx context.Context, db *gorm.DB, pagination object.Pagination) ([]object.Tenant, error) {
+	var data []object.Tenant
+	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Find(&data).Error
+	return data, err
 }
