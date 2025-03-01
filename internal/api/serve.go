@@ -21,10 +21,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// IdentityRoutes defines the routes related to identity management.
+// It holds a reference to the IdentityService which contains the business logic.
 type IdentityRoutes struct {
 	service logic.IdentityService
 }
 
+// SetupRoutes initializes the API routes for identity management.
+// It sets up the routes for creating and updating tenants.
+//
+// Parameters:
+//   - r: a gin.Engine instance representing the HTTP router.
+//   - service: an instance of IdentityService containing the business logic for identity management.
 func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	identityRoutes := &IdentityRoutes{service}
 

@@ -16,6 +16,8 @@
 
 package config
 
+// Database represents the configuration settings for the database connection.
+// It includes the driver type and the data source name, both of which are required and populated from environment variables.
 type Database struct {
 	Driver     string `env:"DB_DRIVER,notEmpty"`
 	DataSource string `env:"DB_DATASOURCE,notEmpty"`
