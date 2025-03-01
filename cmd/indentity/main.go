@@ -40,7 +40,7 @@ func main() {
 	service := logic.NewIdentityService(engine)
 
 	router := gin.Default()
-	api.SetupRoutes(router)
+	api.SetupRoutes(router, service)
 	err = router.Run(":8080")
 
 	if err != nil {

@@ -16,31 +16,7 @@
 
 package api
 
-import (
-	"github.com/anthrove/identity/pkg/object"
-	"github.com/gin-gonic/gin"
-	"net/http"
-)
-
-func (ir IdentityRoutes) createTenant(c *gin.Context) {
-	var body object.CreateTenant
-	err := c.ShouldBind(&body)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, HttpResponse{
-			Error: err.Error(),
-		})
-	}
-
-	tenant, err := ir.service.CreateTenant(c, body)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, HttpResponse{
-			Error: err.Error(),
-		})
-	}
-
-	c.JSON(http.StatusCreated, HttpResponse{
-		Data: tenant,
-	})
+type HttpResponse struct {
+	Data  any    `json:"data,omitempty"`
+	Error string `json:"error,omitempty"`
 }

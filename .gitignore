@@ -31,3 +31,5 @@ go.work.sum
 !.idea/codeStyles
 !.idea/runConfigurations
 !.idea/copyright
+
+gorm.db

@@ -22,6 +22,7 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/caarlos0/env/v11"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -37,6 +38,9 @@ func GetEngine() (*gorm.DB, error) {
 	switch dbConfig.Driver {
 	case "postgres":
 		db, err = gorm.Open(postgres.Open(dbConfig.DataSource), &gorm.Config{})
+	case "sqlite":
+		db, err = gorm.Open(sqlite.Open(dbConfig.DataSource), &gorm.Config{})
+
 	default:
 		return nil, errors.New("unknown database driver: " + dbConfig.Driver)
 	}

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/repository"
+	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -32,7 +33,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 
 		var validateErrs validator.ValidationErrors
 		if errors.As(err, &validateErrs) {
-			return object.Tenant{}, errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
+			return object.Tenant{}, errors.Join(fmt.Errorf("problem while validating create tenant data"), util.ConvertValidationError(validateErrs))
 		}
 	}
 
