@@ -22,6 +22,14 @@ import (
 	"strings"
 )
 
+// ConvertValidationError converts a validator.ValidationErrors object into a single error message.
+// It extracts the invalid field names from the validation errors and concatenates them into a single string.
+//
+// Parameters:
+//   - err: a validator.ValidationErrors object containing the validation errors.
+//
+// Returns:
+//   - An error object with a formatted message listing the invalid fields.
 func ConvertValidationError(err validator.ValidationErrors) error {
 	fields := make([]string, 0, len(err))
 

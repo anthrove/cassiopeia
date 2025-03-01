@@ -22,6 +22,8 @@ import (
 	"time"
 )
 
+// User represents a user entity in the system.
+// It contains information about the user such as their ID, organisation ID, timestamps, username, display name, email, password details, and associated groups.
 type User struct {
 	ID             string `json:"id" gorm:"primaryKey;type:char(25)"`
 	OrganisationID string `json:"organisation_id"`
@@ -41,6 +43,14 @@ type User struct {
 	Groups []Group `json:"groups" gorm:"many2many:user_groups;"`
 }
 
+// BeforeCreate is a GORM hook that is called before a new user record is inserted into the database.
+// It generates a unique ID for the user if it is not already set.
+//
+// Parameters:
+//   - db: a gorm.DB instance representing the database connection.
+//
+// Returns:
+//   - An error if there is any issue generating the unique ID.
 func (base *User) BeforeCreate(db *gorm.DB) error {
 	if base.ID == "" {
 		id, err := gonanoid.New(25)
