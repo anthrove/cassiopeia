@@ -33,14 +33,15 @@ func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTe
 	return tenant, err
 }
 
-func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenant object.UpdateTenant) (object.Tenant, error) {
+func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenant object.UpdateTenant) error {
 	tenant := object.Tenant{
-		ID:           tenantID,
 		DisplayName:  updateTenant.DisplayName,
 		PasswordType: updateTenant.PasswordType,
 	}
 
-	err := db.WithContext(ctx).Model(&object.Tenant{}).Create(&tenant).Error
+	err := db.WithContext(ctx).Model(&object.Tenant{
+		ID: tenantID,
+	}).Updates(&tenant).Error
 
-	return tenant, err
+	return err
 }

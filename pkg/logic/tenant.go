@@ -40,9 +40,9 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 	return repository.CreateTenant(ctx, is.db, createTenant)
 }
 
-func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, updateTenant object.UpdateTenant) (object.Tenant, error) {
+func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, updateTenant object.UpdateTenant) error {
 	if len(tenantID) == 0 {
-		return object.Tenant{}, errors.New("tenantID is required")
+		return errors.New("tenantID is required")
 	}
 
 	err := validate.Struct(updateTenant)
@@ -50,7 +50,7 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 	if err != nil {
 		var validateErrs validator.ValidationErrors
 		if errors.As(err, &validateErrs) {
-			return object.Tenant{}, errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
+			return errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
 		}
 	}
 

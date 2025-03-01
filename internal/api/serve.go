@@ -29,5 +29,6 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	identityRoutes := &IdentityRoutes{service}
 
 	v1 := r.Group("/api/v1")
-	v1.POST("tenant", identityRoutes.createTenant)
+	v1.POST("/tenant", identityRoutes.createTenant)
+	v1.PUT("/tenant/:tenant_id", identityRoutes.updateTenant)
 }
