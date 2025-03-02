@@ -96,7 +96,7 @@ func (ir IdentityRoutes) updateUser(c *gin.Context) {
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [delete]
-func (ir IdentityRoutes) deleteUser(c *gin.Context) {
+func (ir IdentityRoutes) killUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 
