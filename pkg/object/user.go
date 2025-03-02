@@ -64,17 +64,23 @@ func (base *User) BeforeCreate(db *gorm.DB) error {
 	return nil
 }
 
+// CreateUser represents the data required to create a new user.
+// It includes the username, display name, email, and password, all of which are required and have validation constraints.
 type CreateUser struct {
-	Username    string `json:"username"  validate:"required,max=100"`
+	Username    string `json:"username" validate:"required,max=100"`
 	DisplayName string `json:"display_name" validate:"required,max=100"`
 	Email       string `json:"email" validate:"required,max=100,email"`
 	Password    string `json:"password" validate:"required,max=100"`
 }
 
+// UpdateUser represents the data required to update an existing user's display name.
+// It includes the display name, which is required and has a maximum length of 100 characters.
 type UpdateUser struct {
 	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
 }
 
+// UpdateUserPassword represents the data required to update an existing user's password.
+// It includes the password, which is required and has a maximum length of 100 characters.
 type UpdateUserPassword struct {
 	Password string `json:"password" validate:"required,max=100"`
 }
