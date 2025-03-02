@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2025 Anthrove
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package api
 
 import (
@@ -23,6 +7,17 @@ import (
 	"net/http"
 )
 
+// @Summary	Creates a new User
+// @Tags		User API
+// @Accept		json
+// @Produce	json
+//
+// @Param		tenant_id	path		string								true	"Tenant ID"
+//
+// @Param		"User"		body		object.CreateUser					true	"Create User Data"
+// @Success	200			{object}	HttpResponse{data=object.User{}}	"User"
+// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/user [post]
 func (ir IdentityRoutes) createUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -36,7 +31,7 @@ func (ir IdentityRoutes) createUser(c *gin.Context) {
 		return
 	}
 
-	group, err := ir.service.CreateUser(c, tenantID, body)
+	user, err := ir.service.CreateUser(c, tenantID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -46,10 +41,22 @@ func (ir IdentityRoutes) createUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, HttpResponse{
-		Data: group,
+		Data: user,
 	})
 }
 
+// @Summary	Update an existing User
+// @Tags		User API
+// @Accept		json
+// @Produce	json
+//
+// @Param		tenant_id	path	string				true	"Tenant ID"
+// @Param		user_id		path	string				true	"User ID"
+//
+// @Param		"User"		body	object.UpdateUser	true	"Update User Data"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [put]
 func (ir IdentityRoutes) updateUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
@@ -76,10 +83,20 @@ func (ir IdentityRoutes) updateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, HttpResponse{
 		Data: gin.H{},
 	})
-
 }
 
-func (ir IdentityRoutes) killUser(c *gin.Context) {
+// @Summary	Delete an existing User
+// @Tags		User API
+// @Accept		json
+// @Produce	json
+//
+// @Param		tenant_id	path	string	true	"Tenant ID"
+// @Param		user_id		path	string	true	"User ID"
+//
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [delete]
+func (ir IdentityRoutes) deleteUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 
@@ -94,8 +111,16 @@ func (ir IdentityRoutes) killUser(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+// @Summary	Get an existing User
+// @Tags		User API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path		string								true	"Tenant ID"
+// @Param		user_id		path		string								true	"User ID"
+// @Success	200			{object}	HttpResponse{data=object.User{}}	"User"
+// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [get]
 func (ir IdentityRoutes) findUser(c *gin.Context) {
-
 	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 
@@ -110,9 +135,20 @@ func (ir IdentityRoutes) findUser(c *gin.Context) {
 	c.JSON(http.StatusOK, HttpResponse{
 		Data: user,
 	})
-
 }
 
+// @Summary	Get existing Users
+// @Tags		User API
+// @Accept		json
+// @Produce	json
+//
+// @Param		page		query		string								false	"Page"
+// @Param		page_limit	query		string								false	"Page Limit"
+//
+// @Param		tenant_id	path		string								true	"Tenant ID"
+// @Success	200			{object}	HttpResponse{data=[]object.User{}}	"User"
+// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/user [get]
 func (ir IdentityRoutes) findUsers(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -141,5 +177,4 @@ func (ir IdentityRoutes) findUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, HttpResponse{
 		Data: users,
 	})
-
 }
