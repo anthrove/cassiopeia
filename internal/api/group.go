@@ -23,6 +23,17 @@ import (
 	"net/http"
 )
 
+//	@Summary	Creates a new Group
+//	@Tags		Group API
+//	@Accept		json
+//	@Produce	json
+//
+//	@Param		tenant_id	path		string								true	"Tenant ID"
+//
+//	@Param		"Group"		body		object.CreateGroup					true	"Create Group Data"
+//	@Success	200			{object}	HttpResponse{data=object.Group{}}	"Group"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/group [post]
 func (ir IdentityRoutes) createGroup(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -50,6 +61,18 @@ func (ir IdentityRoutes) createGroup(c *gin.Context) {
 	})
 }
 
+//	@Summary	Update an existing Group
+//	@Tags		Group API
+//	@Accept		json
+//	@Produce	json
+//
+//	@Param		tenant_id	path	string				true	"Tenant ID"
+//	@Param		group_id	path	string				true	"Group ID"
+//
+//	@Param		"Group"		body	object.UpdateGroup	true	"Create Group Data"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/group/{group_id} [put]
 func (ir IdentityRoutes) updateGroup(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	groupID := c.Param("group_id")
@@ -78,6 +101,17 @@ func (ir IdentityRoutes) updateGroup(c *gin.Context) {
 	})
 }
 
+//	@Summary	Kill an existing Group
+//	@Tags		Group API
+//	@Accept		json
+//	@Produce	json
+//
+//	@Param		tenant_id	path	string	true	"Tenant ID"
+//	@Param		group_id	path	string	true	"Group ID"
+//
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/group/{group_id} [delete]
 func (ir IdentityRoutes) killGroup(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	groupID := c.Param("group_id")
@@ -93,6 +127,15 @@ func (ir IdentityRoutes) killGroup(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+//	@Summary	Get an existing Group
+//	@Tags		Group API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path		string								true	"Tenant ID"
+//	@Param		group_id	path		string								true	"Group ID"
+//	@Success	200			{object}	HttpResponse{data=object.Group{}}	"Group"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/group/{group_id} [get]
 func (ir IdentityRoutes) findGroup(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	groupID := c.Param("group_id")
@@ -110,6 +153,18 @@ func (ir IdentityRoutes) findGroup(c *gin.Context) {
 	})
 }
 
+//	@Summary	Get existing Groups
+//	@Tags		Group API
+//	@Accept		json
+//	@Produce	json
+//
+//	@Param		page		query		string								false	"Page"
+//	@Param		page_limit	query		string								false	"Page Limit"
+//
+//	@Param		tenant_id	path		string								true	"Tenant ID"
+//	@Success	200			{object}	HttpResponse{data=[]object.Group{}}	"Group"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/group [get]
 func (ir IdentityRoutes) findGroups(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 

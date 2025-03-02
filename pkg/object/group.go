@@ -25,16 +25,16 @@ import (
 // Group represents a group entity in the system.
 // It contains information about the group such as its ID, tenant ID, timestamps, parent group, display name, and status.
 type Group struct {
-	ID       string `json:"id" gorm:"primaryKey;type:char(25)"`
-	TenantID string `json:"tenant_id"`
+	ID       string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	TenantID string `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	CreatedAt time.Time `json:"createdAt" format:"date-time"`
+	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
 
-	ParentGroupID *string `json:"parent_group_id"`
+	ParentGroupID *string `json:"parent_group_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	ParentGroup   *Group  `json:"-"`
 
-	DisplayName string `json:"displayName" gorm:"type:varchar(100)"`
+	DisplayName string `json:"displayName" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.
@@ -59,11 +59,11 @@ func (base *Group) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateGroup struct {
-	DisplayName   string  `json:"display_name" validate:"required,max=100"`
-	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25"`
+	DisplayName   string  `json:"display_name" validate:"required,max=100"  maxLength:"100" example:"Tenant Title"`
+	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25" maxLength:"25" minLength:"25"`
 }
 
 type UpdateGroup struct {
-	DisplayName   string  `json:"display_name" validate:"required,max=100"`
-	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25"`
+	DisplayName   string  `json:"display_name" validate:"required,max=100"  maxLength:"100" example:"Tenant Title"`
+	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25" maxLength:"25" minLength:"25"`
 }
