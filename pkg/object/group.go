@@ -34,9 +34,7 @@ type Group struct {
 	ParentGroupID *string `json:"parent_group_id"`
 	ParentGroup   *Group  `json:"-"`
 
-	DisplayName string `json:"displayName;type:varchar(100)"`
-
-	Enabled bool `json:"enabled"`
+	DisplayName string `json:"displayName" gorm:"type:varchar(100)"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.
@@ -58,4 +56,14 @@ func (base *Group) BeforeCreate(db *gorm.DB) error {
 	}
 
 	return nil
+}
+
+type CreateGroup struct {
+	DisplayName   string  `json:"display_name" validate:"required,max=100"`
+	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25"`
+}
+
+type UpdateGroup struct {
+	DisplayName   string  `json:"display_name" validate:"required,max=100"`
+	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25"`
 }
