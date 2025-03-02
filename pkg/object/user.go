@@ -32,13 +32,13 @@ type User struct {
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at"`
 
-	Username      string `json:"username;type:varchar(100)"`
-	DisplayName   string `json:"display_name;type:varchar(100)"`
-	Email         string `json:"email;type:varchar(100);index"`
+	Username      string `json:"username"  gorm:"type:varchar(100)"`
+	DisplayName   string `json:"display_name"  gorm:"type:varchar(100)"`
+	Email         string `json:"email" gorm:"type:varchar(100);index"`
 	EmailVerified bool   `json:"email_verified"`
-	PasswordHash  string `json:"password_hash;type:varchar(150)"`
-	PasswordSalt  string `json:"password_salt;type:varchar(100)"`
-	PasswordType  string `json:"password_type;type:varchar(100)"`
+	PasswordHash  string `json:"password_hash" gorm:"type:varchar(150)"`
+	PasswordSalt  string `json:"password_salt" gorm:"type:varchar(100)"`
+	PasswordType  string `json:"password_type" gorm:"type:varchar(100)"`
 
 	Groups []Group `json:"groups" gorm:"many2many:user_groups;"`
 }
