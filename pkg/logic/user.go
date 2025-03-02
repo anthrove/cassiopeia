@@ -53,6 +53,9 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		}
 	}
 
+	// TODO: Verify that the user dose not already exist in the tenant
+	// TODO: If user email is not verified: error with "account with email already exists"
+
 	userTenant, err := is.FindTenant(ctx, tenantID)
 	if err != nil {
 		return object.User{}, err
