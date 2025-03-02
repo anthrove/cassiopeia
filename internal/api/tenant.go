@@ -32,6 +32,7 @@ import (
 //   - c: a gin.Context instance representing the context of the HTTP request.
 //
 //	@Summary	Creates a new Tenant
+//	@Tags		Tenant API
 //	@Accept		json
 //	@Produce	json
 //	@Param		"Tenant"	body		object.CreateTenant					true	"Create Tenant Data"
@@ -72,6 +73,7 @@ func (ir IdentityRoutes) createTenant(c *gin.Context) {
 //   - c: a gin.Context instance representing the context of the HTTP request.
 //
 //	@Summary	Update an existing Tenant
+//	@Tags		Tenant API
 //	@Accept		json
 //	@Produce	json
 //	@Param		tenant_id	path	string				true	"Tenant ID"
@@ -105,7 +107,7 @@ func (ir IdentityRoutes) updateTenant(c *gin.Context) {
 }
 
 //	@Summary	Delete a Tenant
-//
+//	@Tags		Tenant API
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	body	string	true	"Tenant ID"
@@ -127,7 +129,7 @@ func (ir IdentityRoutes) killTenant(c *gin.Context) {
 }
 
 //	@Summary	Get a Tenant by ID
-//
+//	@Tags		Tenant API
 //	@Accept		json
 //	@Produce	json
 //	@Param		tenant_id	path		string								true	"Tenant ID"
@@ -151,7 +153,7 @@ func (ir IdentityRoutes) findTenant(c *gin.Context) {
 }
 
 //	@Summary	Get all Tenants
-//
+//	@Tags		Tenant API
 //	@Accept		json
 //	@Produce	json
 //	@Param		page		query		string									false	"Page"
