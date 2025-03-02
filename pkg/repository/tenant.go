@@ -22,6 +22,16 @@ import (
 	"gorm.io/gorm"
 )
 
+// CreateTenant creates a new tenant in the database.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - db: a gorm.DB instance representing the database connection.
+//   - createTenant: object containing the details of the tenant to be created.
+//
+// Returns:
+//   - Tenant object if creation is successful.
+//   - Error if there is any issue during creation.
 func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTenant) (object.Tenant, error) {
 	tenant := object.Tenant{
 		DisplayName:  createTenant.DisplayName,
@@ -33,6 +43,16 @@ func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTe
 	return tenant, err
 }
 
+// UpdateTenant updates an existing tenant's information in the database.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - db: a gorm.DB instance representing the database connection.
+//   - tenantID: unique identifier of the tenant to be updated.
+//   - updateTenant: object containing the updated details of the tenant.
+//
+// Returns:
+//   - Error if there is any issue during updating.
 func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenant object.UpdateTenant) error {
 	tenant := object.Tenant{
 		DisplayName:  updateTenant.DisplayName,
@@ -46,16 +66,45 @@ func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenan
 	return err
 }
 
+// KillTenant deletes an existing tenant from the database.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - db: a gorm.DB instance representing the database connection.
+//   - tenantID: unique identifier of the tenant to be deleted.
+//
+// Returns:
+//   - Error if there is any issue during deletion.
 func KillTenant(ctx context.Context, db *gorm.DB, tenantID string) error {
 	return db.WithContext(ctx).Delete(&object.Tenant{}, "id = ?", tenantID).Error
 }
 
+// FindTenant retrieves a specific tenant from the database.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - db: a gorm.DB instance representing the database connection.
+//   - tenantID: unique identifier of the tenant to be retrieved.
+//
+// Returns:
+//   - Tenant object if retrieval is successful.
+//   - Error if there is any issue during retrieval.
 func FindTenant(ctx context.Context, db *gorm.DB, tenantID string) (object.Tenant, error) {
 	var tenant object.Tenant
 	err := db.WithContext(ctx).Take(&tenant, "id = ?", tenantID).Error
 	return tenant, err
 }
 
+// FindTenants retrieves a list of tenants from the database, with pagination support.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - db: a gorm.DB instance representing the database connection.
+//   - pagination: object containing pagination details (limit and page).
+//
+// Returns:
+//   - Slice of Tenant objects if retrieval is successful.
+//   - Error if there is any issue during retrieval.
 func FindTenants(ctx context.Context, db *gorm.DB, pagination object.Pagination) ([]object.Tenant, error) {
 	var data []object.Tenant
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Find(&data).Error

@@ -24,6 +24,11 @@ import (
 	"strconv"
 )
 
+// Pagination is a middleware function for handling pagination in HTTP requests.
+// It extracts the page and page_limit query parameters, validates them, and sets a Pagination object in the context.
+//
+// Returns:
+//   - A gin.HandlerFunc that can be used as middleware in a Gin router.
 func Pagination() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		page := c.DefaultQuery("page", "1")
