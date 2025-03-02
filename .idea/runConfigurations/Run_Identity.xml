@@ -17,7 +17,7 @@
       </ENTRIES>
     </EXTENSION>
     <kind value="PACKAGE" />
-    <package value="github.com/anthrove/identity/cmd/indentity" />
+    <package value="github.com/anthrove/identity/cmd/identity" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$/cmd/indentity/main.go" />
     <method v="2" />

@@ -28,7 +28,16 @@ import (
 // If successful, it returns the created tenant; otherwise, it returns an error response.
 //
 // Parameters:
+//
 //   - c: a gin.Context instance representing the context of the HTTP request.
+//
+//	@Summary	Creates a new Tenant
+//	@Accept		json
+//	@Produce	json
+//	@Param		"Tenant"	body		object.CreateTenant					true	"Create Tenant Data"
+//	@Success	200			{object}	HttpResponse{data=object.Tenant{}}	"Tenant"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant [post]
 func (ir IdentityRoutes) createTenant(c *gin.Context) {
 	var body object.CreateTenant
 	err := c.ShouldBind(&body)
@@ -59,7 +68,17 @@ func (ir IdentityRoutes) createTenant(c *gin.Context) {
 // If successful, it returns an empty response; otherwise, it returns an error response.
 //
 // Parameters:
+//
 //   - c: a gin.Context instance representing the context of the HTTP request.
+//
+//	@Summary	Update an existing Tenant
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path	string				true	"Tenant ID"
+//	@Param		"Tenant"	body	object.UpdateTenant	true	"Update Tenant Data"
+//	@Success	200
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id} [put]
 func (ir IdentityRoutes) updateTenant(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -82,11 +101,17 @@ func (ir IdentityRoutes) updateTenant(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, HttpResponse{
-		Data: gin.H{},
-	})
+	c.Status(http.StatusOK)
 }
 
+//	@Summary	Delete a Tenant
+//
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	body	string	true	"Tenant ID"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id} [delete]
 func (ir IdentityRoutes) killTenant(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -101,6 +126,14 @@ func (ir IdentityRoutes) killTenant(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+//	@Summary	Get a Tenant by ID
+//
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path		string								true	"Tenant ID"
+//	@Success	200			{object}	HttpResponse{data=object.Tenant{}}	"Tenant"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id} [get]
 func (ir IdentityRoutes) findTenant(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -117,6 +150,15 @@ func (ir IdentityRoutes) findTenant(c *gin.Context) {
 	})
 }
 
+//	@Summary	Get all Tenants
+//
+//	@Accept		json
+//	@Produce	json
+//	@Param		page		query		string									false	"Page"
+//	@Param		page_limit	query		string									false	"Page Limit"
+//	@Success	200			{object}	HttpResponse{data=[]object.Tenant{}}	"Tenant"
+//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant [get]
 func (ir IdentityRoutes) findTenants(c *gin.Context) {
 	pagination, ok := c.Get("pagination")
 	if !ok {

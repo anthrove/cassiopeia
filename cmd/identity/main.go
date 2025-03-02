@@ -24,6 +24,11 @@ import (
 	"log"
 )
 
+//	@contact.name	API Support
+//	@contact.email	support@anthrove.art
+
+// @license.name	Apache 2.0
+// @license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 func main() {
 	engine, err := repository.GetEngine()
 

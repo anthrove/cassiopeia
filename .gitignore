@@ -33,3 +33,5 @@ go.work.sum
 !.idea/copyright
 
 gorm.db
+
+docs

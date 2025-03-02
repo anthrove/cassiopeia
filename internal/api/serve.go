@@ -17,8 +17,11 @@
 package api
 
 import (
+	"github.com/anthrove/identity/docs"
 	"github.com/anthrove/identity/pkg/logic"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // IdentityRoutes defines the routes related to identity management.
@@ -34,6 +37,9 @@ type IdentityRoutes struct {
 //   - r: a gin.Engine instance representing the HTTP router.
 //   - service: an instance of IdentityService containing the business logic for identity management.
 func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
+	docs.SwaggerInfo.BasePath = ""
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	identityRoutes := &IdentityRoutes{service}
 
 	v1 := r.Group("/api/v1")
