@@ -79,14 +79,40 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 	return repository.UpdateTenant(ctx, is.db, tenantID, updateTenant)
 }
 
+// KillTenant deletes an existing tenant from the system.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - tenantID: unique identifier of the tenant to be deleted.
+//
+// Returns:
+//   - Error if there is any issue during deletion.
 func (is IdentityService) KillTenant(ctx context.Context, tenantID string) error {
 	return repository.KillTenant(ctx, is.db, tenantID)
 }
 
+// FindTenant retrieves a specific tenant from the system.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - tenantID: unique identifier of the tenant to be retrieved.
+//
+// Returns:
+//   - Tenant object if retrieval is successful.
+//   - Error if there is any issue during retrieval.
 func (is IdentityService) FindTenant(ctx context.Context, tenantID string) (object.Tenant, error) {
 	return repository.FindTenant(ctx, is.db, tenantID)
 }
 
+// FindTenants retrieves a list of tenants from the system, with pagination support.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - pagination: object containing pagination details (limit and page).
+//
+// Returns:
+//   - Slice of Tenant objects if retrieval is successful.
+//   - Error if there is any issue during retrieval.
 func (is IdentityService) FindTenants(ctx context.Context, pagination object.Pagination) ([]object.Tenant, error) {
 	return repository.FindTenants(ctx, is.db, pagination)
 }

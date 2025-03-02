@@ -58,12 +58,16 @@ func (base *Group) BeforeCreate(db *gorm.DB) error {
 	return nil
 }
 
+// CreateGroup represents the data required to create a new group.
+// It includes the display name and an optional parent group ID, both of which have validation constraints.
 type CreateGroup struct {
-	DisplayName   string  `json:"display_name" validate:"required,max=100"  maxLength:"100" example:"Tenant Title"`
+	DisplayName   string  `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Tenant Title"`
 	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25" maxLength:"25" minLength:"25"`
 }
 
+// UpdateGroup represents the data required to update an existing group.
+// It includes the display name and an optional parent group ID, both of which have validation constraints.
 type UpdateGroup struct {
-	DisplayName   string  `json:"display_name" validate:"required,max=100"  maxLength:"100" example:"Tenant Title"`
+	DisplayName   string  `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Tenant Title"`
 	ParentGroupID *string `json:"parent_group_id" validate:"omitnil,len=25" maxLength:"25" minLength:"25"`
 }
