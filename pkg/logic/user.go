@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/anthrove/identity/pkg/crypto"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
@@ -62,7 +63,15 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		return object.User{}, err
 	}
 
-	passwordHash := "" //TODO: Implement the Provider for password hashing
+	passwordHasher, err := crypto.GetPasswordHasher(userTenant.PasswordType)
+	if err != nil {
+		return object.User{}, err
+	}
+
+	passwordHash, err := passwordHasher.HashPassword(createUser.Password, passwordSalt)
+	if err != nil {
+		return object.User{}, err
+	}
 
 	user := object.User{
 		TenantID:     tenantID,
