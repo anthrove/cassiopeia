@@ -25,8 +25,8 @@ import (
 // User represents a user entity in the system.
 // It contains information about the user such as their ID, organisation ID, timestamps, username, display name, email, password details, and associated groups.
 type User struct {
-	ID             string `json:"id" gorm:"primaryKey;type:char(25)"`
-	OrganisationID string `json:"organisation_id"`
+	ID       string `json:"id" gorm:"primaryKey;type:char(25)"`
+	TenantID string `json:"tenant_id"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
@@ -62,4 +62,19 @@ func (base *User) BeforeCreate(db *gorm.DB) error {
 	}
 
 	return nil
+}
+
+type CreateUser struct {
+	Username    string `json:"username"  validate:"required,max=100"`
+	DisplayName string `json:"display_name" validate:"required,max=100"`
+	Email       string `json:"email" validate:"required,max=100,email"`
+	Password    string `json:"password" validate:"required,max=100"`
+}
+
+type UpdateUser struct {
+	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
+}
+
+type UpdateUserPassword struct {
+	Password string `json:"password" validate:"required,max=100"`
 }
