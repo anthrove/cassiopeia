@@ -17,11 +17,15 @@
 package email
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/go-playground/validator/v10"
+	"net"
+	"net/mail"
+	"net/smtp"
 )
 
 type smtpConfiguration struct {
@@ -96,7 +100,82 @@ func (s smtpProvider) ValidateConfigurationFields() error {
 	return nil
 }
 
-func (s smtpProvider) SendMail(fromAddress string, fromName string, toAddress, subject string, body string) error {
-	//TODO implement me
-	panic("implement me")
+func (s smtpProvider) SendMail(toAddress string, subject string, body string) error {
+	smtpConfig := smtpConfiguration{}
+
+	err := json.Unmarshal(s.provider.Parameter, &smtpConfig)
+	if err != nil {
+		return err
+	}
+
+	from := mail.Address{Name: smtpConfig.FromName, Address: smtpConfig.From}
+	to := mail.Address{Address: toAddress}
+
+	// Setup headers
+	headers := make(map[string]string)
+	headers["From"] = from.String()
+	headers["To"] = to.String()
+	headers["Subject"] = subject
+
+	// Setup message
+	message := ""
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + body
+
+	servername := fmt.Sprintf("%s:%d", smtpConfig.Host, smtpConfig.Port)
+	host, _, _ := net.SplitHostPort(servername)
+
+	auth := smtp.PlainAuth("", smtpConfig.Username, smtpConfig.Password, host)
+
+	var tlsConfig *tls.Config
+	if smtpConfig.SSL {
+		tlsConfig = &tls.Config{
+			InsecureSkipVerify: true,
+			ServerName:         host,
+		}
+	}
+
+	// Here is the key, you need to call tls.Dial instead of smtp.Dial
+	// for smtp servers running on 465 that require an ssl connection
+	// from the very beginning (no starttls)
+	conn, err := tls.Dial("tcp", servername, tlsConfig)
+	if err != nil {
+		return err
+	}
+
+	c, err := smtp.NewClient(conn, host)
+	if err != nil {
+		return err
+	}
+	defer c.Quit()
+
+	// Auth
+	if err = c.Auth(auth); err != nil {
+		return err
+	}
+
+	// To && From
+	if err = c.Mail(from.Address); err != nil {
+		return err
+	}
+
+	if err = c.Rcpt(toAddress); err != nil {
+		return err
+	}
+
+	// Data
+	w, err := c.Data()
+	if err != nil {
+		return err
+	}
+	defer w.Close()
+
+	_, err = w.Write([]byte(message))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

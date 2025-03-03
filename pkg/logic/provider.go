@@ -14,23 +14,4 @@
  * limitations under the License.
  */
 
-package email
-
-import (
-	"errors"
-	"github.com/anthrove/identity/pkg/object"
-)
-
-type Provider interface {
-	GetConfigurationFields() []object.ProviderConfigurationField
-	ValidateConfigurationFields() error
-	SendMail(toAddress, subject string, body string) error
-}
-
-func GetEMailProvider(provider object.Provider) (Provider, error) {
-	switch provider.ProviderType {
-	case "smtp":
-		return newSMTPProvider(provider)
-	}
-	return nil, errors.New("unknown email provider: " + provider.ProviderType)
-}
+package logic
