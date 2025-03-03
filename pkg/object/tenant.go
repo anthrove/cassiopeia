@@ -33,7 +33,8 @@ type Tenant struct {
 	DisplayName  string `json:"display_name" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
 	PasswordType string `json:"password_type" gorm:"type:varchar(100)" maxLength:"100" example:"bcrypt"`
 
-	Groups []Group `json:"-" swaggerignore:"true"`
+	Groups    []Group    `json:"-" swaggerignore:"true"`
+	Providers []Provider `json:"-" swaggerignore:"true"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new tenant record is inserted into the database.
