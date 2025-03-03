@@ -115,29 +115,31 @@ func FindUsers(ctx context.Context, db *gorm.DB, tenantID string, pagination obj
 // Parameters:
 //   - ctx: context for managing request-scoped values, cancelation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
+//   - tenantID: unique identifier of the tenant to which the users belong.
 //   - username: the username of the user to be retrieved.
 //
 // Returns:
 //   - User object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func FindUserByUsername(ctx context.Context, db *gorm.DB, username string) (object.User, error) {
+func FindUserByUsername(ctx context.Context, db *gorm.DB, tenantID string, username string) (object.User, error) {
 	var user object.User
-	err := db.WithContext(ctx).Take(&user, "username = ?", username).Error
+	err := db.WithContext(ctx).Take(&user, "tenant_id = ? AND username = ?", tenantID, username).Error
 	return user, err
 }
 
-// FindUserByEmail retrieves a user from the database based on their email address.
+// FindUsersByEmail retrieves a user from the database based on their email.
 //
 // Parameters:
 //   - ctx: context for managing request-scoped values, cancelation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
+//   - tenantID: unique identifier of the tenant to which the users belong.
 //   - email: the email address of the user to be retrieved.
 //
 // Returns:
 //   - User object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func FindUserByEmail(ctx context.Context, db *gorm.DB, email string) (object.User, error) {
-	var user object.User
-	err := db.WithContext(ctx).Take(&user, "email = ?", email).Error
-	return user, err
+func FindUsersByEmail(ctx context.Context, db *gorm.DB, tenantID string, email string) ([]object.User, error) {
+	var users []object.User
+	err := db.WithContext(ctx).Model(object.User{}).Where("tenant_id = ? AND email = ?", tenantID, email).Scan(&users).Error
+	return users, err
 }

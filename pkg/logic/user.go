@@ -53,8 +53,25 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		}
 	}
 
-	// TODO: Verify that the user dose not already exist in the tenant
-	// TODO: If user email is not verified: error with "account with email already exists"
+	// If user already exists, no error returned!
+	user, err := is.FindUserByUsername(ctx, tenantID, createUser.Username)
+	if err == nil {
+		return object.User{}, errors.New("username already exists")
+	}
+	// ==============================================
+
+	// Check if email already exists while verified.
+	// We want to make sure nobody is blocking a email while not verifying it!
+	users, err := is.FindUsersByEmail(ctx, tenantID, createUser.Email)
+	if err != nil {
+		return object.User{}, err
+	}
+
+	for _, user := range users {
+		if user.EmailVerified == true {
+			return object.User{}, errors.New("email is already verified")
+		}
+	}
 
 	userTenant, err := is.FindTenant(ctx, tenantID)
 	if err != nil {
@@ -76,7 +93,7 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		return object.User{}, err
 	}
 
-	user := object.User{
+	user = object.User{
 		TenantID:     tenantID,
 		Username:     createUser.Username,
 		DisplayName:  createUser.DisplayName,
@@ -181,4 +198,48 @@ func (is IdentityService) FindUsers(ctx context.Context, tenantID string, pagina
 	}
 
 	return repository.FindUsers(ctx, is.db, tenantID, pagination)
+}
+
+// FindUserByUsername retrieves a user within a specified tenant based on their username.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - tenantID: unique identifier of the tenant to which the user belongs.
+//   - userName: the username of the user to be retrieved.
+//
+// Returns:
+//   - User object if retrieval is successful.
+//   - Error if there is any issue during retrieval.
+func (is IdentityService) FindUserByUsername(ctx context.Context, tenantID string, userName string) (object.User, error) {
+	if len(tenantID) == 0 {
+		return object.User{}, errors.New("tenantID is required")
+	}
+
+	if len(userName) == 0 {
+		return object.User{}, errors.New("userName is required")
+	}
+
+	return repository.FindUserByUsername(ctx, is.db, tenantID, userName)
+}
+
+// FindUsersByEmail retrieves a user within a specified tenant based on their email.
+//
+// Parameters:
+//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - tenantID: unique identifier of the tenant to which the user belongs.
+//   - email: the email address of the user to be retrieved.
+//
+// Returns:
+//   - User object if retrieval is successful.
+//   - Error if there is any issue during retrieval.
+func (is IdentityService) FindUsersByEmail(ctx context.Context, tenantID string, email string) ([]object.User, error) {
+	if len(tenantID) == 0 {
+		return nil, errors.New("tenantID is required")
+	}
+
+	if len(email) == 0 {
+		return nil, errors.New("email is required")
+	}
+
+	return repository.FindUsersByEmail(ctx, is.db, tenantID, email)
 }
