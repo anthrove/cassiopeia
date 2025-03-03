@@ -16,7 +16,7 @@
 
 package identity
 
+//go:generate go fmt
 //go:generate swag fmt
 //go:generate swag init --parseDependency --parseInternal -g "./cmd/identity/main.go" -o "./docs"
 //go:generate go mod tidy
-//go:generate go fmt
