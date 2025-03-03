@@ -19,13 +19,25 @@ package util
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"math/big"
+	"strconv"
 )
 
-func RandomString(size int) (string, error) {
+func RandomSaltString(size int) (string, error) {
 	salt := make([]byte, size)
 	_, err := rand.Read(salt)
 	if err != nil {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(salt), nil
+}
+
+func RandomNumber(amount int) int {
+	var numberStr string
+	for i := 0; i < amount; i++ {
+		digit, _ := rand.Int(rand.Reader, big.NewInt(10)) // generates a random digit between 0 and 9
+		numberStr += digit.String()
+	}
+	number, _ := strconv.Atoi(numberStr)
+	return number
 }

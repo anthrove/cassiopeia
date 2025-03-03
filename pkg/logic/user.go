@@ -25,6 +25,7 @@ import (
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
+	"strconv"
 )
 
 // CreateUser creates a new user within a specified tenant.
@@ -78,7 +79,7 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		return object.User{}, err
 	}
 
-	passwordSalt, err := util.RandomString(25)
+	passwordSalt, err := util.RandomSaltString(25)
 	if err != nil {
 		return object.User{}, err
 	}
@@ -93,14 +94,17 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		return object.User{}, err
 	}
 
+	emailVerificationToken := util.RandomNumber(6)
+
 	user = object.User{
-		TenantID:     tenantID,
-		Username:     createUser.Username,
-		DisplayName:  createUser.DisplayName,
-		Email:        createUser.Email,
-		PasswordSalt: passwordSalt,
-		PasswordType: userTenant.PasswordType,
-		PasswordHash: passwordHash,
+		TenantID:               tenantID,
+		Username:               createUser.Username,
+		DisplayName:            createUser.DisplayName,
+		Email:                  createUser.Email,
+		EmailVerificationToken: strconv.Itoa(emailVerificationToken),
+		PasswordSalt:           passwordSalt,
+		PasswordType:           userTenant.PasswordType,
+		PasswordHash:           passwordHash,
 	}
 
 	return repository.CreateUser(ctx, is.db, tenantID, user)
