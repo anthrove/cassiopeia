@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2025 Anthrove
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package api
 
 import (
@@ -23,21 +7,21 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new Group
-// @Tags		Group API
+// @Summary	Creates a new User
+// @Tags		User API
 // @Accept		json
 // @Produce	json
 //
 // @Param		tenant_id	path		string								true	"Tenant ID"
 //
-// @Param		"Group"		body		object.CreateGroup					true	"Create Group Data"
-// @Success	200			{object}	HttpResponse{data=object.Group{}}	"Group"
+// @Param		"User"		body		object.CreateUser					true	"Create User Data"
+// @Success	200			{object}	HttpResponse{data=object.User{}}	"User"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/group [post]
-func (ir IdentityRoutes) createGroup(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/user [post]
+func (ir IdentityRoutes) createUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
-	var body object.CreateGroup
+	var body object.CreateUser
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -47,7 +31,7 @@ func (ir IdentityRoutes) createGroup(c *gin.Context) {
 		return
 	}
 
-	group, err := ir.service.CreateGroup(c, tenantID, body)
+	user, err := ir.service.CreateUser(c, tenantID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -57,27 +41,27 @@ func (ir IdentityRoutes) createGroup(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, HttpResponse{
-		Data: group,
+		Data: user,
 	})
 }
 
-// @Summary	Update an existing Group
-// @Tags		Group API
+// @Summary	Update an existing User
+// @Tags		User API
 // @Accept		json
 // @Produce	json
 //
 // @Param		tenant_id	path	string				true	"Tenant ID"
-// @Param		group_id	path	string				true	"Group ID"
+// @Param		user_id		path	string				true	"User ID"
 //
-// @Param		"Group"		body	object.UpdateGroup	true	"Create Group Data"
+// @Param		"User"		body	object.UpdateUser	true	"Update User Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/group/{group_id} [put]
-func (ir IdentityRoutes) updateGroup(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [put]
+func (ir IdentityRoutes) updateUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	groupID := c.Param("group_id")
+	userID := c.Param("user_id")
 
-	var body object.UpdateGroup
+	var body object.UpdateUser
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -87,7 +71,7 @@ func (ir IdentityRoutes) updateGroup(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateGroup(c, tenantID, groupID, body)
+	err = ir.service.UpdateUser(c, tenantID, userID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -101,22 +85,22 @@ func (ir IdentityRoutes) updateGroup(c *gin.Context) {
 	})
 }
 
-// @Summary	Kill an existing Group
-// @Tags		Group API
+// @Summary	Delete an existing User
+// @Tags		User API
 // @Accept		json
 // @Produce	json
 //
 // @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		group_id	path	string	true	"Group ID"
+// @Param		user_id		path	string	true	"User ID"
 //
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/group/{group_id} [delete]
-func (ir IdentityRoutes) killGroup(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [delete]
+func (ir IdentityRoutes) killUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	groupID := c.Param("group_id")
+	userID := c.Param("user_id")
 
-	err := ir.service.KillGroup(c, tenantID, groupID)
+	err := ir.service.KillUser(c, tenantID, userID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -127,20 +111,20 @@ func (ir IdentityRoutes) killGroup(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing Group
-// @Tags		Group API
+// @Summary	Get an existing User
+// @Tags		User API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path		string								true	"Tenant ID"
-// @Param		group_id	path		string								true	"Group ID"
-// @Success	200			{object}	HttpResponse{data=object.Group{}}	"Group"
+// @Param		user_id		path		string								true	"User ID"
+// @Success	200			{object}	HttpResponse{data=object.User{}}	"User"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/group/{group_id} [get]
-func (ir IdentityRoutes) findGroup(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [get]
+func (ir IdentityRoutes) findUser(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	groupID := c.Param("group_id")
+	userID := c.Param("user_id")
 
-	group, err := ir.service.FindGroup(c, tenantID, groupID)
+	user, err := ir.service.FindUser(c, tenantID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
 			Error: err.Error(),
@@ -149,12 +133,12 @@ func (ir IdentityRoutes) findGroup(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: group,
+		Data: user,
 	})
 }
 
-// @Summary	Get existing Groups
-// @Tags		Group API
+// @Summary	Get existing Users
+// @Tags		User API
 // @Accept		json
 // @Produce	json
 //
@@ -162,10 +146,10 @@ func (ir IdentityRoutes) findGroup(c *gin.Context) {
 // @Param		page_limit	query		string								false	"Page Limit"
 //
 // @Param		tenant_id	path		string								true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.Group{}}	"Group"
+// @Success	200			{object}	HttpResponse{data=[]object.User{}}	"User"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/group [get]
-func (ir IdentityRoutes) findGroups(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/user [get]
+func (ir IdentityRoutes) findUsers(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
 	pagination, ok := c.Get("pagination")
@@ -182,7 +166,7 @@ func (ir IdentityRoutes) findGroups(c *gin.Context) {
 		return
 	}
 
-	groups, err := ir.service.FindGroups(c, tenantID, paginationObj)
+	users, err := ir.service.FindUsers(c, tenantID, paginationObj)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
@@ -191,6 +175,6 @@ func (ir IdentityRoutes) findGroups(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: groups,
+		Data: users,
 	})
 }
