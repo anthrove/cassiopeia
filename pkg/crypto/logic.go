@@ -19,6 +19,7 @@ package crypto
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/crypto/sha3"
 )
 
 type PasswordHasher interface {
@@ -32,6 +33,8 @@ func GetPasswordHasher(passwordType string) (PasswordHasher, error) {
 		return NewBcryptHasher(bcrypt.DefaultCost), nil
 	case "argon2id":
 		return NewArgon2IDHasher(16*1024, 3, 2, 16, 32), nil
+	case "pbkdf2":
+		return NewPBKDF2Hasher(sha3.New256, 1000, 32), nil
 	default:
 		return nil, fmt.Errorf("unsupported password type: %s", passwordType)
 	}
