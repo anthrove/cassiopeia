@@ -16,7 +16,11 @@
 
 package crypto
 
-import "testing"
+import (
+	"golang.org/x/crypto/bcrypt"
+	"sync"
+	"testing"
+)
 
 func Test_bcryptHasher_ComparePassword(t *testing.T) {
 	type fields struct {
@@ -74,4 +78,47 @@ func Test_bcryptHasher_ComparePassword(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Benchmark_bcryptHasher_Speed(b *testing.B) {
+	hasher := bcryptHasher{
+		costs: bcrypt.DefaultCost,
+	}
+
+	password := "password123"
+	salt := "SomeSalt"
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := hasher.HashPassword(password, salt)
+		if err != nil {
+			b.Fatalf("HashPassword() error = %v", err)
+		}
+	}
+}
+
+func Benchmark_bcryptHasher_SpeedParallel(b *testing.B) {
+	hasher := bcryptHasher{
+		costs: bcrypt.DefaultCost,
+	}
+
+	password := "password123"
+	salt := "SomeSalt"
+
+	var wg sync.WaitGroup
+
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, err := hasher.HashPassword(password, salt)
+			if err != nil {
+				b.Errorf("HashPassword() error = %v", err)
+			}
+		}()
+	}
+	wg.Wait()
 }
