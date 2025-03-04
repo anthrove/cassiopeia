@@ -291,6 +291,8 @@ func Benchmark_scryptHasher_HashPassword(b *testing.B) {
 	password := "password123"
 	salt := "SomeSalt"
 
+	b.ReportAllocs()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_, err := hasher.HashPassword(password, salt)
 		if err != nil {
@@ -309,6 +311,8 @@ func Benchmark_scryptHasher_HashPasswordParallel(b *testing.B) {
 	password := "password123"
 	salt := "SomeSalt"
 
+	b.ReportAllocs()
+	b.ResetTimer()
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			_, err := hasher.HashPassword(password, salt)
