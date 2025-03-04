@@ -22,24 +22,37 @@ import (
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/go-playground/validator/v10"
+	"github.com/qor/oss/filesystem"
 )
 
 type localConfiguration struct {
-	basePath string
+	BasePath string `json:"base_path" validate:"required"`
 }
 
 type localProvider struct {
+	filesystem.FileSystem
 	provider object.Provider
 }
 
 func newLocalProvider(provider object.Provider) (Provider, error) {
-	return localProvider{provider: provider}, nil
+	var parameters map[string]string
+	err := json.Unmarshal(provider.Parameter, &parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	return localProvider{
+		FileSystem: filesystem.FileSystem{
+			Base: parameters["base_path"],
+		},
+		provider: provider,
+	}, nil
 }
 
 func (l localProvider) GetConfigurationFields() []object.ProviderConfigurationField {
 	return []object.ProviderConfigurationField{
 		{
-			FieldKey:  "basePath",
+			FieldKey:  "base_path",
 			FieldType: "text",
 		},
 	}
@@ -64,14 +77,4 @@ func (l localProvider) ValidateConfigurationFields() error {
 	}
 
 	return nil
-}
-
-func (l localProvider) GetFile() error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (l localProvider) SaveFile() error {
-	//TODO implement me
-	panic("implement me")
 }

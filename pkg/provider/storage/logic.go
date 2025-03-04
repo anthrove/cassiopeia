@@ -19,19 +19,26 @@ package storage
 import (
 	"errors"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/qor/oss"
+	"io"
+	"os"
 )
 
 type Provider interface {
 	GetConfigurationFields() []object.ProviderConfigurationField
-	ValidateConfigurationFields() error
-	GetFile() error
-	SaveFile() error
+	Get(path string) (*os.File, error)
+	GetStream(path string) (io.ReadCloser, error)
+	Put(path string, reader io.Reader) (*oss.Object, error)
+	Delete(path string) error
+	List(path string) ([]*oss.Object, error)
+	GetEndpoint() string
+	GetURL(path string) (string, error)
 }
 
 func GetStorageProvider(provider object.Provider) (Provider, error) {
 	switch provider.ProviderType {
 	case "local":
-		return nil, nil
+		return newLocalProvider(provider)
 	}
 	return nil, errors.New("unknown storage provider: " + provider.ProviderType)
 
