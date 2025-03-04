@@ -17,30 +17,41 @@
 package logic
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider/email"
 	"github.com/go-playground/validator/v10"
-	"gorm.io/gorm"
 )
 
-// use a single instance of Validate, it caches struct info
-var validate *validator.Validate
-
-// IdentityService provides methods to interact with the identity database.
-type IdentityService struct {
-	db *gorm.DB
-}
-
-// NewIdentityService initializes a new IdentityService with the given database connection.
-// It also sets up the validator instance used for validating structs.
-//
-// Parameters:
-//   - db: a gorm.DB instance representing the database connection.
-//
-// Returns:
-//   - An initialized IdentityService instance.
-func NewIdentityService(db *gorm.DB) IdentityService {
-	validate = validator.New(validator.WithRequiredStructEnabled())
-
-	return IdentityService{
-		db: db,
+func (is IdentityService) SendMail(ctx context.Context, tenantID string, providerID string, mailData object.SendMailData) error {
+	providerObj, err := is.FindProvider(ctx, tenantID, providerID)
+	if err != nil {
+		return err
 	}
+
+	if providerObj.Category != "email" {
+		return errors.New("provider category not email")
+	}
+
+	provider, err := email.GetEMailProvider(providerObj)
+	if err != nil {
+		return err
+	}
+
+	err = validate.Struct(mailData)
+	if err != nil {
+		var validateErrs validator.ValidationErrors
+		if errors.As(err, &validateErrs) {
+			return errors.Join(fmt.Errorf("problem while validating send mail data"), validateErrs)
+		}
+	}
+
+	err = provider.SendMail(mailData.To, mailData.Subject, mailData.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
