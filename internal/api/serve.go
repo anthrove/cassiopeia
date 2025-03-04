@@ -68,6 +68,12 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/provider/:provider_id", identityRoutes.killProvider)
 	v1.POST("/tenant/:tenant_id/provider/:provider_id/mail", identityRoutes.SendMail)
 
+	v1.POST("/tenant/:tenant_id/certificate", identityRoutes.createCertificate)
+	v1.GET("/tenant/:tenant_id/certificate", Pagination(), identityRoutes.findCertificates)
+	v1.GET("/tenant/:tenant_id/certificate/:certificate_id", identityRoutes.findCertificate)
+	v1.PUT("/tenant/:tenant_id/certificate/:certificate_id", identityRoutes.updateCertificate)
+	v1.DELETE("/tenant/:tenant_id/certificate/:certificate_id", identityRoutes.killCertificate)
+
 	v1.POST("/tenant/:tenant_id/template", identityRoutes.createMessageTemplate)
 	v1.GET("/tenant/:tenant_id/template", Pagination(), identityRoutes.findMessageTemplates)
 	v1.GET("/tenant/:tenant_id/template/:template_id", identityRoutes.findMessageTemplate)
