@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/anthrove/identity/pkg/crypto"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
@@ -48,6 +49,11 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		}
 	}
 
+	_, err = crypto.GetPasswordHasher(createTenant.PasswordType)
+	if err != nil {
+		return object.Tenant{}, errors.New("password type does not match any known types")
+	}
+
 	return repository.CreateTenant(ctx, is.db, createTenant)
 }
 
@@ -74,6 +80,11 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 		if errors.As(err, &validateErrs) {
 			return errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
 		}
+	}
+
+	_, err = crypto.GetPasswordHasher(updateTenant.PasswordType)
+	if err != nil {
+		return errors.New("password type does not match any known types")
 	}
 
 	return repository.UpdateTenant(ctx, is.db, tenantID, updateTenant)
