@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"time"
 )
 
 func Test_argon2IDHasher_HashPassword(t *testing.T) {
@@ -197,7 +196,7 @@ func Test_argon2IDHasher_decodeHash(t *testing.T) {
 	}
 }
 
-func Test_argon2IDHasher_Speed(t *testing.T) {
+func Benchmark_argon2IDHasher_Speed(b *testing.B) {
 	hasher := argon2IDHasher{
 		memory:      16 * 1024,
 		iterations:  3,
@@ -208,45 +207,18 @@ func Test_argon2IDHasher_Speed(t *testing.T) {
 
 	password := "password123"
 	salt := "somesalt"
-	testAmount := 1000
 
-	// Measure hashing speed
-	startHash := time.Now()
-	for i := 0; i < testAmount; i++ {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
 		_, err := hasher.HashPassword(password, salt)
 		if err != nil {
-			t.Fatalf("HashPassword() error = %v", err)
+			b.Fatalf("HashPassword() error = %v", err)
 		}
 	}
-	durationHash := time.Since(startHash)
-
-	// Generate a single hash for comparison
-	hash, err := hasher.HashPassword(password, salt)
-	if err != nil {
-		t.Fatalf("HashPassword() error = %v", err)
-	}
-
-	// Measure comparison speed
-	startCompare := time.Now()
-	for i := 0; i < testAmount; i++ {
-		_, err := hasher.ComparePassword(password, hash, salt)
-		if err != nil {
-			t.Fatalf("ComparePassword() error = %v", err)
-		}
-	}
-	durationCompare := time.Since(startCompare)
-
-	// Calculate average times
-	averageHashTime := durationHash / time.Duration(testAmount)
-	averageCompareTime := durationCompare / time.Duration(testAmount)
-
-	t.Logf("Time taken for %d hashings: %v", testAmount, durationHash)
-	t.Logf("Time taken for %d comparisons: %v", testAmount, durationCompare)
-	t.Logf("Average time per hash: %v", averageHashTime)
-	t.Logf("Average time per comparison: %v", averageCompareTime)
 }
 
-func Test_argon2IDHasher_SpeedParallel(t *testing.T) {
+func Benchmark_argon2IDHasher_SpeedParallel(b *testing.B) {
 	hasher := argon2IDHasher{
 		memory:      16 * 1024,
 		iterations:  3,
@@ -257,52 +229,20 @@ func Test_argon2IDHasher_SpeedParallel(t *testing.T) {
 
 	password := "password123"
 	salt := "somesalt"
-	testAmount := 1000
 
 	var wg sync.WaitGroup
 
-	// Measure hashing speed in parallel
-	startHash := time.Now()
-	for i := 0; i < testAmount; i++ {
+	b.ReportAllocs()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			_, err := hasher.HashPassword(password, salt)
 			if err != nil {
-				t.Errorf("HashPassword() error = %v", err)
+				b.Errorf("HashPassword() error = %v", err)
 			}
 		}()
 	}
 	wg.Wait()
-	durationHash := time.Since(startHash)
-
-	// Generate a single hash for comparison
-	hash, err := hasher.HashPassword(password, salt)
-	if err != nil {
-		t.Fatalf("HashPassword() error = %v", err)
-	}
-
-	// Measure comparison speed in parallel
-	startCompare := time.Now()
-	for i := 0; i < testAmount; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			_, err := hasher.ComparePassword(password, hash, salt)
-			if err != nil {
-				t.Errorf("ComparePassword() error = %v", err)
-			}
-		}()
-	}
-	wg.Wait()
-	durationCompare := time.Since(startCompare)
-
-	// Calculate average times
-	averageHashTime := durationHash / time.Duration(testAmount)
-	averageCompareTime := durationCompare / time.Duration(testAmount)
-
-	t.Logf("Time taken for %d parallel hashings: %v", testAmount, durationHash)
-	t.Logf("Time taken for %d parallel comparisons: %v", testAmount, durationCompare)
-	t.Logf("Average time per parallel hash: %v", averageHashTime)
-	t.Logf("Average time per parallel comparison: %v", averageCompareTime)
 }

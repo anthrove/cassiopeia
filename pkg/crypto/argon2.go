@@ -45,6 +45,14 @@ func NewArgon2IDHasher(memory uint32, iterations uint32, parallelism uint8, salt
 }
 
 func (a argon2IDHasher) HashPassword(password string, salt string) (string, error) {
+	if len(salt) == 0 {
+		return "", errors.New("salt should not be empty")
+	}
+
+	if len(password) == 0 {
+		return "", errors.New("password should not be empty")
+	}
+
 	hash := argon2.IDKey([]byte(password), []byte(salt), a.iterations, a.memory, a.parallelism, a.keyLength)
 
 	b64Salt := base64.RawStdEncoding.EncodeToString([]byte(salt))
