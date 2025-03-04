@@ -16,7 +16,7 @@
 
 package templates
 
-const EMailLVerificationTemplateWithLink = `<!DOCTYPE html>
+const VerificationTemplateWithLink = `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -77,7 +77,7 @@ const EMailLVerificationTemplateWithLink = `<!DOCTYPE html>
 </body>
 </html>`
 
-const EMailLVerificationTemplateWithCode = `<!DOCTYPE html>
+const VerificationTemplateWithCode = `<!DOCTYPE html>
 <html>
 <head>
     <style>
@@ -124,6 +124,108 @@ const EMailLVerificationTemplateWithCode = `<!DOCTYPE html>
         <p class="content">Thank you for registering. Please verify your email address by using the code below:</p>
         <div class="code">{{.VerificationCode}}</div>
         <p class="footer">If you did not register for this account, please ignore this email.</p>
+    </div>
+</body>
+</html>`
+
+const PasswordResetTemplate = `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #f7fafc;
+            color: #2d3748;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .content {
+            margin-bottom: 16px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            color: #ffffff;
+            background-color: #4299e1;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #3182ce;
+        }
+        .link {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #4299e1;
+            word-break: break-all;
+        }
+        .footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Password Reset Request</h1>
+        <p class="content">We received a request to reset your password. Click the link below to reset your password:</p>
+        <a href="{{.ResetLink}}" class="button">Reset Password</a>
+        <p class="content">If the button above does not work, please copy and paste the following link into your browser:</p>
+        <p class="link">{{.ResetLink}}</p>
+        <p class="footer">If you did not request a password reset, please ignore this email.</p>
+    </div>
+</body>
+</html>`
+
+const AccountDeactivationTemplate = `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-color: #f7fafc;
+            color: #2d3748;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .content {
+            margin-bottom: 16px;
+        }
+        .footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Account Deactivation Notice</h1>
+        <p class="content">Your account has been deactivated. If you believe this is a mistake, please contact our support team.</p>
+        <p class="footer">If you did not request this deactivation, please ignore this email.</p>
     </div>
 </body>
 </html>`
