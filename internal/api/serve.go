@@ -61,4 +61,10 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.PUT("/tenant/:tenant_id/user/:user_id", identityRoutes.updateUser)
 	v1.DELETE("/tenant/:tenant_id/user/:user_id", identityRoutes.killUser)
 
+	v1.POST("/tenant/:tenant_id/provider", identityRoutes.createProvider)
+	v1.GET("/tenant/:tenant_id/provider", Pagination(), identityRoutes.findProviders)
+	v1.GET("/tenant/:tenant_id/provider/:provider_id", identityRoutes.findProvider)
+	v1.PUT("/tenant/:tenant_id/provider/:provider_id", identityRoutes.updateProvider)
+	v1.DELETE("/tenant/:tenant_id/provider/:provider_id", identityRoutes.killProvider)
+	v1.POST("/tenant/:tenant_id/provider/:provider_id/mail", identityRoutes.SendMail)
 }
