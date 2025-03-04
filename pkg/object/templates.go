@@ -30,7 +30,7 @@ type MessageTemplate struct {
 	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
 
 	DisplayName  string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	TemplateType int    `json:"template_type" validate:"required"`
+	TemplateType string `json:"template_type" validate:"required"`
 	Template     string `json:"template" validate:"required"`
 }
 
@@ -49,11 +49,15 @@ func (base *MessageTemplate) BeforeCreate(db *gorm.DB) error {
 
 type CreateMessageTemplate struct {
 	DisplayName  string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	TemplateType int    `json:"template_type" validate:"required"`
+	TemplateType string `json:"template_type" validate:"required"`
 	Template     string `json:"template" validate:"required"`
 }
 
 type UpdateMessageTemplate struct {
 	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
 	Template    string `json:"template" validate:"required"`
+}
+
+type FillMessageTemplate struct {
+	Data map[string]any `json:"data" validate:"required"`
 }

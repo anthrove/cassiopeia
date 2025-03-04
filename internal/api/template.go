@@ -18,6 +18,7 @@ package api
 
 import (
 	"errors"
+	"github.com/anthrove/identity/pkg/i18n/templates"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -206,4 +207,50 @@ func (ir IdentityRoutes) findMessageTemplates(c *gin.Context) {
 	c.JSON(http.StatusOK, HttpResponse{
 		Data: tenants,
 	})
+}
+
+// @Summary	Gets a filled template with the data provided
+// @Tags		MessageTemplate API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path		string						true	"Tenant ID"
+// @Param		template_id	path		string						true	"MessageTemplate ID"
+// @Param		"Data"		body		object.FillMessageTemplate	true	"Create MessageTemplate Data"
+//
+// @Success	200			{object}	HttpResponse{data=string}	"MessageTemplate"
+// @Failure	400			{object}	HttpResponse{data=nil}		"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/template/{template_id}/fill [post]
+func (ir IdentityRoutes) fillMessageTemplate(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
+	templateID := c.Param("template_id")
+
+	var body object.FillMessageTemplate
+	err := c.ShouldBind(&body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	template, err := ir.service.FindMessageTemplate(c, tenantID, templateID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	message, err := templates.FillMessageTemplate(template, body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: message,
+	})
+
 }
