@@ -23,17 +23,17 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new Provider
-// @Tags		Provider API
-// @Accept		json
-// @Produce	json
+//	@Summary	Creates a new Provider
+//	@Tags		Provider API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id	path		string									true	"Tenant ID"
+//	@Param		tenant_id	path		string									true	"Tenant ID"
 //
-// @Param		"Provider"	body		object.CreateProvider					true	"Create Provider Data"
-// @Success	200			{object}	HttpResponse{data=object.Provider{}}	"Provider"
-// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider [post]
+//	@Param		"Provider"	body		object.CreateProvider					true	"Create Provider Data"
+//	@Success	200			{object}	HttpResponse{data=object.Provider{}}	"Provider"
+//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/provider [post]
 func (ir IdentityRoutes) createProvider(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -61,18 +61,18 @@ func (ir IdentityRoutes) createProvider(c *gin.Context) {
 	})
 }
 
-// @Summary	Update an existing Provider
-// @Tags		Provider API
-// @Accept		json
-// @Produce	json
+//	@Summary	Update an existing Provider
+//	@Tags		Provider API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id	path	string					true	"Tenant ID"
-// @Param		provider_id	path	string					true	"Provider ID"
+//	@Param		tenant_id	path	string					true	"Tenant ID"
+//	@Param		provider_id	path	string					true	"Provider ID"
 //
-// @Param		"Provider"	body	object.UpdateProvider	true	"Create Provider Data"
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [put]
+//	@Param		"Provider"	body	object.UpdateProvider	true	"Create Provider Data"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [put]
 func (ir IdentityRoutes) updateProvider(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	providerID := c.Param("provider_id")
@@ -99,17 +99,17 @@ func (ir IdentityRoutes) updateProvider(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Kill an existing Provider
-// @Tags		Provider API
-// @Accept		json
-// @Produce	json
+//	@Summary	Kill an existing Provider
+//	@Tags		Provider API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		provider_id	path	string	true	"Provider ID"
+//	@Param		tenant_id	path	string	true	"Tenant ID"
+//	@Param		provider_id	path	string	true	"Provider ID"
 //
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [delete]
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [delete]
 func (ir IdentityRoutes) killProvider(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	providerID := c.Param("provider_id")
@@ -125,15 +125,15 @@ func (ir IdentityRoutes) killProvider(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing Provider
-// @Tags		Provider API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id	path		string									true	"Tenant ID"
-// @Param		provider_id	path		string									true	"Provider ID"
-// @Success	200			{object}	HttpResponse{data=object.Provider{}}	"Provider"
-// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [get]
+//	@Summary	Get an existing Provider
+//	@Tags		Provider API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path		string									true	"Tenant ID"
+//	@Param		provider_id	path		string									true	"Provider ID"
+//	@Success	200			{object}	HttpResponse{data=object.Provider{}}	"Provider"
+//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [get]
 func (ir IdentityRoutes) findProvider(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	providerID := c.Param("provider_id")
@@ -151,18 +151,18 @@ func (ir IdentityRoutes) findProvider(c *gin.Context) {
 	})
 }
 
-// @Summary	Get existing Providers
-// @Tags		Provider API
-// @Accept		json
-// @Produce	json
+//	@Summary	Get existing Providers
+//	@Tags		Provider API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		page		query		string									false	"Page"
-// @Param		page_limit	query		string									false	"Page Limit"
+//	@Param		page		query		string									false	"Page"
+//	@Param		page_limit	query		string									false	"Page Limit"
 //
-// @Param		tenant_id	path		string									true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.Provider{}}	"Provider"
-// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider [get]
+//	@Param		tenant_id	path		string									true	"Tenant ID"
+//	@Success	200			{object}	HttpResponse{data=[]object.Provider{}}	"Provider"
+//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/provider [get]
 func (ir IdentityRoutes) findProviders(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -193,15 +193,15 @@ func (ir IdentityRoutes) findProviders(c *gin.Context) {
 	})
 }
 
-// @Summary	Send Mail from Provider
-// @Tags		Provider API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id	path		string									true	"Tenant ID"
-// @Param		provider_id	path		string									true	"Provider ID"
-// @Success	204
-// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/:provider-id/mail [post]
+//	@Summary	Send Mail from Provider
+//	@Tags		Provider API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path	string	true	"Tenant ID"
+//	@Param		provider_id	path	string	true	"Provider ID"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/provider/:provider-id/mail [post]
 func (ir IdentityRoutes) SendMail(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	providerID := c.Param("provider_id")
