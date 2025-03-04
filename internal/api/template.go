@@ -110,7 +110,7 @@ func (ir IdentityRoutes) updateMessageTemplate(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.Status(http.StatusNoContent)
 }
 
 // @Summary	Delete a MessageTemplate
@@ -143,10 +143,8 @@ func (ir IdentityRoutes) killMessageTemplate(c *gin.Context) {
 // @Tags		MessageTemplate API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path		string										true	"Tenant ID"
 // @Param		template_id	path		string										true	"MessageTemplate ID"
-//
 // @Success	200			{object}	HttpResponse{data=object.MessageTemplate{}}	"MessageTemplate"
 // @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/template/{template_id} [get]
@@ -167,17 +165,16 @@ func (ir IdentityRoutes) findMessageTemplate(c *gin.Context) {
 	})
 }
 
-//	@Summary	Get all MessageTemplates
-//	@Tags		MessageTemplate API
-//	@Accept		json
-//	@Produce	json
-//	@Param		page		query	string	false	"Page"
-//	@Param		page_limit	query	string	false	"Page Limit"
-//	@Param		tenant_id	path	string	true	"Tenant ID"
-//	@Param		template_id	path	string	true	"MessageTemplate ID"
-
-// @Success	200	{object}	HttpResponse{data=[]object.MessageTemplate{}}	"MessageTemplate"
-// @Failure	400	{object}	HttpResponse{data=nil}							"Bad Request"
+// @Summary	Get all MessageTemplates
+// @Tags		MessageTemplate API
+// @Accept		json
+// @Produce	json
+// @Param		page		query		string											false	"Page"
+// @Param		page_limit	query		string											false	"Page Limit"
+// @Param		tenant_id	path		string											true	"Tenant ID"
+// @Param		template_id	path		string											true	"MessageTemplate ID"
+// @Success	200			{object}	HttpResponse{data=[]object.MessageTemplate{}}	"MessageTemplate"
+// @Failure	400			{object}	HttpResponse{data=nil}							"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/template [get]
 func (ir IdentityRoutes) findMessageTemplates(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
@@ -216,7 +213,6 @@ func (ir IdentityRoutes) findMessageTemplates(c *gin.Context) {
 // @Param		tenant_id	path		string						true	"Tenant ID"
 // @Param		template_id	path		string						true	"MessageTemplate ID"
 // @Param		"Data"		body		object.FillMessageTemplate	true	"Create MessageTemplate Data"
-//
 // @Success	200			{object}	HttpResponse{data=string}	"MessageTemplate"
 // @Failure	400			{object}	HttpResponse{data=nil}		"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/template/{template_id}/fill [post]
