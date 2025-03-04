@@ -30,7 +30,14 @@ func GetPasswordHasher(passwordType string) (PasswordHasher, error) {
 	switch passwordType {
 	case "bcrypt":
 		return NewBcryptHasher(bcrypt.DefaultCost), nil
+	case "argon2id":
+		return NewArgon2IDHasher(16*1024, 3, 2, 16, 32), nil
 	default:
 		return nil, fmt.Errorf("unsupported password type: %s", passwordType)
 	}
 }
+
+// Implement these hashing functions for password hashers
+// PBKDF2
+// scrypt
+// SHA-512
