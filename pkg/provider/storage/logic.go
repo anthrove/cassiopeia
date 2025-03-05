@@ -26,6 +26,7 @@ import (
 
 type Provider interface {
 	GetConfigurationFields() []object.ProviderConfigurationField
+	ValidateConfigurationFields(provider object.Provider) error
 	Get(path string) (*os.File, error)
 	GetStream(path string) (io.ReadCloser, error)
 	Put(path string, reader io.Reader) (*oss.Object, error)

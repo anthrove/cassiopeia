@@ -39,7 +39,7 @@ import (
 // Returns:
 //   - Resource object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateResource(ctx context.Context, tenantId string, createResource object.CreateResource, mimeType string, fileSize int64, file io.Reader) (object.Resource, error) {
+func (is IdentityService) CreateResource(ctx context.Context, tenantId string, createResource object.CreateResource, mimeType string, fileSize int64, fileName string, file io.Reader) (object.Resource, error) {
 	err := validate.Struct(createResource)
 
 	if err != nil {

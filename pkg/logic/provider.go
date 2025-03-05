@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/provider/email"
+	"github.com/anthrove/identity/pkg/provider/storage"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
@@ -111,6 +112,19 @@ func validateProvider(providerObj object.Provider) error {
 		if err != nil {
 			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
 		}
+	case "storage":
+		provider, err := storage.GetStorageProvider(providerObj)
+
+		if err != nil {
+			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
+		}
+
+		err = provider.ValidateConfigurationFields(providerObj)
+
+		if err != nil {
+			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
+		}
+
 	default:
 		return errors.New("invalid provider category")
 	}

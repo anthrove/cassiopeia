@@ -58,8 +58,10 @@ func (l localProvider) GetConfigurationFields() []object.ProviderConfigurationFi
 	}
 }
 
-func (l localProvider) ValidateConfigurationFields() error {
+func (l localProvider) ValidateConfigurationFields(provider object.Provider) error {
 	localConfig := localConfiguration{}
+
+	// TODO: more validation?
 
 	err := json.Unmarshal(l.provider.Parameter, &localConfig)
 	if err != nil {
