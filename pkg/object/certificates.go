@@ -36,6 +36,8 @@ type Certificate struct {
 
 	Certificate string `json:"certificate"`
 	PrivateKey  string `json:"private_key"`
+
+	Applications []Application `json:"-" swaggerignore:"true"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.

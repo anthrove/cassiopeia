@@ -81,4 +81,9 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/template/:template_id", identityRoutes.killMessageTemplate)
 	v1.POST("/tenant/:tenant_id/template/:template_id/fill", identityRoutes.fillMessageTemplate)
 
+	v1.POST("/tenant/:tenant_id/application", identityRoutes.createApplication)
+	v1.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplication)
+	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplications)
+	v1.PUT("/tenant/:tenant_id/application/:application_id", identityRoutes.updateApplication)
+	v1.DELETE("/tenant/:tenant_id/application/:application_id", identityRoutes.killApplication)
 }
