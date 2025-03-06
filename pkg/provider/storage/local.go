@@ -23,6 +23,8 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/go-playground/validator/v10"
 	"github.com/qor/oss/filesystem"
+	"path/filepath"
+	"strings"
 )
 
 type localConfiguration struct {
@@ -41,9 +43,12 @@ func newLocalProvider(provider object.Provider) (Provider, error) {
 		return nil, err
 	}
 
+	sanitizedPath := strings.TrimPrefix(filepath.Clean(parameters["base_path"]), "/")
+	basePath := fmt.Sprintf("local_storage_provider/%s/%s", provider.TenantID, sanitizedPath)
+
 	return localProvider{
 		FileSystem: filesystem.FileSystem{
-			Base: parameters["base_path"],
+			Base: basePath,
 		},
 		provider: provider,
 	}, nil
