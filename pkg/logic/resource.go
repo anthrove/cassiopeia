@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider/storage"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
@@ -39,7 +40,7 @@ import (
 // Returns:
 //   - Resource object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateResource(ctx context.Context, tenantId string, createResource object.CreateResource, mimeType string, fileSize int64, fileName string, file io.Reader) (object.Resource, error) {
+func (is IdentityService) CreateResource(ctx context.Context, tenantId string, createResource object.CreateResource, file io.Reader) (object.Resource, error) {
 	err := validate.Struct(createResource)
 
 	if err != nil {
@@ -49,7 +50,42 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 		}
 	}
 
-	return repository.CreateResource(ctx, is.db, tenantId, createResource, mimeType, fileSize, file)
+	provider, err := is.FindProvider(ctx, tenantId, createResource.ProviderID)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	fileProvider, err := storage.GetStorageProvider(provider)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	randomPrefix, err := util.RandomString(10)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	filenameWithPrefix := fmt.Sprintf("%s_%s", randomPrefix, createResource.FileName)
+
+	resourcePath := fmt.Sprintf("%s/%s", createResource.Tag, filenameWithPrefix)
+
+	hash, err := util.HashFileMD5(file)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	resourceObject, err := fileProvider.Put(resourcePath, file)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	// TODO: the URL is not the full URL of the file, including the gin path
+	resourceURL, err := resourceObject.StorageInterface.GetURL(resourceObject.Path)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	return repository.CreateResource(ctx, is.db, tenantId, createResource, resourcePath, resourceURL, hash)
 }
 
 // KillResource deletes an existing resource within a specified tenant.

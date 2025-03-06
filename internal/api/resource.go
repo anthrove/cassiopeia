@@ -44,6 +44,9 @@ func (ir IdentityRoutes) createResource(c *gin.Context) {
 	createResource := object.CreateResource{
 		ProviderID: providerID,
 		Tag:        tag,
+		FileSize:   file.Size,
+		FileName:   file.Filename,
+		MimeType:   file.Header.Get("Content-Type"),
 	}
 
 	fileContent, err := file.Open()
@@ -53,9 +56,7 @@ func (ir IdentityRoutes) createResource(c *gin.Context) {
 	}
 	defer fileContent.Close()
 
-	// TODO: Upload works, but the path is not fully correct. Its missing the type and the full filepath is wrong. same for the url and the format is missing
-	// TODO: Maybe a file Info struct to minimize the function header length?
-	resource, err := ir.service.CreateResource(c, tenantID, createResource, file.Header.Get("Content-Type"), file.Size, file.Filename, fileContent)
+	resource, err := ir.service.CreateResource(c, tenantID, createResource, fileContent)
 	if err != nil {
 		return
 	}

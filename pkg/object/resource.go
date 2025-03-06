@@ -31,11 +31,12 @@ type Resource struct {
 
 	ProviderID string `json:"provider_id"`
 	Tag        string `json:"tag"`
-	Type       string `json:"type"`
+	MimeType   string `json:"mime_type"`
 	FilePath   string `json:"file_path"`
 	FileSize   int64  `json:"file_size"`
 	Format     string `json:"format"`
 	Url        string `json:"url"`
+	Hash       string `json:"hash"`
 }
 
 func (base *Resource) BeforeCreate(db *gorm.DB) error {
@@ -54,4 +55,7 @@ func (base *Resource) BeforeCreate(db *gorm.DB) error {
 type CreateResource struct {
 	ProviderID string `json:"provider_id"`
 	Tag        string `json:"tag"`
+	FileName   string `json:"file_name"`
+	FileSize   int64  `json:"file_size"`
+	MimeType   string `json:"mime_type"`
 }

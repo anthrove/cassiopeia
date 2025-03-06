@@ -18,12 +18,10 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"github.com/anthrove/identity/pkg/object"
-	"github.com/anthrove/identity/pkg/provider/storage"
 	"gorm.io/gorm"
-	"io"
 	"path/filepath"
+	"strings"
 )
 
 // CreateResource creates a new resource within a specified tenant in the database.
@@ -37,41 +35,21 @@ import (
 // Returns:
 //   - Resource object if creation is successful.
 //   - Error if there is any issue during creation.
-func CreateResource(ctx context.Context, db *gorm.DB, tenantId string, createResource object.CreateResource, mimeType string, fileSize int64, file io.Reader) (object.Resource, error) {
-	provider, err := FindProvider(ctx, db, tenantId, createResource.ProviderID)
-	if err != nil {
-		return object.Resource{}, err
-	}
-
-	fileProvider, err := storage.GetStorageProvider(provider)
-	if err != nil {
-		return object.Resource{}, err
-	}
-
-	filePath := fmt.Sprintf("%s", createResource.Tag)
-
-	resourceObject, err := fileProvider.Put(filePath, file)
-	if err != nil {
-		return object.Resource{}, err
-	}
-
-	resourceURL, err := resourceObject.StorageInterface.GetURL(resourceObject.Path)
-	if err != nil {
-		return object.Resource{}, err
-	}
+func CreateResource(ctx context.Context, db *gorm.DB, tenantId string, createResource object.CreateResource, resourcePath string, resourceURL string, hash string) (object.Resource, error) {
 
 	resource := object.Resource{
 		TenantID:   tenantId,
 		ProviderID: createResource.ProviderID,
 		Tag:        createResource.Tag,
-		Type:       mimeType,
-		FilePath:   resourceObject.Path,
-		FileSize:   fileSize,
-		Format:     filepath.Ext(resourceObject.Path),
+		MimeType:   createResource.MimeType,
+		FilePath:   resourcePath,
+		FileSize:   createResource.FileSize,
+		Format:     strings.TrimPrefix(filepath.Ext(resourcePath), "."),
 		Url:        resourceURL,
+		Hash:       hash,
 	}
 
-	err = db.WithContext(ctx).Model(&object.Resource{}).Create(&resource).Error
+	err := db.WithContext(ctx).Model(&object.Resource{}).Create(&resource).Error
 
 	return resource, err
 }

@@ -23,6 +23,8 @@ import (
 	"strconv"
 )
 
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
 func RandomSaltString(size int) (string, error) {
 	salt := make([]byte, size)
 	_, err := rand.Read(salt)
@@ -40,4 +42,16 @@ func RandomNumber(amount int) int {
 	}
 	number, _ := strconv.Atoi(numberStr)
 	return number
+}
+
+func RandomString(length int) (string, error) {
+	result := make([]byte, length)
+	for i := range result {
+		randomIndex, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		result[i] = charset[randomIndex.Int64()]
+	}
+	return string(result), nil
 }
