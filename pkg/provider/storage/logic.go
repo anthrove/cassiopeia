@@ -34,12 +34,15 @@ type Provider interface {
 	List(path string) ([]*oss.Object, error)
 	GetEndpoint() string
 	GetURL(path string) (string, error)
+	GetBucketName() (string, error)
 }
 
 func GetStorageProvider(provider object.Provider) (Provider, error) {
 	switch provider.ProviderType {
 	case "local":
 		return newLocalProvider(provider)
+	case "s3":
+		return newS3Provider(provider)
 	}
 	return nil, errors.New("unknown storage provider: " + provider.ProviderType)
 

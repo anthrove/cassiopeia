@@ -36,6 +36,11 @@ type localProvider struct {
 	provider object.Provider
 }
 
+func (l localProvider) GetBucketName() (string, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func newLocalProvider(provider object.Provider) (Provider, error) {
 	var parameters map[string]string
 	err := json.Unmarshal(provider.Parameter, &parameters)

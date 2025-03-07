@@ -58,6 +58,8 @@ func (ir IdentityRoutes) createResource(c *gin.Context) {
 
 	resource, err := ir.service.CreateResource(c, tenantID, createResource, fileContent)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
+
 		return
 	}
 

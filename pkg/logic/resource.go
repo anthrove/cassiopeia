@@ -85,6 +85,15 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 		return object.Resource{}, err
 	}
 
+	bucketName, err := fileProvider.GetBucketName()
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	if resourceURL == resourceObject.Path {
+		resourceURL = fmt.Sprintf("%s/%s/%s", resourceObject.StorageInterface.GetEndpoint(), bucketName, resourceObject.Path)
+	}
+
 	return repository.CreateResource(ctx, is.db, tenantId, createResource, resourcePath, resourceURL, hash)
 }
 

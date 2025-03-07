@@ -57,30 +57,3 @@ func (ir IdentityRoutes) cdnGetFile(c *gin.Context) {
 	}
 	return
 }
-
-//func (ir IdentityRoutes) cdnGetFile(c *gin.Context) {
-//	tenantID := c.Param("tenant_id")
-//	filePath := c.Param("file_path")
-
-//	providers, err := ir.service.FindProviders(c, tenantID, object.Pagination{})
-//	if err != nil {
-//		return
-//	}
-//	sanitizedFilePath := strings.TrimPrefix(filePath, "/")
-
-//	for _, provider := range providers {
-//		if provider.Category == "storage" && provider.ProviderType == "local" {
-//			var parameters map[string]string
-//			_ = json.Unmarshal(provider.Parameter, &parameters)
-
-//			sanitizedBasePath := strings.TrimPrefix(filepath.Clean(parameters["base_path"]), "/")
-
-//			localFilePath := fmt.Sprintf("local_storage_provider/%s/%s/%s", tenantID, sanitizedBasePath, sanitizedFilePath)
-
-//			c.File(localFilePath)
-//			return
-//		}
-//		break
-//	}
-
-//
