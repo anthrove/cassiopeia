@@ -160,3 +160,7 @@ func (is IdentityService) FindCertificate(ctx context.Context, tenantID string, 
 func (is IdentityService) FindCertificates(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Certificate, error) {
 	return repository.FindCertificates(ctx, is.db, tenantID, pagination)
 }
+
+func (is IdentityService) FindAllCertificates(ctx context.Context) ([]object.Certificate, error) {
+	return repository.FindAllCertificates(ctx, is.db)
+}

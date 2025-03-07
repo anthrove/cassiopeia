@@ -42,6 +42,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	identityRoutes := &IdentityRoutes{service}
 
+	r.GET("/.well-known/jwks", identityRoutes.getJWKs)
+
 	v1 := r.Group("/api/v1")
 	v1.POST("/tenant", identityRoutes.createTenant)
 	v1.GET("/tenant", Pagination(), identityRoutes.findTenants)
