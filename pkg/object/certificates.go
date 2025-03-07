@@ -17,6 +17,9 @@
 package object
 
 import (
+	"crypto/x509"
+	"encoding/pem"
+	"github.com/go-jose/go-jose/v4"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
 	"time"
@@ -70,4 +73,21 @@ type CreateCertificate struct {
 
 type UpdateCertificate struct {
 	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Certificate Title"`
+}
+
+func (base *Certificate) ToJWK() (jose.JSONWebKey, error) {
+	certPemBlock := []byte(base.Certificate)
+	certDerBlock, _ := pem.Decode(certPemBlock)
+	x509Cert, err := x509.ParseCertificate(certDerBlock.Bytes)
+	if err != nil {
+		return jose.JSONWebKey{}, err
+	}
+
+	return jose.JSONWebKey{
+		Key:          x509Cert.PublicKey,
+		KeyID:        base.ID,
+		Algorithm:    base.Algorithm,
+		Use:          "sig",
+		Certificates: []*x509.Certificate{x509Cert},
+	}, nil
 }

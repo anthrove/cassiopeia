@@ -54,3 +54,10 @@ func FindCertificates(ctx context.Context, db *gorm.DB, tenantID string, paginat
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
 }
+
+func FindAllCertificates(ctx context.Context, db *gorm.DB) ([]object.Certificate, error) {
+	var data []object.Certificate
+	err := db.WithContext(ctx).Find(&data).Error
+
+	return data, err
+}
