@@ -63,3 +63,26 @@ func Pagination() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+func (ir IdentityRoutes) Authorization() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		sessionID, err := c.Cookie("identity_session_id")
+
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		if sessionID == "" {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		session := ir.service.FindSession(c, sessionID)
+		if session == nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+	}
+}
