@@ -86,4 +86,7 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplications)
 	v1.PUT("/tenant/:tenant_id/application/:application_id", identityRoutes.updateApplication)
 	v1.DELETE("/tenant/:tenant_id/application/:application_id", identityRoutes.killApplication)
+
+	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
+
 }
