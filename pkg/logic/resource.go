@@ -107,7 +107,33 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillResource(ctx context.Context, tenantID string, resourceID string) error {
-	return repository.KillResource(ctx, is.db, tenantID, resourceID)
+
+	resource, err := is.FindResource(ctx, tenantID, resourceID)
+	if err != nil {
+		return err
+	}
+
+	provider, err := is.FindProvider(ctx, tenantID, resource.ProviderID)
+	if err != nil {
+		return err
+	}
+
+	fileProvider, err := storage.GetStorageProvider(provider)
+	if err != nil {
+		return err
+	}
+
+	err = fileProvider.Delete(resource.FilePath)
+	if err != nil {
+		return err
+	}
+
+	err = repository.KillResource(ctx, is.db, tenantID, resourceID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // FindResource retrieves a specific resource within a specified tenant.
