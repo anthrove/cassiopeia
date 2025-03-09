@@ -2,9 +2,9 @@ package logic
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/util"
 	"path/filepath"
 	"strings"
 )
@@ -28,7 +28,7 @@ func (is IdentityService) ServeResource(ctx context.Context, tenantID string, re
 
 	for _, provider := range providers {
 		if provider.Category == "storage" && provider.ProviderType == "local" {
-			parameters, err := unmarshalProviderParameters(provider)
+			parameters, err := util.UnmarshalProviderParameters(provider)
 			if err != nil {
 				return "", err
 			}
@@ -44,10 +44,4 @@ func (is IdentityService) ServeResource(ctx context.Context, tenantID string, re
 
 func sanitizeFilePath(path string) string {
 	return strings.TrimPrefix(filepath.Clean(path), "/")
-}
-
-func unmarshalProviderParameters(provider object.Provider) (map[string]string, error) {
-	var parameters map[string]string
-	err := json.Unmarshal(provider.Parameter, &parameters)
-	return parameters, err
 }

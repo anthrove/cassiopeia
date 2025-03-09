@@ -119,7 +119,7 @@ func validateProvider(providerObj object.Provider) error {
 			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
 		}
 
-		err = provider.ValidateConfigurationFields(providerObj)
+		err = provider.ValidateConfigurationFields()
 
 		if err != nil {
 			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)

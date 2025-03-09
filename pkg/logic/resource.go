@@ -55,6 +55,13 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 		return object.Resource{}, err
 	}
 
+	parameters, err := util.UnmarshalProviderParameters(provider)
+	if err != nil {
+		return object.Resource{}, err
+	}
+
+	bucket := parameters["bucket"]
+
 	fileProvider, err := storage.GetStorageProvider(provider)
 	if err != nil {
 		return object.Resource{}, err
@@ -80,18 +87,11 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 	}
 
 	// TODO: the URL is not the full URL of the file, including the gin path
-	resourceURL, err := resourceObject.StorageInterface.GetURL(resourceObject.Path)
-	if err != nil {
-		return object.Resource{}, err
-	}
+	resourceURL := resourceObject.Path
 
-	bucketName, err := fileProvider.GetBucketName()
-	if err != nil {
-		return object.Resource{}, err
-	}
-
-	if resourceURL == resourceObject.Path {
-		resourceURL = fmt.Sprintf("%s/%s/%s", resourceObject.StorageInterface.GetEndpoint(), bucketName, resourceObject.Path)
+	// Needed for S3 storage providers
+	if len(bucket) != 0 {
+		resourceURL = fmt.Sprintf("%s/%s/%s", resourceObject.StorageInterface.GetEndpoint(), bucket, resourceObject.Path)
 	}
 
 	return repository.CreateResource(ctx, is.db, tenantId, createResource, resourcePath, resourceURL, hash)

@@ -26,7 +26,7 @@ import (
 	"github.com/qor/oss/s3"
 )
 
-type s3Configuration struct {
+type minioConfiguration struct {
 	AccessID  string `json:"access_id" validate:"required"`
 	AccessKey string `json:"access_key" validate:"required"`
 	Bucket    string `json:"bucket" validate:"required"`
@@ -34,35 +34,37 @@ type s3Configuration struct {
 	Region    string `json:"region" validate:"required"`
 }
 
-type s3Provider struct {
+type minioProvider struct {
 	s3.Client
 	provider object.Provider
 }
 
-func newS3Provider(provider object.Provider) (Provider, error) {
+func newMinioProvider(provider object.Provider) (Provider, error) {
 	var parameters map[string]string
 	err := json.Unmarshal(provider.Parameter, &parameters)
 	if err != nil {
 		return nil, err
 	}
 
+	// Specific for Minio
 	s3config := s3.Config{
-		AccessID:   parameters["access_id"],
-		AccessKey:  parameters["access_key"],
-		Region:     parameters["region"],
-		Bucket:     parameters["bucket"],
-		Endpoint:   parameters["endpoint"],
-		S3Endpoint: parameters["endpoint"],
-		ACL:        s3control.BucketCannedACLPublicRead,
+		AccessID:         parameters["access_id"],
+		AccessKey:        parameters["access_key"],
+		Region:           parameters["region"],
+		Bucket:           parameters["bucket"],
+		Endpoint:         parameters["endpoint"],
+		S3Endpoint:       parameters["endpoint"],
+		ACL:              s3control.BucketCannedACLPublicRead,
+		S3ForcePathStyle: true,
 	}
 
-	return s3Provider{
+	return minioProvider{
 		Client:   *s3.New(&s3config),
 		provider: provider,
 	}, nil
 }
 
-func (s s3Provider) GetConfigurationFields() []object.ProviderConfigurationField {
+func (s minioProvider) GetConfigurationFields() []object.ProviderConfigurationField {
 	return []object.ProviderConfigurationField{
 		{
 			FieldKey:  "access_id",
@@ -87,7 +89,7 @@ func (s s3Provider) GetConfigurationFields() []object.ProviderConfigurationField
 	}
 }
 
-func (s s3Provider) ValidateConfigurationFields() error {
+func (s minioProvider) ValidateConfigurationFields() error {
 	s3Configuration := s3Configuration{}
 
 	err := json.Unmarshal(s.provider.Parameter, &s3Configuration)

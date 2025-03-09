@@ -68,7 +68,7 @@ func (l localProvider) GetConfigurationFields() []object.ProviderConfigurationFi
 	}
 }
 
-func (l localProvider) ValidateConfigurationFields(provider object.Provider) error {
+func (l localProvider) ValidateConfigurationFields() error {
 	localConfig := localConfiguration{}
 
 	// TODO: more validation?

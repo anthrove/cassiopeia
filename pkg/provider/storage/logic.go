@@ -26,7 +26,7 @@ import (
 
 type Provider interface {
 	GetConfigurationFields() []object.ProviderConfigurationField
-	ValidateConfigurationFields(provider object.Provider) error
+	ValidateConfigurationFields() error
 	Get(path string) (*os.File, error)
 	GetStream(path string) (io.ReadCloser, error)
 	Put(path string, reader io.Reader) (*oss.Object, error)
@@ -34,7 +34,6 @@ type Provider interface {
 	List(path string) ([]*oss.Object, error)
 	GetEndpoint() string
 	GetURL(path string) (string, error)
-	GetBucketName() (string, error)
 }
 
 func GetStorageProvider(provider object.Provider) (Provider, error) {
@@ -43,6 +42,8 @@ func GetStorageProvider(provider object.Provider) (Provider, error) {
 		return newLocalProvider(provider)
 	case "s3":
 		return newS3Provider(provider)
+	case "minio":
+		return newMinioProvider(provider)
 	}
 	return nil, errors.New("unknown storage provider: " + provider.ProviderType)
 
