@@ -104,8 +104,8 @@ func (ir IdentityRoutes) killResource(c *gin.Context) {
 // @Summary	Lists all resource
 // @Tags		Resource API
 // @Accept		json
-// @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		resource_id	query	string	true	"Resource ID"
+// @Param		tenant_id	path		string									true	"Tenant ID"
+// @Param		resource_id	query		string									true	"Resource ID"
 // @Success	200			{object}	HttpResponse{data=object.Resource{}}	"Resource"
 // @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
 // @Produce	json
@@ -131,11 +131,11 @@ func (ir IdentityRoutes) findResource(c *gin.Context) {
 // @Tags		Group API
 // @Accept		json
 // @Produce	json
-// @Param		page		query		string								false	"Page"
-// @Param		page_limit	query		string								false	"Page Limit"
-// @Param		tenant_id	path		string								true	"Tenant ID"
+// @Param		page		query		string									false	"Page"
+// @Param		page_limit	query		string									false	"Page Limit"
+// @Param		tenant_id	path		string									true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Resource{}}	"Resources"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/group [get]
 func (ir IdentityRoutes) findResources(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
