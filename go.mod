@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/gin-gonic/gin v1.10.0
+	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/matoous/go-nanoid/v2 v2.1.0
 	github.com/qor/oss v0.0.0-20241126061828-4629f3a3524a

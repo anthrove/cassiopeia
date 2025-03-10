@@ -67,11 +67,12 @@ func GetEngine() (*gorm.DB, error) {
 // Returns:
 //   - An error if there is any issue during the migration.
 func Migrate(engine *gorm.DB) error {
-	return engine.AutoMigrate(
-		&object.Tenant{},
+	return engine.AutoMigrate(&object.Tenant{},
 		&object.Group{},
 		&object.User{},
 		&object.Provider{},
+		&object.Certificate{},
 		&object.MessageTemplate{},
-		&object.Resource{})
+    &object.Resource{}),
+		&object.Application{})
 }

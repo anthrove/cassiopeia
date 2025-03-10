@@ -42,6 +42,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	identityRoutes := &IdentityRoutes{service}
 
+	r.GET("/.well-known/jwks", identityRoutes.getJWKs)
+
 	v1 := r.Group("/api/v1")
 	v1.POST("/tenant", identityRoutes.createTenant)
 	v1.GET("/tenant", Pagination(), identityRoutes.findTenants)
@@ -68,6 +70,12 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/provider/:provider_id", identityRoutes.killProvider)
 	v1.POST("/tenant/:tenant_id/provider/:provider_id/mail", identityRoutes.SendMail)
 
+	v1.POST("/tenant/:tenant_id/certificate", identityRoutes.createCertificate)
+	v1.GET("/tenant/:tenant_id/certificate", Pagination(), identityRoutes.findCertificates)
+	v1.GET("/tenant/:tenant_id/certificate/:certificate_id", identityRoutes.findCertificate)
+	v1.PUT("/tenant/:tenant_id/certificate/:certificate_id", identityRoutes.updateCertificate)
+	v1.DELETE("/tenant/:tenant_id/certificate/:certificate_id", identityRoutes.killCertificate)
+
 	v1.POST("/tenant/:tenant_id/template", identityRoutes.createMessageTemplate)
 	v1.GET("/tenant/:tenant_id/template", Pagination(), identityRoutes.findMessageTemplates)
 	v1.GET("/tenant/:tenant_id/template/:template_id", identityRoutes.findMessageTemplate)
@@ -75,11 +83,18 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/template/:template_id", identityRoutes.killMessageTemplate)
 	v1.POST("/tenant/:tenant_id/template/:template_id/fill", identityRoutes.fillMessageTemplate)
 
-	v1.POST("/tenant/:tenant_id/resource", identityRoutes.createResource)
+	v1.POST("/tenant/:tenant_id/application", identityRoutes.createApplication)
+	v1.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplication)
+	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplications)
+	v1.PUT("/tenant/:tenant_id/application/:application_id", identityRoutes.updateApplication)
+	v1.DELETE("/tenant/:tenant_id/application/:application_id", identityRoutes.killApplication)
+
+  v1.POST("/tenant/:tenant_id/resource", identityRoutes.createResource)
 	v1.GET("/tenant/:tenant_id/resource", Pagination(), identityRoutes.findResources)
 	v1.GET("/tenant/:tenant_id/resource/:resource_id", identityRoutes.findResource)
 	v1.DELETE("/tenant/:tenant_id/resource/:resource_id", identityRoutes.killResource)
+  
+	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
-
 }
