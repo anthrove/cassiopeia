@@ -23,20 +23,20 @@ import (
 )
 
 type Resource struct {
-	ID       string `json:"id" gorm:"primaryKey;type:char(25)" `
-	TenantID string `json:"tenant_id" gorm:"type:char(25)"`
+	ID       string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	TenantID string `json:"tenant_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
-	CreatedAt time.Time `json:"createdAt" format:"date-time"`
-	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
+	CreatedAt time.Time `json:"createdAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+	UpdatedAt time.Time `json:"updatedAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
 
-	ProviderID string `json:"provider_id" gorm:"type:char(25)"`
-	Tag        string `json:"tag"`
-	MimeType   string `json:"mime_type"`
-	FilePath   string `json:"file_path"`
-	FileSize   int64  `json:"file_size"`
-	Format     string `json:"format"`
-	Url        string `json:"url"`
-	Hash       string `json:"hash"`
+	ProviderID string `json:"provider_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	Tag        string `json:"tag" example:"example-tag"`
+	MimeType   string `json:"mime_type" example:"image/png"`
+	FilePath   string `json:"file_path" example:"/path/to/file.png"`
+	FileSize   int64  `json:"file_size" example:"1024"`
+	Format     string `json:"format" example:"png"`
+	Url        string `json:"url" example:"https://domain.tld/files/file.png"`
+	Hash       string `json:"hash" example:"d41d8cd98f00b204e9800998ecf8427e"`
 }
 
 func (base *Resource) BeforeCreate(db *gorm.DB) error {
@@ -53,9 +53,9 @@ func (base *Resource) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateResource struct {
-	ProviderID string `json:"provider_id"`
-	Tag        string `json:"tag"`
-	FileName   string `json:"file_name"`
-	FileSize   int64  `json:"file_size"`
-	MimeType   string `json:"mime_type"`
+	ProviderID string `json:"provider_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	Tag        string `json:"tag" example:"example-tag"`
+	FileName   string `json:"file_name" example:"file.png"`
+	FileSize   int64  `json:"file_size" example:"1024"`
+	MimeType   string `json:"mime_type" example:"image/png"`
 }

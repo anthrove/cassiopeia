@@ -25,7 +25,7 @@ import (
 // @Tags		OIDC API
 // @Accept		json
 // @Produce	json
-// @Success	200 {object}    jose.JSONWebKeySet "JWKs"
+// @Success	200	{object}	jose.JSONWebKeySet		"JWKs"
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/.well-known/jwks [get]
 func (ir IdentityRoutes) getJWKs(c *gin.Context) {
