@@ -2,9 +2,9 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
-	"github.com/anthrove/identity/pkg/util"
 	"path/filepath"
 	"strings"
 )
@@ -26,19 +26,22 @@ func (is IdentityService) ServeResource(ctx context.Context, tenantID string, re
 	}
 	sanitizedFilePath := sanitizeFilePath(resourcePath)
 
+	var parameters map[string]string
+
 	for _, provider := range providers {
 		if provider.Category == "storage" && provider.ProviderType == "local" {
-			parameters, err := util.UnmarshalProviderParameters(provider)
+			err := json.Unmarshal(provider.Parameter, &parameters)
 			if err != nil {
 				return "", err
 			}
-
-			sanitizedBasePath := sanitizeFilePath(parameters["base_path"])
-			localFilePath := fmt.Sprintf("local_storage_provider/%s/%s/%s", tenantID, sanitizedBasePath, sanitizedFilePath)
-
-			return localFilePath, nil
 		}
+
+		sanitizedBasePath := sanitizeFilePath(parameters["base_path"])
+		localFilePath := fmt.Sprintf("local_storage_provider/%s/%s/%s", tenantID, sanitizedBasePath, sanitizedFilePath)
+
+		return localFilePath, nil
 	}
+
 	return "", fmt.Errorf("no suitable provider found")
 }
 
