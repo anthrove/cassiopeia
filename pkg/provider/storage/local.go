@@ -36,11 +36,6 @@ type localProvider struct {
 	provider object.Provider
 }
 
-func (l localProvider) GetBucketName() (string, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
 func newLocalProvider(provider object.Provider) (Provider, error) {
 	var parameters map[string]string
 	err := json.Unmarshal(provider.Parameter, &parameters)
@@ -70,8 +65,6 @@ func (l localProvider) GetConfigurationFields() []object.ProviderConfigurationFi
 
 func (l localProvider) ValidateConfigurationFields() error {
 	localConfig := localConfiguration{}
-
-	// TODO: more validation?
 
 	err := json.Unmarshal(l.provider.Parameter, &localConfig)
 	if err != nil {
