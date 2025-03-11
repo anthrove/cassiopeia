@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-package api
+package util
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"crypto/md5"
+	"encoding/hex"
+	"io"
 )
 
-// @Summary	Get all configured JWKs
-// @Tags		OIDC API
-// @Accept		json
-// @Produce	json
-// @Success	200	{object}	jose.JSONWebKeySet		"JWKs"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/.well-known/jwks [get]
-func (ir IdentityRoutes) getJWKs(c *gin.Context) {
-	jwks, err := ir.service.GetJWKs(c)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, HttpResponse{
-			Error: err.Error(),
-		})
-		return
+// HashFileMD5 computes the MD5 hash of the content read from the provided io.Reader.
+//
+// Parameters:
+//   - file: an io.Reader representing the file content to be hashed.
+//
+// Returns:
+//   - A string representing the MD5 hash in hexadecimal format.
+//   - An error if there is any issue during hashing.
+func HashFileMD5(file io.Reader) (string, error) {
+	hasher := md5.New()
+	if _, err := io.Copy(hasher, file); err != nil {
+		return "", err
 	}
-
-	c.JSON(http.StatusOK, jwks)
+	hash := hex.EncodeToString(hasher.Sum(nil))
+	return hash, nil
 }
