@@ -24,12 +24,12 @@ import (
 
 type Resource struct {
 	ID       string `json:"id" gorm:"primaryKey;type:char(25)" `
-	TenantID string `json:"tenant_id"`
+	TenantID string `json:"tenant_id" gorm:"type:char(25)"`
 
 	CreatedAt time.Time `json:"createdAt" format:"date-time"`
 	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
 
-	ProviderID string `json:"provider_id"`
+	ProviderID string `json:"provider_id" gorm:"type:char(25)"`
 	Tag        string `json:"tag"`
 	MimeType   string `json:"mime_type"`
 	FilePath   string `json:"file_path"`
