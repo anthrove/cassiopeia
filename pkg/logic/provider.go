@@ -99,34 +99,28 @@ func (is IdentityService) FindProviders(ctx context.Context, tenantID string, pa
 }
 
 func validateProvider(providerObj object.Provider) error {
+	var provider interface {
+		ValidateConfigurationFields() error
+	}
+	var err error
+
 	switch providerObj.Category {
 	case "email":
-		provider, err := email.GetEMailProvider(providerObj)
-
-		if err != nil {
-			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
-		}
-
-		err = provider.ValidateConfigurationFields()
-
-		if err != nil {
-			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
-		}
+		provider, err = email.GetEMailProvider(providerObj)
 	case "storage":
-		provider, err := storage.GetStorageProvider(providerObj)
-
-		if err != nil {
-			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
-		}
-
-		err = provider.ValidateConfigurationFields()
-
-		if err != nil {
-			return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
-		}
-
+		provider, err = storage.GetStorageProvider(providerObj)
 	default:
 		return errors.New("invalid provider category")
 	}
+
+	if err != nil {
+		return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
+	}
+
+	err = provider.ValidateConfigurationFields()
+	if err != nil {
+		return errors.Join(fmt.Errorf("problem validate provider parameter"), err)
+	}
+
 	return nil
 }
