@@ -39,7 +39,7 @@ func setup(t *testing.T) {
 
 	fileName = "/" + filepath.Join(randomPath, "alexander-andrews-mEdKuPYJe1I-unsplash.jpg")
 	fileName2 = "/" + filepath.Join(randomPath, "sample2", "alexander-andrews-mEdKuPYJe1I-unsplash.jpg")
-	sampleFile, _ = filepath.Abs("./test_files/alexander-andrews-mEdKuPYJe1I-unsplash.jpg")
+	sampleFile, _ = filepath.Abs("../../../test/testdata/alexander-andrews-mEdKuPYJe1I-unsplash.jpg")
 }
 
 func TestLocalProvider(t *testing.T) {
