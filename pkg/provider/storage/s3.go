@@ -32,6 +32,7 @@ type s3Configuration struct {
 	Bucket    string `json:"bucket" validate:"required"`
 	Endpoint  string `json:"endpoint" validate:"required"`
 	Region    string `json:"region" validate:"required"`
+	Type      string `json:"type" validate:"required"`
 }
 
 type s3Provider struct {
@@ -40,20 +41,26 @@ type s3Provider struct {
 }
 
 func newS3Provider(provider object.Provider) (Provider, error) {
-	var parameters map[string]string
+	var parameters s3Configuration
 	err := json.Unmarshal(provider.Parameter, &parameters)
 	if err != nil {
 		return nil, err
 	}
 
 	s3config := s3.Config{
-		AccessID:   parameters["access_id"],
-		AccessKey:  parameters["access_key"],
-		Region:     parameters["region"],
-		Bucket:     parameters["bucket"],
-		Endpoint:   parameters["endpoint"],
-		S3Endpoint: parameters["endpoint"],
-		ACL:        s3control.BucketCannedACLPublicRead,
+		AccessID:         parameters.AccessID,
+		AccessKey:        parameters.AccessKey,
+		Region:           parameters.Region,
+		Bucket:           parameters.Bucket,
+		Endpoint:         parameters.Endpoint,
+		S3Endpoint:       parameters.Endpoint,
+		ACL:              s3control.BucketCannedACLPublicRead,
+		S3ForcePathStyle: true,
+	}
+
+	switch parameters.Type {
+	case "minio":
+		s3config.S3ForcePathStyle = true
 	}
 
 	return s3Provider{
@@ -82,6 +89,10 @@ func (s s3Provider) GetConfigurationFields() []object.ProviderConfigurationField
 		},
 		{
 			FieldKey:  "endpoint",
+			FieldType: "text",
+		},
+		{
+			FieldKey:  "type",
 			FieldType: "text",
 		},
 	}

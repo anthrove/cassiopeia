@@ -42,8 +42,6 @@ func GetStorageProvider(provider object.Provider) (Provider, error) {
 		return newLocalProvider(provider)
 	case "s3":
 		return newS3Provider(provider)
-	case "minio":
-		return newMinioProvider(provider)
 	}
 	return nil, errors.New("unknown storage provider: " + provider.ProviderType)
 
