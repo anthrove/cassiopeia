@@ -18,6 +18,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
@@ -55,7 +56,8 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 		return object.Resource{}, err
 	}
 
-	parameters, err := util.UnmarshalProviderParameters(provider)
+	var parameters map[string]string
+	err = json.Unmarshal(provider.Parameter, &parameters)
 	if err != nil {
 		return object.Resource{}, err
 	}
