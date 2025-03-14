@@ -127,7 +127,7 @@ func (ir IdentityRoutes) findResource(c *gin.Context) {
 	})
 }
 
-// @Summary	Get existing Groups
+// @Summary	Get existing Resources
 // @Tags		Group API
 // @Accept		json
 // @Produce	json
@@ -136,7 +136,7 @@ func (ir IdentityRoutes) findResource(c *gin.Context) {
 // @Param		tenant_id	path		string									true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Resource{}}	"Resources"
 // @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/group [get]
+// @Router		/api/v1/tenant/{tenant_id}/resource [get]
 func (ir IdentityRoutes) findResources(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
