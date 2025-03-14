@@ -19,9 +19,7 @@ package mfa
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/anthrove/identity/pkg/object"
-	"github.com/go-playground/validator/v10"
 	"github.com/pquerna/otp"
 	"github.com/pquerna/otp/totp"
 )
@@ -99,22 +97,6 @@ func (t totpProvider) GetConfigurationFields() []object.ProviderConfigurationFie
 }
 
 func (t totpProvider) ValidateConfigurationFields() error {
-	localConfig := totpConfiguration{}
-
-	err := json.Unmarshal(t.provider.Parameter, &localConfig)
-	if err != nil {
-		return err
-	}
-
-	// use a single instance of Validate, it caches struct info
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	err = validate.Struct(localConfig)
-	if err != nil {
-		var validateErrs validator.ValidationErrors
-		if errors.As(err, &validateErrs) {
-			return errors.Join(fmt.Errorf("problem while validating create totp data"), validateErrs)
-		}
-	}
-
+	// There is no configuration that needs to be validated
 	return nil
 }

@@ -35,6 +35,7 @@ type MFA struct {
 	Verified      bool     `json:"verified"`
 	Secret        string   `json:"secret" validate:"required"`
 	RecoveryCodes []string `json:"recovery_codes" validate:"required" gorm:"type:text[]"`
+	URI           string   `json:"uri"`
 }
 
 func (base *MFA) BeforeCreate(db *gorm.DB) error {
@@ -51,9 +52,12 @@ func (base *MFA) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateMFA struct {
+	ProviderID  string `json:"provider_id" validate:"required" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
 	Type        string `json:"type" validate:"required,max=100" maxLength:"100"`
 	Priority    int    `json:"priority" validate:"required"`
+	Secret      string `json:"-" swaggerignore:"true"`
+	URI         string `json:"-" swaggerignore:"true"`
 }
 
 type UpdateMFA struct {

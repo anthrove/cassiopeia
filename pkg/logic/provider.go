@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/provider/email"
+	"github.com/anthrove/identity/pkg/provider/mfa"
 	"github.com/anthrove/identity/pkg/provider/storage"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
@@ -109,6 +110,8 @@ func validateProvider(providerObj object.Provider) error {
 		provider, err = email.GetEMailProvider(providerObj)
 	case "storage":
 		provider, err = storage.GetStorageProvider(providerObj)
+	case "mfa":
+		provider, err = mfa.GetMFAProvider(providerObj)
 	default:
 		return errors.New("invalid provider category")
 	}
