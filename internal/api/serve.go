@@ -63,6 +63,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.PUT("/tenant/:tenant_id/user/:user_id", identityRoutes.updateUser)
 	v1.DELETE("/tenant/:tenant_id/user/:user_id", identityRoutes.killUser)
 
+	// TODO: Add VerifieMFA endpoint
+	// TODO: Add UpdateMFARecoveryCodes endpoint (removes the used code)
 	v1.POST("/tenant/:tenant_id/user/:user_id/mfa", identityRoutes.createMFA)
 	v1.GET("/tenant/:tenant_id/user/:user_id/mfa", Pagination(), identityRoutes.findMFAs)
 	v1.GET("/tenant/:tenant_id/user/:user_id/mfa/:mfa_id", identityRoutes.findMFA)
