@@ -51,6 +51,10 @@ func (t totpProvider) Create(username string) (object.MFAProviderData, error) {
 		return object.MFAProviderData{}, errors.New("username is required")
 	}
 
+	// TODO: Create backup codes for the user
+	// Use GenerateCodeCustom & ValidateCustom to create custom backup code fucntinalaty.
+	// maybe we can use the time as salt? maybe time.now + random?
+
 	secret, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      t.provider.TenantID, //TODO: maybe refactor to use the name instead of the ID
 		AccountName: username,
