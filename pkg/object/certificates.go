@@ -26,14 +26,14 @@ import (
 )
 
 type Certificate struct {
-	ID       string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	IDs      string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	TenantID string `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	UpdatedAt time.Time `json:"updated_at" format:"date-time"`
 
 	DisplayName string    `json:"display_name" gorm:"type:varchar(100)" maxLength:"100" example:"Certification Title"`
-	Algorithm   string    `json:"algorithm" gorm:"type:varchar(100)" maxLength:"100" example:"RS512"`
+	Algo        string    `json:"algorithm" gorm:"type:varchar(100)" maxLength:"100" example:"RS512"`
 	BitSize     int       `json:"bit_size" example:"2048"`
 	ExpiredAt   time.Time `json:"expired_at" format:"date-time"`
 
@@ -41,6 +41,30 @@ type Certificate struct {
 	PrivateKey  string `json:"private_key"`
 
 	Applications []Application `json:"-" swaggerignore:"true"`
+}
+
+func (base Certificate) ID() string {
+	return base.IDs
+}
+
+func (base *Certificate) Algorithm() jose.SignatureAlgorithm {
+	return jose.SignatureAlgorithm(base.Algo)
+}
+
+func (base *Certificate) Use() string {
+	return "sig"
+}
+
+func (base *Certificate) Key() any {
+	certPemBlock := []byte(base.Certificate)
+	certDerBlock, _ := pem.Decode(certPemBlock)
+	x509Cert, err := x509.ParseCertificate(certDerBlock.Bytes)
+
+	if err != nil {
+		return nil
+	}
+
+	return x509Cert.PublicKey
 }
 
 // BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.
@@ -52,13 +76,13 @@ type Certificate struct {
 // Returns:
 //   - An error if there is any issue generating the unique ID.
 func (base *Certificate) BeforeCreate(db *gorm.DB) error {
-	if base.ID == "" {
+	if base.IDs == "" {
 		id, err := gonanoid.New(25)
 		if err != nil {
 			return err
 		}
 
-		base.ID = id
+		base.IDs = id
 	}
 
 	return nil
@@ -73,21 +97,4 @@ type CreateCertificate struct {
 
 type UpdateCertificate struct {
 	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Certificate Title"`
-}
-
-func (base *Certificate) ToJWK() (jose.JSONWebKey, error) {
-	certPemBlock := []byte(base.Certificate)
-	certDerBlock, _ := pem.Decode(certPemBlock)
-	x509Cert, err := x509.ParseCertificate(certDerBlock.Bytes)
-	if err != nil {
-		return jose.JSONWebKey{}, err
-	}
-
-	return jose.JSONWebKey{
-		Key:          x509Cert.PublicKey,
-		KeyID:        base.ID,
-		Algorithm:    base.Algorithm,
-		Use:          "sig",
-		Certificates: []*x509.Certificate{x509Cert},
-	}, nil
 }

@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package logic
+package api
 
-import (
-	"context"
-	"github.com/zitadel/oidc/v3/pkg/op"
-)
+import "github.com/zitadel/oidc/v3/pkg/op"
 
-func (is IdentityService) FindOIDCProvider(ctx context.Context, tenantId string) (*op.Provider, error) {
-	return op.NewProvider(*op.Config{
+func test()  {
+	issuer := "https://issuer.example.com"
+
+	op.NewProvider(&op.Config{
 		CryptoKey:                         [32]byte{},
 		DefaultLogoutRedirectURI:          "",
 		CodeMethodS256:                    false,
@@ -36,11 +35,7 @@ func (is IdentityService) FindOIDCProvider(ctx context.Context, tenantId string)
 		DeviceAuthorization:               op.DeviceAuthorizationConfig{},
 		BackChannelLogoutSupported:        false,
 		BackChannelLogoutSessionSupported: false,
-	}, is.newtenantProvider(ctx, tenantId), nil)
+	}, op.Storage(), func(insecure bool) (op.IssuerFromRequest, error) {
+		
+	}, op.)
 }
-
-func (is IdentityService) newtenantProvider(ctx context.Context, tenantId string) (op.Storage, error) {
-	return &oidcStorage{}, nil
-}
-
-type oidcStorage struct{}

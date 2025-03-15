@@ -43,6 +43,7 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	identityRoutes := &IdentityRoutes{service}
 
 	r.GET("/.well-known/jwks", identityRoutes.getJWKs)
+	r.
 
 	v1 := r.Group("/api/v1")
 	v1.POST("/tenant", identityRoutes.createTenant)
@@ -90,5 +91,7 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/application/:application_id", identityRoutes.killApplication)
 
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
+
+
 
 }

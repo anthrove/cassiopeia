@@ -39,6 +39,7 @@ type Tenant struct {
 	Users        []User            `json:"-" swaggerignore:"true"`
 	Application  []Application     `json:"-" swaggerignore:"true"`
 	Certificates []Certificate     `json:"-" swaggerignore:"true"`
+	Tokens       []Token           `json:"-" swaggerignore:"true"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new tenant record is inserted into the database.

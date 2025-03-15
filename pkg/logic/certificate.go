@@ -41,7 +41,7 @@ func (is IdentityService) CreateCertificate(ctx context.Context, tenantID string
 	certificate := object.Certificate{
 		TenantID:    tenantID,
 		DisplayName: createCertificate.DisplayName,
-		Algorithm:   createCertificate.Algorithm,
+		Algo:        createCertificate.Algorithm,
 		BitSize:     createCertificate.BitSize,
 		ExpiredAt:   createCertificate.ExpiredAt,
 	}
