@@ -195,7 +195,7 @@ func (is IdentityService) FindMFAs(ctx context.Context, userID string, paginatio
 //
 // Returns:
 //   - Error if there is any issue during updating.
-func (is IdentityService) VerifieMFA(ctx context.Context, mfaID string, userID string, verified bool) error {
+func (is IdentityService) VerifieMFA(ctx context.Context, tenantID string, mfaID string, userID string, verified bool) error {
 	if len(mfaID) == 0 {
 		return errors.New("mfaID is required")
 	}
@@ -203,6 +203,8 @@ func (is IdentityService) VerifieMFA(ctx context.Context, mfaID string, userID s
 	if len(userID) == 0 {
 		return errors.New("userID is required")
 	}
+
+	// TODO: Implement the ValidateMFAMethode to validate if the MFA works
 
 	return repository.VerifieMFA(ctx, is.db, mfaID, userID, verified)
 }

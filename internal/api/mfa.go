@@ -176,3 +176,42 @@ func (ir IdentityRoutes) findMFAs(c *gin.Context) {
 		Data: mfas,
 	})
 }
+
+// @Summary	Validates a given MFA
+// @Tags		MFA API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path	string				true	"Tenant ID"
+// @Param		user_id		path	string				true	"User ID"
+// @Param		mfa_id		path	string				true	"MFA ID"
+// @Param		MFA			body	object.UpdateMFA	true	"Update MFA Data"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/tenant/{tenant_id}/user/{user_id}/mfa/{mfa_id} [put]
+func (ir IdentityRoutes) validateMFA(c *gin.Context) {
+	userID := c.Param("user_id")
+	mfaID := c.Param("mfa_id")
+
+	var body object.UpdateMFA
+	err := c.ShouldBind(&body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	err = ir.service.UpdateMFA(c, userID, mfaID, body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: gin.H{},
+	})
+}

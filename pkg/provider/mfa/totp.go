@@ -111,3 +111,7 @@ func (t totpProvider) ValidateConfigurationFields() error {
 	// There is no configuration that needs to be validated
 	return nil
 }
+
+func (t totpProvider) ValidateMFAMethode(secret string, data map[string]any) (bool, error) {
+	return t.Validate(secret, data)
+}
