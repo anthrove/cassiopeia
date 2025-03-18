@@ -27,7 +27,6 @@ type Provider interface {
 	ValidateConfigurationFields() error
 	Create(username string) (object.MFAProviderData, error)
 	Validate(secret string, data map[string]any) (bool, error)
-	ValidateBackup(secret string, data map[string]any) (bool, error)
 }
 
 func GetMFAProvider(provider object.Provider) (Provider, error) {
