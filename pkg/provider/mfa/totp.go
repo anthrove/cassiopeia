@@ -24,7 +24,10 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
-type totpConfiguration struct{}
+type totpProperties struct {
+	URI    string `json:"uri"`
+	Secret string `json:"secret"`
+}
 
 type totpBodyData struct {
 	OTP string `json:"otp" validate:"required"`
@@ -67,9 +70,17 @@ func (t totpProvider) Create(username string) (object.MFAProviderData, error) {
 		return object.MFAProviderData{}, err
 	}
 
-	return object.MFAProviderData{
-		Secret: secret.Secret(),
+	propertiesJson, err := json.Marshal(totpProperties{
 		URI:    secret.URL(),
+		Secret: secret.Secret(),
+	})
+
+	if err != nil {
+		return object.MFAProviderData{}, err
+	}
+
+	return object.MFAProviderData{
+		Properties: propertiesJson,
 	}, nil
 
 }
@@ -96,7 +107,13 @@ func (t totpProvider) Validate(secret string, data map[string]any) (bool, error)
 
 }
 
+func (t totpProvider) ValidateBackup(secret string, data map[string]any) (bool, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (t totpProvider) GetConfigurationFields() []object.ProviderConfigurationField {
+	// There is no configuration that can be returned
 	return []object.ProviderConfigurationField{}
 }
 

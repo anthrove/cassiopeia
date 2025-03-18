@@ -19,8 +19,10 @@ package util
 import (
 	"crypto/rand"
 	"encoding/base64"
+	"github.com/sethvargo/go-diceware/diceware"
 	"math/big"
 	"strconv"
+	"strings"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -54,4 +56,12 @@ func RandomString(length int) (string, error) {
 		result[i] = charset[randomIndex.Int64()]
 	}
 	return string(result), nil
+}
+
+func RandomPassPhrase(length int, concatSymbol string) (string, error) {
+	list, err := diceware.Generate(length)
+	if err != nil {
+		return "", err
+	}
+	return strings.Join(list, concatSymbol), nil
 }

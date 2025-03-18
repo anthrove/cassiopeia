@@ -17,25 +17,23 @@
 package object
 
 import (
+	"encoding/json"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
 	"time"
 )
 
 type MFA struct {
-	ID     string `json:"id" gorm:"primaryKey;type:char(25)" `
-	UserID string `json:"user_id"`
-
-	CreatedAt time.Time `json:"createdAt" format:"date-time"`
-	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
-
-	DisplayName   string   `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	Type          string   `json:"type" validate:"required,max=100" maxLength:"100"`
-	Priority      int      `json:"priority" validate:"required"`
-	Verified      bool     `json:"verified"`
-	Secret        string   `json:"secret" validate:"required"`
-	RecoveryCodes []string `json:"recovery_codes" validate:"required" gorm:"type:text[]"`
-	URI           string   `json:"uri"`
+	ID            string          `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	UserID        string          `json:"user_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	CreatedAt     time.Time       `json:"createdAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+	UpdatedAt     time.Time       `json:"updatedAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+	DisplayName   string          `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Authenticator App"`
+	Type          string          `json:"type" validate:"required,max=100" maxLength:"100" example:"totp"`
+	Priority      int             `json:"priority" validate:"required" example:"1"`
+	Verified      bool            `json:"verified" example:"true"`
+	RecoveryCodes []string        `json:"recovery_codes" validate:"required" gorm:"type:text[]; serializer:json" example:"[\"code1\", \"code2\"]"`
+	Properties    json.RawMessage `json:"properties" validate:"required"`
 }
 
 func (base *MFA) BeforeCreate(db *gorm.DB) error {
@@ -52,20 +50,19 @@ func (base *MFA) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateMFA struct {
-	ProviderID  string `json:"provider_id" validate:"required" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	Type        string `json:"type" validate:"required,max=100" maxLength:"100"`
-	Priority    int    `json:"priority" validate:"required"`
-	Secret      string `json:"-" swaggerignore:"true"`
-	URI         string `json:"-" swaggerignore:"true"`
+	ProviderID    string          `json:"provider_id" validate:"required" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	DisplayName   string          `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Authenticator App"`
+	Type          string          `json:"type" validate:"required,max=100" maxLength:"100" example:"totp"`
+	Priority      int             `json:"priority" validate:"required" example:"1"`
+	RecoveryCodes []string        `json:"recovery_codes" validate:"required" gorm:"type:text[]; serializer:json" example:"[\"code1\", \"code2\"]"`
+	Properties    json.RawMessage `json:"-" swaggerignore:"true"`
 }
 
 type UpdateMFA struct {
-	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	Priority    int    `json:"priority" validate:"required"`
+	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Authenticator App"`
+	Priority    int    `json:"priority" validate:"required" example:"1"`
 }
 
 type MFAProviderData struct {
-	Secret string `json:"secret" validate:"required"`
-	URI    string `json:"uri"`
+	Properties json.RawMessage `json:"secret" validate:"required"`
 }

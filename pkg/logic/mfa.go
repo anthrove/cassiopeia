@@ -25,6 +25,7 @@ import (
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
+	"slices"
 )
 
 // CreateMFA creates a new MFA for a specific User within a specified tenant.
@@ -71,8 +72,20 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 		return object.MFA{}, err
 	}
 
-	createMFA.Secret = mfaData.Secret
-	createMFA.URI = mfaData.URI
+	var recoveryCodes []string
+
+	// This could be configurable, but i don't see the reason why. So I left this note here for a future dev to maybe implement.
+	for range 6 {
+		phrase, err := util.RandomPassPhrase(3, "-")
+		if err != nil {
+			return object.MFA{}, err
+		}
+		recoveryCodes = append(recoveryCodes, phrase)
+
+	}
+
+	createMFA.RecoveryCodes = recoveryCodes
+	createMFA.Properties = mfaData.Properties
 
 	createdMFA, err := repository.CreateMFA(ctx, is.db, tenantID, createMFA)
 	if err != nil {
@@ -94,11 +107,7 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 //
 // Returns:
 //   - Error if there is any issue during validation or updating.
-func (is IdentityService) UpdateMFA(ctx context.Context, tenantID string, mfaID string, updateMFA object.UpdateMFA) error {
-	if len(tenantID) == 0 {
-		return errors.New("tenantID is required")
-	}
-
+func (is IdentityService) UpdateMFA(ctx context.Context, userID string, mfaID string, updateMFA object.UpdateMFA) error {
 	if len(mfaID) == 0 {
 		return errors.New("mfaID is required")
 	}
@@ -112,7 +121,7 @@ func (is IdentityService) UpdateMFA(ctx context.Context, tenantID string, mfaID 
 		}
 	}
 
-	return repository.UpdateMFA(ctx, is.db, tenantID, mfaID, updateMFA)
+	return repository.UpdateMFA(ctx, is.db, mfaID, userID, updateMFA)
 }
 
 // KillMFA deletes an existing MFA within a specified tenant.
@@ -146,16 +155,16 @@ func (is IdentityService) KillMFA(ctx context.Context, tenantID string, mfaID st
 // Returns:
 //   - MFA object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func (is IdentityService) FindMFA(ctx context.Context, tenantID string, mfaID string) (object.MFA, error) {
-	if len(tenantID) == 0 {
-		return object.MFA{}, errors.New("tenantID is required")
+func (is IdentityService) FindMFA(ctx context.Context, userID string, mfaID string) (object.MFA, error) {
+	if len(userID) == 0 {
+		return object.MFA{}, errors.New("userID is required")
 	}
 
 	if len(mfaID) == 0 {
 		return object.MFA{}, errors.New("mfaID is required")
 	}
 
-	return repository.FindMFA(ctx, is.db, tenantID, mfaID)
+	return repository.FindMFA(ctx, is.db, mfaID, userID)
 }
 
 // FindMFAs retrieves a list of MFAs within a specified tenant, with pagination support.
@@ -192,34 +201,33 @@ func (is IdentityService) VerifieMFA(ctx context.Context, mfaID string, userID s
 	}
 
 	if len(userID) == 0 {
-		return errors.New("tenantID is required")
+		return errors.New("userID is required")
 	}
 
 	return repository.VerifieMFA(ctx, is.db, mfaID, userID, verified)
 }
 
-// UpdateMFARecoveryCodesKeys updates the recovery codes of an existing MFA within a specified tenant in the database.
-//
-// Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
-//   - mfaID: unique identifier of the MFA to be updated.
-//   - userID: unique identifier of the user to which the MFAs belong.
-//   - recoveryCodes: slice of strings containing the new recovery codes.
-//
-// Returns:
-//   - Error if there is any issue during updating.
-func (is IdentityService) UpdateMFARecoveryCodesKeys(ctx context.Context, mfaID string, userID string, recoveryCodes []string) error {
-	if len(mfaID) == 0 {
-		return errors.New("mfaID is required")
+func (is IdentityService) UseRecoveryCode(ctx context.Context, mfaID string, userID string, recoveryCode string) (bool, error) {
+	userMFA, err := is.FindMFA(ctx, userID, mfaID)
+	if err != nil {
+		return false, err
 	}
 
-	if len(userID) == 0 {
-		return errors.New("tenantID is required")
+	recoveryCodeIndex := slices.Index(userMFA.RecoveryCodes, recoveryCode)
+
+	if recoveryCodeIndex == -1 {
+		return false, errors.New("mfaID is invalid")
 	}
 
-	if len(recoveryCodes) == 0 {
-		return errors.New("recoveryCodes is required")
-	}
+	// This deletes the uses recovery code
+	// https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-a-slice-in-golang
+	userMFA.RecoveryCodes[recoveryCodeIndex] = userMFA.RecoveryCodes[len(userMFA.RecoveryCodes)-1]
+	userMFA.RecoveryCodes = userMFA.RecoveryCodes[:len(userMFA.RecoveryCodes)-1]
 
-	return repository.UpdateMFARecoveryCodes(ctx, is.db, mfaID, userID, recoveryCodes)
+	err = repository.UpdateMFARecoveryCodes(ctx, is.db, mfaID, userID, userMFA.RecoveryCodes)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+
 }

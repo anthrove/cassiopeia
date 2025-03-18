@@ -39,9 +39,8 @@ func CreateMFA(ctx context.Context, db *gorm.DB, userID string, createMFA object
 		Type:          createMFA.Type,
 		Priority:      createMFA.Priority,
 		Verified:      false,
-		Secret:        createMFA.Secret,
-		RecoveryCodes: nil,
-		URI:           createMFA.URI,
+		RecoveryCodes: createMFA.RecoveryCodes,
+		Properties:    createMFA.Properties,
 	}
 
 	err := db.WithContext(ctx).Model(&object.MFA{}).Create(&mfa).Error
