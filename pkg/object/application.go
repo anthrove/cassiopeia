@@ -42,7 +42,7 @@ type Application struct {
 	ForgetURL string `json:"forget_url" gorm:"type:varchar(255)"`
 	TermsURL  string `json:"terms_url" gorm:"type:varchar(255)"`
 
-	RedirectURLs []string `json:"redirect_urls" gorm:"type:text;serializer:json"`
+	RedirectURLs []string `json:"redirect_urls" gorm:"type:text[]; serializer:json"`
 
 	Tokens []Token `json:"-" swaggerignore:"true"`
 }
@@ -119,8 +119,8 @@ func (base *Application) GrantTypes() []oidc.GrantType {
 
 // LoginURL will be called to redirect the user (agent) to the login UI
 // you could implement some logic here to redirect the users to different login UIs depending on the client
-func (base *Application) LoginURL(user_id string) string {
-	return base.SignInURL
+func (base *Application) LoginURL(requestID string) string {
+	return "/auth/" + base.TenantID + "/login?request_id=" + requestID
 }
 
 // AccessTokenType must return the type of access token the client uses (Bearer (opaque) or JWT)

@@ -17,11 +17,144 @@
 package object
 
 import (
+	"database/sql"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
-	"golang.org/x/text/language"
+	"gorm.io/gorm"
 	"time"
 )
+
+type AuthRequest struct {
+	ID            string         `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	TenantID      string         `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ApplicationID string         `json:"application_id" maxLength:"25" minLength:"25" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	UserID        sql.NullString `json:"user_id" maxLength:"25" gorm:"type:char(25)" `
+
+	CreatedAt time.Time `json:"created_at" format:"date-time"`
+
+	CallbackURI   string             `json:"callback_uri"`
+	TransferState string             `json:"transfer_state"`
+	Prompt        []string           `json:"prompt" gorm:"type:text[]; serializer:json"`
+	LoginHint     string             `json:"login_hint"`
+	MaxAuthAge    *time.Duration     `json:"max_auth_age"`
+	Scopes        []string           `json:"scopes" gorm:"type:text[]; serializer:json"`
+	ResponseType  oidc.ResponseType  `json:"response_type"`
+	ResponseMode  oidc.ResponseMode  `json:"response_mode"`
+	Nonce         string             `json:"nonce"`
+	CodeChallenge *OIDCCodeChallenge `json:"code_challenge" gorm:"type:text; serializer:json"`
+
+	Authenticated   bool      `json:"authenticated" format:"date-time"`
+	AuthenticatedAt time.Time `json:"authenticated_at" format:"date-time"`
+}
+
+func (a AuthRequest) GetID() string {
+	return a.ID
+}
+
+func (a AuthRequest) GetACR() string {
+	return "" // we won't handle acr in this example
+}
+
+func (a AuthRequest) GetAMR() []string {
+	// this example only uses password for authentication
+	if a.Authenticated {
+		return []string{"pwd"}
+	}
+	return nil
+}
+
+func (a AuthRequest) GetAudience() []string {
+	return []string{a.ApplicationID} // this example will always just use the client_id as audience
+}
+
+func (a AuthRequest) GetAuthTime() time.Time {
+	return a.AuthenticatedAt
+}
+
+func (a AuthRequest) GetClientID() string {
+	return a.ApplicationID
+}
+
+func (a AuthRequest) GetCodeChallenge() *oidc.CodeChallenge {
+	return CodeChallengeToOIDC(a.CodeChallenge)
+}
+
+func (a AuthRequest) GetNonce() string {
+	return a.Nonce
+}
+
+func (a AuthRequest) GetRedirectURI() string {
+	return a.CallbackURI
+}
+
+func (a AuthRequest) GetResponseType() oidc.ResponseType {
+	return a.ResponseType
+}
+
+func (a AuthRequest) GetResponseMode() oidc.ResponseMode {
+	return a.ResponseMode
+}
+
+func (a AuthRequest) GetScopes() []string {
+	return a.Scopes
+}
+
+func (a AuthRequest) GetState() string {
+	return a.TransferState
+}
+
+func (a AuthRequest) GetSubject() string {
+	return a.UserID.String
+}
+
+func (a AuthRequest) Done() bool {
+	return a.Authenticated
+}
+
+// BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.
+// It generates a unique ID for the group if it is not already set.
+//
+// Parameters:
+//   - db: a gorm.DB instance representing the database connection.
+//
+// Returns:
+//   - An error if there is any issue generating the unique ID.
+func (a *AuthRequest) BeforeCreate(db *gorm.DB) error {
+	if a.ID == "" {
+		id, err := gonanoid.New(25)
+		if err != nil {
+			return err
+		}
+
+		a.ID = id
+	}
+
+	return nil
+}
+
+type CreateAuthRequest struct {
+	ApplicationID string         `json:"application_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	UserID        sql.NullString `json:"user_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+
+	CallbackURI   string             `json:"callback_uri"`
+	TransferState string             `json:"transfer_state"`
+	Prompt        []string           `json:"prompt" gorm:"type:text[]; serializer:json"`
+	LoginHint     string             `json:"login_hint"`
+	MaxAuthAge    *time.Duration     `json:"max_auth_age"`
+	Scopes        []string           `json:"scopes" gorm:"type:text[]; serializer:json"`
+	ResponseType  oidc.ResponseType  `json:"response_type"`
+	ResponseMode  oidc.ResponseMode  `json:"response_mode"`
+	Nonce         string             `json:"nonce"`
+	CodeChallenge *OIDCCodeChallenge `json:"code_challenge" gorm:"type:text; serializer:json"`
+}
+
+type UpdateAuthRequest struct {
+	UserID sql.NullString `json:"user_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+
+	Authenticated   bool      `json:"authenticated" format:"date-time"`
+	AuthenticatedAt time.Time `json:"authenticated_at" format:"date-time"`
+}
 
 // Copyright https://github.com/zitadel/oidc/blob/eb2f912c5e5a783e6fb682d5eeea3a13b1ad12c7/example/server/storage/oidc.go#L145
 // =============================================
@@ -52,91 +185,6 @@ type RefreshToken struct {
 type OIDCCodeChallenge struct {
 	Challenge string
 	Method    string
-}
-
-type AuthRequest struct {
-	ID            string
-	CreationDate  time.Time
-	ApplicationID string
-	CallbackURI   string
-	TransferState string
-	Prompt        []string
-	UiLocales     []language.Tag
-	LoginHint     string
-	MaxAuthAge    *time.Duration
-	UserID        string
-	Scopes        []string
-	ResponseType  oidc.ResponseType
-	ResponseMode  oidc.ResponseMode
-	Nonce         string
-	CodeChallenge *OIDCCodeChallenge
-
-	done     bool
-	authTime time.Time
-}
-
-func (a *AuthRequest) GetID() string {
-	return a.ID
-}
-
-func (a *AuthRequest) GetACR() string {
-	return "" // we won't handle acr in this example
-}
-
-func (a *AuthRequest) GetAMR() []string {
-	// this example only uses password for authentication
-	if a.done {
-		return []string{"pwd"}
-	}
-	return nil
-}
-
-func (a *AuthRequest) GetAudience() []string {
-	return []string{a.ApplicationID} // this example will always just use the client_id as audience
-}
-
-func (a *AuthRequest) GetAuthTime() time.Time {
-	return a.authTime
-}
-
-func (a *AuthRequest) GetClientID() string {
-	return a.ApplicationID
-}
-
-func (a *AuthRequest) GetCodeChallenge() *oidc.CodeChallenge {
-	return CodeChallengeToOIDC(a.CodeChallenge)
-}
-
-func (a *AuthRequest) GetNonce() string {
-	return a.Nonce
-}
-
-func (a *AuthRequest) GetRedirectURI() string {
-	return a.CallbackURI
-}
-
-func (a *AuthRequest) GetResponseType() oidc.ResponseType {
-	return a.ResponseType
-}
-
-func (a *AuthRequest) GetResponseMode() oidc.ResponseMode {
-	return a.ResponseMode
-}
-
-func (a *AuthRequest) GetScopes() []string {
-	return a.Scopes
-}
-
-func (a *AuthRequest) GetState() string {
-	return a.TransferState
-}
-
-func (a *AuthRequest) GetSubject() string {
-	return a.UserID
-}
-
-func (a *AuthRequest) Done() bool {
-	return a.done
 }
 
 func CodeChallengeToOIDC(challenge *OIDCCodeChallenge) *oidc.CodeChallenge {

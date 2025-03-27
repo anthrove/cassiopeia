@@ -17,8 +17,10 @@
 package oidc
 
 import (
+	"database/sql"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
+	"github.com/zitadel/oidc/v3/pkg/op"
 	"time"
 )
 
@@ -46,17 +48,17 @@ func MaxAgeToInternal(maxAge *uint) *time.Duration {
 	return &dur
 }
 
-func authRequestToInternal(authReq *oidc.AuthRequest, userID string) *object.AuthRequest {
+func authRequestToInternal(requestID string, authReq *oidc.AuthRequest, userID string) op.AuthRequest {
 	return &object.AuthRequest{
-		CreationDate:  time.Now(),
+		ID:            requestID,
+		CreatedAt:     time.Now(),
 		ApplicationID: authReq.ClientID,
 		CallbackURI:   authReq.RedirectURI,
 		TransferState: authReq.State,
 		Prompt:        PromptToInternal(authReq.Prompt),
-		UiLocales:     authReq.UILocales,
 		LoginHint:     authReq.LoginHint,
 		MaxAuthAge:    MaxAgeToInternal(authReq.MaxAge),
-		UserID:        userID,
+		UserID:        sql.NullString{String: userID, Valid: true},
 		Scopes:        authReq.Scopes,
 		ResponseType:  authReq.ResponseType,
 		ResponseMode:  authReq.ResponseMode,

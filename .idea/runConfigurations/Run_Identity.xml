@@ -5,6 +5,7 @@
     <envs>
       <env name="DB_DATASOURCE" value="gorm.db" />
       <env name="DB_DRIVER" value="sqlite" />
+      <env name="DB_DEBUG" value="true" />
     </envs>
     <EXTENSION ID="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />

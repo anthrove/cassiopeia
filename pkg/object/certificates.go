@@ -26,7 +26,7 @@ import (
 )
 
 type Certificate struct {
-	IDs      string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	IDs      string `json:"id" gorm:"column:id;primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	TenantID string `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
 	CreatedAt time.Time `json:"created_at" format:"date-time"`

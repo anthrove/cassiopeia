@@ -32,6 +32,7 @@ func CreateApplication(ctx context.Context, db *gorm.DB, tenantId string, create
 		SignUpURL:     createApplication.SignUpURL,
 		ForgetURL:     createApplication.ForgetURL,
 		TermsURL:      createApplication.TermsURL,
+		RedirectURLs:  createApplication.RedirectURLs,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Application{}).Create(&application).Error
@@ -49,6 +50,7 @@ func UpdateApplication(ctx context.Context, db *gorm.DB, tenantID string, applic
 		SignUpURL:     updateApplication.SignUpURL,
 		ForgetURL:     updateApplication.ForgetURL,
 		TermsURL:      updateApplication.TermsURL,
+		RedirectURLs:  updateApplication.RedirectURLs,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Application{}).Where("id = ? AND tenant_id = ?", applicationID, tenantID).Updates(&application).Error

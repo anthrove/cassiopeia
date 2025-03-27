@@ -19,6 +19,7 @@ package oidc
 import (
 	"context"
 	"crypto/rsa"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/anthrove/identity/pkg/logic"
@@ -30,6 +31,7 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"gorm.io/gorm"
+	"log"
 	"math"
 	"slices"
 	"strings"
@@ -43,7 +45,6 @@ type storage struct {
 
 	//TODO put this data into db
 	lock         sync.Mutex
-	authRequests map[string]op.AuthRequest
 	requestCodes map[string]string
 
 	signingKeys signingKey
@@ -71,9 +72,8 @@ func NewStorage(is logic.IdentityService, tenantID string) op.Storage {
 	key, _, _ := util.GenerateRSAKey(2048)
 
 	return &storage{
-		service:      logic.IdentityService{},
+		service:      is,
 		tenantID:     tenantID,
-		authRequests: make(map[string]op.AuthRequest),
 		requestCodes: make(map[string]string),
 		signingKeys: signingKey{
 			id:        uuid.NewString(),
@@ -88,7 +88,7 @@ func NewStorage(is logic.IdentityService, tenantID string) op.Storage {
 
 // CreateAuthRequest implements the op.Storage interface
 // it will be called after parsing and validation of the authentication request
-func (s *storage) CreateAuthRequest(_ context.Context, request *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
+func (s *storage) CreateAuthRequest(ctx context.Context, request *oidc.AuthRequest, userID string) (op.AuthRequest, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -98,34 +98,47 @@ func (s *storage) CreateAuthRequest(_ context.Context, request *oidc.AuthRequest
 		return nil, oidc.ErrLoginRequired()
 	}
 
-	req := authRequestToInternal(request, userID)
-
-	id, err := gonanoid.New(40)
+	id, err := gonanoid.New(25)
 	if err != nil {
 		return nil, err
 	}
 
-	req.ID = id
-	s.authRequests[req.ID] = req
+	req := authRequestToInternal(id, request, userID)
+
+	req, err = s.service.CreateAuthRequest(ctx, s.tenantID, object.CreateAuthRequest{
+		ApplicationID: request.ClientID,
+		CallbackURI:   request.RedirectURI,
+		TransferState: request.State,
+		Prompt:        PromptToInternal(request.Prompt),
+		LoginHint:     request.LoginHint,
+		MaxAuthAge:    MaxAgeToInternal(request.MaxAge),
+		UserID:        sql.NullString{String: userID, Valid: true},
+		Scopes:        request.Scopes,
+		ResponseType:  request.ResponseType,
+		ResponseMode:  request.ResponseMode,
+		Nonce:         request.Nonce,
+		CodeChallenge: &object.OIDCCodeChallenge{
+			Challenge: request.CodeChallenge,
+			Method:    string(request.CodeChallengeMethod),
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
 
 // AuthRequestByID implements the op.Storage interface
 // it will be called after the Login UI redirects back to the OIDC endpoint
-func (s *storage) AuthRequestByID(_ context.Context, id string) (op.AuthRequest, error) {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	request, ok := s.authRequests[id]
-	if !ok {
-		return nil, errors.New("auth request not found")
-	}
-	return request, nil
+func (s *storage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
+	return s.service.FindAuthRequest(ctx, s.tenantID, id)
 }
 
 // AuthRequestByCode implements the op.Storage interface
 // it will be called after parsing and validation of the token request (in an authorization code flow)
-func (s *storage) AuthRequestByCode(_ context.Context, code string) (op.AuthRequest, error) {
+func (s *storage) AuthRequestByCode(ctx context.Context, code string) (op.AuthRequest, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -135,12 +148,7 @@ func (s *storage) AuthRequestByCode(_ context.Context, code string) (op.AuthRequ
 		return nil, errors.New("auth request not found")
 	}
 
-	request, ok := s.authRequests[requestID]
-	if !ok {
-		return nil, errors.New("auth request not found")
-	}
-
-	return request, nil
+	return s.service.FindAuthRequest(ctx, s.tenantID, requestID)
 }
 
 // SaveAuthCode implements the op.Storage interface
@@ -158,25 +166,16 @@ func (s *storage) SaveAuthCode(_ context.Context, id string, code string) error 
 // it will be called after creating the token response (id and access tokens) for a valid
 // - authentication request (in an implicit flow)
 // - token request (in an authorization code flow)
-func (s *storage) DeleteAuthRequest(_ context.Context, id string) error {
-	s.lock.Lock()
-	defer s.lock.Unlock()
-	delete(s.authRequests, id)
-
-	for code, codeId := range s.requestCodes {
-		if codeId == id {
-			delete(s.requestCodes, code)
-			break
-		}
-	}
-
-	return nil
+func (s *storage) DeleteAuthRequest(ctx context.Context, id string) error {
+	return s.service.KillAuthRequest(ctx, s.tenantID, id)
 }
 
 // CreateAccessToken implements the op.Storage interface
 // it will be called for all requests able to return an access token (Authorization Code Flow, Implicit Flow, JWT Profile, ...)
 func (s *storage) CreateAccessToken(ctx context.Context, request op.TokenRequest) (accessTokenID string, expiration time.Time, err error) {
 	//TODO
+	log.Println("TEST CreateAccessToken")
+
 	panic("implement me")
 }
 
@@ -184,6 +183,7 @@ func (s *storage) CreateAccessToken(ctx context.Context, request op.TokenRequest
 // it will be called for all requests able to return an access and refresh token (Authorization Code Flow, Refresh Token Request)
 func (s *storage) CreateAccessAndRefreshTokens(ctx context.Context, request op.TokenRequest, currentRefreshToken string) (accessTokenID string, newRefreshTokenID string, expiration time.Time, err error) {
 	//TODO implement me
+	log.Println("TEST CreateAccessAndRefreshTokens")
 	panic("implement me")
 }
 
@@ -191,6 +191,8 @@ func (s *storage) CreateAccessAndRefreshTokens(ctx context.Context, request op.T
 // it will be called after parsing and validation of the refresh token request
 func (s *storage) TokenRequestByRefreshToken(ctx context.Context, refreshTokenID string) (op.RefreshTokenRequest, error) {
 	//TODO implement me
+	log.Println("TEST TokenRequestByRefreshToken")
+
 	panic("implement me")
 }
 
@@ -282,7 +284,7 @@ func (s *storage) KeySet(ctx context.Context) ([]op.Key, error) {
 		return nil, err
 	}
 
-	keys := make([]op.Key, len(certs))
+	keys := make([]op.Key, 0, len(certs))
 	for _, cert := range certs {
 		keys = append(keys, &cert)
 	}
