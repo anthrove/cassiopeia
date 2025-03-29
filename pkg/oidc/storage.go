@@ -31,7 +31,6 @@ import (
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
 	"gorm.io/gorm"
-	"log"
 	"math"
 	"slices"
 	"strings"
@@ -173,17 +172,25 @@ func (s *storage) DeleteAuthRequest(ctx context.Context, id string) error {
 // CreateAccessToken implements the op.Storage interface
 // it will be called for all requests able to return an access token (Authorization Code Flow, Implicit Flow, JWT Profile, ...)
 func (s *storage) CreateAccessToken(ctx context.Context, request op.TokenRequest) (accessTokenID string, expiration time.Time, err error) {
-	//TODO
-	log.Println("TEST CreateAccessToken")
+	token, err := s.service.CreateToken(ctx, s.tenantID, object.CreateToken{
+		ApplicationID: "",
+		UserID:        request.GetSubject(),
+		Scope:         strings.Join(request.GetScopes(), " "),
+		Audience:      strings.Join(request.GetAudience(), " "),
+		ExpiredAt:     time.Now().Add(24 * time.Hour),
+	})
 
-	panic("implement me")
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return token.ID, token.ExpiredAt, nil
 }
 
 // CreateAccessAndRefreshTokens implements the op.Storage interface
 // it will be called for all requests able to return an access and refresh token (Authorization Code Flow, Refresh Token Request)
 func (s *storage) CreateAccessAndRefreshTokens(ctx context.Context, request op.TokenRequest, currentRefreshToken string) (accessTokenID string, newRefreshTokenID string, expiration time.Time, err error) {
 	//TODO implement me
-	log.Println("TEST CreateAccessAndRefreshTokens")
 	panic("implement me")
 }
 
@@ -191,8 +198,6 @@ func (s *storage) CreateAccessAndRefreshTokens(ctx context.Context, request op.T
 // it will be called after parsing and validation of the refresh token request
 func (s *storage) TokenRequestByRefreshToken(ctx context.Context, refreshTokenID string) (op.RefreshTokenRequest, error) {
 	//TODO implement me
-	log.Println("TEST TokenRequestByRefreshToken")
-
 	panic("implement me")
 }
 
@@ -416,10 +421,28 @@ func (s *storage) GetKeyByIDAndClientID(ctx context.Context, keyID, clientID str
 		return nil, errors.New("clientID not found")
 	}
 
+	application, err := s.service.FindApplication(ctx, s.tenantID, token.ApplicationID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	certificate, err := s.service.FindCertificate(ctx, s.tenantID, application.CertificateID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	publicKey, err := util.BytesToPublicKey([]byte(certificate.Certificate))
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &jose.JSONWebKey{
 		KeyID: keyID,
 		Use:   "sig",
-		Key:   token.AccessToken,
+		Key:   publicKey,
 	}, nil
 }
 

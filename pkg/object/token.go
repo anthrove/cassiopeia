@@ -30,11 +30,12 @@ type Token struct {
 	UserID        sql.NullString `json:"user_id" maxLength:"25" gorm:"type:char(25)" `
 
 	CreatedAt time.Time `json:"createdAt" format:"date-time"`
+	ExpiredAt time.Time `json:"expired_at" format:"date-time"`
 
-	AccessToken  string    `json:"access_token"`
-	RefreshToken string    `json:"refresh_token"`
-	ExpiredAt    time.Time `json:"expired_at" format:"date-time"`
-	Scope        string    `json:"scope"`
+	RefreshTokenID string `json:"refresh_token"`
+
+	Scope    string `json:"scope"`
+	Audience string `json:"audience"`
 }
 
 func (base *Token) BeforeCreate(db *gorm.DB) error {
@@ -53,8 +54,7 @@ func (base *Token) BeforeCreate(db *gorm.DB) error {
 type CreateToken struct {
 	ApplicationID string    `json:"application_id" maxLength:"25" minLength:"25"`
 	UserID        string    `json:"user_id"`
-	AccessToken   string    `json:"access_token"`
-	RefreshToken  string    `json:"refresh_token"`
 	Scope         string    `json:"scope"`
+	Audience      string    `json:"audience"`
 	ExpiredAt     time.Time `json:"expired_at" format:"date-time"`
 }

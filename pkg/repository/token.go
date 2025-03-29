@@ -20,10 +20,14 @@ import (
 	"context"
 	"database/sql"
 	"github.com/anthrove/identity/pkg/object"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
+	"time"
 )
 
 func CreateToken(ctx context.Context, db *gorm.DB, tenantId string, createToken object.CreateToken) (object.Token, error) {
+	refreshTokenID, _ := gonanoid.New(25)
+
 	token := object.Token{
 		TenantID:      tenantId,
 		ApplicationID: createToken.ApplicationID,
@@ -31,10 +35,11 @@ func CreateToken(ctx context.Context, db *gorm.DB, tenantId string, createToken 
 			String: createToken.UserID,
 			Valid:  true,
 		},
-		AccessToken:  createToken.AccessToken,
-		RefreshToken: createToken.RefreshToken,
-		ExpiredAt:    createToken.ExpiredAt,
-		Scope:        createToken.Scope,
+		CreatedAt:      time.Time{},
+		ExpiredAt:      createToken.ExpiredAt,
+		RefreshTokenID: refreshTokenID,
+		Scope:          createToken.Scope,
+		Audience:       createToken.Audience,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Token{}).Create(&token).Error
@@ -58,7 +63,7 @@ func FindToken(ctx context.Context, db *gorm.DB, tenantID string, tokenID string
 
 func FindTokenByRefresh(ctx context.Context, db *gorm.DB, tenantID string, refreshToken string) (object.Token, error) {
 	var token object.Token
-	err := db.WithContext(ctx).Take(&token, "refresh_token = ? AND tenant_id = ?", refreshToken, tenantID).Error
+	err := db.WithContext(ctx).Take(&token, "refresh_token_id = ? AND tenant_id = ?", refreshToken, tenantID).Error
 	return token, err
 }
 
