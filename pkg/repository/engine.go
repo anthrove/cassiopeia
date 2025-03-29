@@ -79,5 +79,6 @@ func Migrate(engine *gorm.DB) error {
 		&object.MessageTemplate{},
 		&object.Application{},
 		&object.AuthRequest{},
-		&object.Token{})
+		&object.Token{},
+		&object.Resource{})
 }
