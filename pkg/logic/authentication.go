@@ -18,10 +18,12 @@ package logic
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"github.com/anthrove/identity/pkg/crypto"
 	"github.com/anthrove/identity/pkg/object"
 	gonanoid "github.com/matoous/go-nanoid/v2"
+	"time"
 )
 
 func (is IdentityService) SignIn(ctx context.Context, tenantID string, applicationID string, signInData object.SignInRequest) (string, object.User, error) {
@@ -70,6 +72,21 @@ func (is IdentityService) SignIn(ctx context.Context, tenantID string, applicati
 	session["logged_in"] = true
 
 	is.UpdateSession(ctx, sessionID, session)
+
+	if signInData.RequestID != "" {
+		err := is.UpdateAuthRequest(ctx, tenantID, signInData.RequestID, object.UpdateAuthRequest{
+			UserID: sql.NullString{
+				String: user.ID,
+				Valid:  true,
+			},
+			Authenticated:   true,
+			AuthenticatedAt: time.Now(),
+		})
+
+		if err != nil {
+			return "", object.User{}, err
+		}
+	}
 
 	return sessionID, user, nil
 }

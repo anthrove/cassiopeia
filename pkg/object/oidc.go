@@ -25,6 +25,10 @@ import (
 	"time"
 )
 
+func new() op.TokenExchangeRequest {
+	return &AuthRequest{}
+}
+
 type AuthRequest struct {
 	ID            string         `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	TenantID      string         `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
@@ -46,6 +50,70 @@ type AuthRequest struct {
 
 	Authenticated   bool      `json:"authenticated" format:"date-time"`
 	AuthenticatedAt time.Time `json:"authenticated_at" format:"date-time"`
+}
+
+func (a AuthRequest) GetResourses() []string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetRequestedTokenType() oidc.TokenType {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeSubject() string {
+	return a.ID
+}
+
+func (a AuthRequest) GetExchangeSubjectTokenType() oidc.TokenType {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeSubjectTokenIDOrToken() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeSubjectTokenClaims() map[string]any {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeActor() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeActorTokenType() oidc.TokenType {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeActorTokenIDOrToken() string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) GetExchangeActorTokenClaims() map[string]any {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) SetCurrentScopes(scopes []string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) SetRequestedTokenType(tt oidc.TokenType) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (a AuthRequest) SetSubject(subject string) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (a AuthRequest) GetID() string {

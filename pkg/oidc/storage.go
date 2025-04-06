@@ -18,7 +18,6 @@ package oidc
 
 import (
 	"context"
-	"crypto/rsa"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -26,7 +25,6 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-jose/go-jose/v4"
-	"github.com/google/uuid"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/zitadel/oidc/v3/pkg/oidc"
 	"github.com/zitadel/oidc/v3/pkg/op"
@@ -38,48 +36,32 @@ import (
 	"time"
 )
 
+type fullStorage interface {
+	op.Storage
+	op.TokenExchangeStorage
+}
+
 type storage struct {
-	service  logic.IdentityService
-	tenantID string
+	service logic.IdentityService
+	tenant  object.Tenant
 
 	//TODO put this data into db
 	lock         sync.Mutex
 	requestCodes map[string]string
-
-	signingKeys signingKey
 }
 
-type signingKey struct {
-	id        string
-	algorithm jose.SignatureAlgorithm
-	key       *rsa.PrivateKey
-}
+func NewStorage(ctx context.Context, is logic.IdentityService, tenantID string) (fullStorage, error) {
+	tenant, err := is.FindTenant(ctx, tenantID)
 
-func (s *signingKey) SignatureAlgorithm() jose.SignatureAlgorithm {
-	return s.algorithm
-}
-
-func (s *signingKey) Key() any {
-	return s.key
-}
-
-func (s *signingKey) ID() string {
-	return s.id
-}
-
-func NewStorage(is logic.IdentityService, tenantID string) op.Storage {
-	key, _, _ := util.GenerateRSAKey(2048)
+	if err != nil {
+		return nil, err
+	}
 
 	return &storage{
 		service:      is,
-		tenantID:     tenantID,
+		tenant:       tenant,
 		requestCodes: make(map[string]string),
-		signingKeys: signingKey{
-			id:        uuid.NewString(),
-			algorithm: jose.RS256,
-			key:       key,
-		},
-	}
+	}, nil
 }
 
 // Documentation to this function are from here: https://github.com/zitadel/oidc/blob/main/example/server/storage/storage.go
@@ -104,7 +86,7 @@ func (s *storage) CreateAuthRequest(ctx context.Context, request *oidc.AuthReque
 
 	req := authRequestToInternal(id, request, userID)
 
-	req, err = s.service.CreateAuthRequest(ctx, s.tenantID, object.CreateAuthRequest{
+	req, err = s.service.CreateAuthRequest(ctx, s.tenant.ID, object.CreateAuthRequest{
 		ApplicationID: request.ClientID,
 		CallbackURI:   request.RedirectURI,
 		TransferState: request.State,
@@ -132,7 +114,7 @@ func (s *storage) CreateAuthRequest(ctx context.Context, request *oidc.AuthReque
 // AuthRequestByID implements the op.Storage interface
 // it will be called after the Login UI redirects back to the OIDC endpoint
 func (s *storage) AuthRequestByID(ctx context.Context, id string) (op.AuthRequest, error) {
-	return s.service.FindAuthRequest(ctx, s.tenantID, id)
+	return s.service.FindAuthRequest(ctx, s.tenant.ID, id)
 }
 
 // AuthRequestByCode implements the op.Storage interface
@@ -147,7 +129,7 @@ func (s *storage) AuthRequestByCode(ctx context.Context, code string) (op.AuthRe
 		return nil, errors.New("auth request not found")
 	}
 
-	return s.service.FindAuthRequest(ctx, s.tenantID, requestID)
+	return s.service.FindAuthRequest(ctx, s.tenant.ID, requestID)
 }
 
 // SaveAuthCode implements the op.Storage interface
@@ -166,13 +148,13 @@ func (s *storage) SaveAuthCode(_ context.Context, id string, code string) error 
 // - authentication request (in an implicit flow)
 // - token request (in an authorization code flow)
 func (s *storage) DeleteAuthRequest(ctx context.Context, id string) error {
-	return s.service.KillAuthRequest(ctx, s.tenantID, id)
+	return s.service.KillAuthRequest(ctx, s.tenant.ID, id)
 }
 
 // CreateAccessToken implements the op.Storage interface
 // it will be called for all requests able to return an access token (Authorization Code Flow, Implicit Flow, JWT Profile, ...)
 func (s *storage) CreateAccessToken(ctx context.Context, request op.TokenRequest) (accessTokenID string, expiration time.Time, err error) {
-	token, err := s.service.CreateToken(ctx, s.tenantID, object.CreateToken{
+	token, err := s.service.CreateToken(ctx, s.tenant.ID, object.CreateToken{
 		ApplicationID: "",
 		UserID:        request.GetSubject(),
 		Scope:         strings.Join(request.GetScopes(), " "),
@@ -204,7 +186,7 @@ func (s *storage) TokenRequestByRefreshToken(ctx context.Context, refreshTokenID
 // TerminateSession implements the op.Storage interface
 // it will be called after the user signed out, therefore the access and refresh token of the user of this client must be removed
 func (s *storage) TerminateSession(ctx context.Context, userID string, clientID string) error {
-	userTokens, err := s.service.FindUserTokens(ctx, s.tenantID, clientID, userID)
+	userTokens, err := s.service.FindUserTokens(ctx, s.tenant.ID, clientID, userID)
 
 	if err != nil {
 		return err
@@ -215,7 +197,7 @@ func (s *storage) TerminateSession(ctx context.Context, userID string, clientID 
 		tokenIDs[i] = token.ID
 	}
 
-	err = s.service.KillTokens(ctx, s.tenantID, tokenIDs)
+	err = s.service.KillTokens(ctx, s.tenant.ID, tokenIDs)
 
 	return err
 }
@@ -224,7 +206,7 @@ func (s *storage) TerminateSession(ctx context.Context, userID string, clientID 
 // it will be called after parsing and validation of the token revocation request
 func (s *storage) RevokeToken(ctx context.Context, tokenOrTokenID string, userID string, clientID string) *oidc.Error {
 	//TODO What if token is a refresh-token instead of token id
-	token, err := s.service.FindToken(ctx, s.tenantID, tokenOrTokenID)
+	token, err := s.service.FindToken(ctx, s.tenant.ID, tokenOrTokenID)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -239,7 +221,7 @@ func (s *storage) RevokeToken(ctx context.Context, tokenOrTokenID string, userID
 		return oidc.ErrInvalidClient().WithDescription("wrong client for this token")
 	}
 
-	err = s.service.KillToken(ctx, s.tenantID, tokenOrTokenID)
+	err = s.service.KillToken(ctx, s.tenant.ID, tokenOrTokenID)
 
 	if err != nil {
 		return oidc.ErrServerError().WithParent(err)
@@ -251,7 +233,7 @@ func (s *storage) RevokeToken(ctx context.Context, tokenOrTokenID string, userID
 // GetRefreshTokenInfo looks up a refresh token and returns the token id and user id.
 // If given something that is not a refresh token, it must return error.
 func (s *storage) GetRefreshTokenInfo(ctx context.Context, clientID string, refreshToken string) (userID string, tokenID string, err error) {
-	token, err := s.service.FindTokenByRefresh(ctx, s.tenantID, refreshToken)
+	token, err := s.service.FindTokenByRefresh(ctx, s.tenant.ID, refreshToken)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", "", op.ErrInvalidRefreshToken
@@ -267,8 +249,14 @@ func (s *storage) GetRefreshTokenInfo(ctx context.Context, clientID string, refr
 
 // SigningKey implements the op.Storage interface
 // it will be called when creating the OpenID Provider
-func (s *storage) SigningKey(_ context.Context) (op.SigningKey, error) {
-	return &s.signingKeys, nil
+func (s *storage) SigningKey(ctx context.Context) (op.SigningKey, error) {
+	certificate, err := s.service.FindCertificate(ctx, s.tenant.ID, *s.tenant.SigningCertificateID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return certificate.ToSigningCert(), nil
 }
 
 // SignatureAlgorithms implements the op.Storage interface
@@ -280,7 +268,7 @@ func (s *storage) SignatureAlgorithms(_ context.Context) ([]jose.SignatureAlgori
 // KeySet implements the op.Storage interface
 // it will be called to get the current (public) keys, among others for the keys_endpoint or for validating access_tokens on the userinfo_endpoint, ...
 func (s *storage) KeySet(ctx context.Context) ([]op.Key, error) {
-	certs, err := s.service.FindCertificates(ctx, s.tenantID, object.Pagination{
+	certs, err := s.service.FindCertificates(ctx, s.tenant.ID, object.Pagination{
 		Limit: math.MaxInt,
 		Page:  0,
 	})
@@ -300,7 +288,7 @@ func (s *storage) KeySet(ctx context.Context) ([]op.Key, error) {
 // GetClientByClientID implements the op.Storage interface
 // it will be called whenever information (type, redirect_uris, ...) about the client behind the client_id is needed
 func (s *storage) GetClientByClientID(ctx context.Context, clientID string) (op.Client, error) {
-	application, err := s.service.FindApplication(ctx, s.tenantID, clientID)
+	application, err := s.service.FindApplication(ctx, s.tenant.ID, clientID)
 
 	if err != nil {
 		return nil, err
@@ -312,7 +300,7 @@ func (s *storage) GetClientByClientID(ctx context.Context, clientID string) (op.
 // AuthorizeClientIDSecret implements the op.Storage interface
 // it will be called for validating the client_id, client_secret on token or introspection requests
 func (s *storage) AuthorizeClientIDSecret(ctx context.Context, clientID, clientSecret string) error {
-	application, err := s.service.FindApplication(ctx, s.tenantID, clientID)
+	application, err := s.service.FindApplication(ctx, s.tenant.ID, clientID)
 
 	if err != nil {
 		return err
@@ -334,7 +322,7 @@ func (s *storage) SetUserinfoFromScopes(ctx context.Context, userinfo *oidc.User
 // SetUserinfoFromToken implements the op.Storage interface
 // it will be called for the userinfo endpoint, so we read the token and pass the information from that to the private function
 func (s *storage) SetUserinfoFromToken(ctx context.Context, userinfo *oidc.UserInfo, tokenID, subject, origin string) error {
-	token, err := s.service.FindToken(ctx, s.tenantID, tokenID)
+	token, err := s.service.FindToken(ctx, s.tenant.ID, tokenID)
 
 	if err != nil {
 		return err
@@ -344,13 +332,13 @@ func (s *storage) SetUserinfoFromToken(ctx context.Context, userinfo *oidc.UserI
 		return errors.New("token expired")
 	}
 
-	return s.setUserinfo(ctx, userinfo, token.UserID.String, token.ApplicationID, strings.Split(subject, " "))
+	return s.setUserinfo(ctx, userinfo, token.UserID.String, token.ApplicationID, strings.Split(token.Scope, " "))
 }
 
 // SetIntrospectionFromToken implements the op.Storage interface
 // it will be called for the introspection endpoint, so we read the token and pass the information from that to the private function
 func (s *storage) SetIntrospectionFromToken(ctx context.Context, introspection *oidc.IntrospectionResponse, tokenID, subject, clientID string) error {
-	token, err := s.service.FindToken(ctx, s.tenantID, tokenID)
+	token, err := s.service.FindToken(ctx, s.tenant.ID, tokenID)
 
 	if err != nil {
 		return err
@@ -380,7 +368,7 @@ func (s *storage) SetIntrospectionFromToken(ctx context.Context, introspection *
 
 // setUserinfo sets the info based on the user, scopes and if necessary the clientID
 func (s *storage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, userID, clientID string, scopes []string) (err error) {
-	user, err := s.service.FindUser(ctx, s.tenantID, userID)
+	user, err := s.service.FindUser(ctx, s.tenant.ID, userID)
 	if err != nil {
 		return fmt.Errorf("user not found")
 	}
@@ -404,14 +392,33 @@ func (s *storage) setUserinfo(ctx context.Context, userInfo *oidc.UserInfo, user
 // GetPrivateClaimsFromScopes implements the op.Storage interface
 // it will be called for the creation of a JWT access token to assert claims for custom scopes
 func (s *storage) GetPrivateClaimsFromScopes(ctx context.Context, userID, clientID string, scopes []string) (map[string]any, error) {
-	// currently no custom claims supported
-	return map[string]any{}, nil
+	user, err := s.service.FindUser(ctx, s.tenant.ID, userID)
+	if err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	claims := make(map[string]any)
+	for _, scope := range scopes {
+		switch scope {
+		case oidc.ScopeOpenID:
+			claims["sub"] = user.ID
+		case oidc.ScopeEmail:
+			claims["email"] = user.Email
+			claims["email_verified"] = user.EmailVerified
+		case oidc.ScopeProfile:
+			claims["preferred_username"] = user.Username
+			claims["name"] = user.DisplayName
+		case oidc.ScopePhone:
+			//TODO setup phone scope
+		}
+	}
+	return claims, nil
 }
 
 // GetKeyByIDAndClientID implements the op.Storage interface
 // it will be called to validate the signatures of a JWT (JWT Profile Grant and Authentication)
 func (s *storage) GetKeyByIDAndClientID(ctx context.Context, keyID, clientID string) (*jose.JSONWebKey, error) {
-	token, err := s.service.FindToken(ctx, s.tenantID, keyID)
+	token, err := s.service.FindToken(ctx, s.tenant.ID, keyID)
 
 	if err != nil {
 		return nil, err
@@ -421,13 +428,7 @@ func (s *storage) GetKeyByIDAndClientID(ctx context.Context, keyID, clientID str
 		return nil, errors.New("clientID not found")
 	}
 
-	application, err := s.service.FindApplication(ctx, s.tenantID, token.ApplicationID)
-
-	if err != nil {
-		return nil, err
-	}
-
-	certificate, err := s.service.FindCertificate(ctx, s.tenantID, application.CertificateID)
+	certificate, err := s.service.FindCertificate(ctx, s.tenant.ID, *s.tenant.SigningCertificateID)
 
 	if err != nil {
 		return nil, err
@@ -468,6 +469,24 @@ func (s *storage) ValidateJWTProfileScopes(ctx context.Context, userID string, s
 // Health implements the op.Storage interface
 func (s *storage) Health(_ context.Context) error {
 	return nil
+}
+
+func (s *storage) ValidateTokenExchangeRequest(ctx context.Context, request op.TokenExchangeRequest) error {
+	//TODO for what is this function?!?
+	return nil
+}
+
+func (s *storage) CreateTokenExchangeRequest(ctx context.Context, request op.TokenExchangeRequest) error {
+	//TODO for what is this function?!?
+	return nil
+}
+
+func (s *storage) GetPrivateClaimsFromTokenExchangeRequest(ctx context.Context, request op.TokenExchangeRequest) (claims map[string]any, err error) {
+	return s.GetPrivateClaimsFromScopes(ctx, request.GetSubject(), request.GetClientID(), request.GetScopes())
+}
+
+func (s *storage) SetUserinfoFromTokenExchangeRequest(ctx context.Context, userinfo *oidc.UserInfo, request op.TokenExchangeRequest) error {
+	return s.SetUserinfoFromScopes(ctx, userinfo, request.GetSubject(), request.GetClientID(), request.GetScopes())
 }
 
 // ============================================

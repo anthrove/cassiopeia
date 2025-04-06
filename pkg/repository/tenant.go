@@ -55,8 +55,9 @@ func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTe
 //   - Error if there is any issue during updating.
 func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenant object.UpdateTenant) error {
 	tenant := object.Tenant{
-		DisplayName:  updateTenant.DisplayName,
-		PasswordType: updateTenant.PasswordType,
+		DisplayName:          updateTenant.DisplayName,
+		PasswordType:         updateTenant.PasswordType,
+		SigningCertificateID: &updateTenant.SigningCertificateID,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Tenant{
