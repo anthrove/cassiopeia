@@ -38,7 +38,7 @@ import (
 
 type fullStorage interface {
 	op.Storage
-	op.TokenExchangeStorage
+	// op.TokenExchangeStorage
 }
 
 type storage struct {
@@ -172,8 +172,19 @@ func (s *storage) CreateAccessToken(ctx context.Context, request op.TokenRequest
 // CreateAccessAndRefreshTokens implements the op.Storage interface
 // it will be called for all requests able to return an access and refresh token (Authorization Code Flow, Refresh Token Request)
 func (s *storage) CreateAccessAndRefreshTokens(ctx context.Context, request op.TokenRequest, currentRefreshToken string) (accessTokenID string, newRefreshTokenID string, expiration time.Time, err error) {
-	//TODO implement me
-	panic("implement me")
+	token, err := s.service.CreateToken(ctx, s.tenant.ID, object.CreateToken{
+		ApplicationID: "",
+		UserID:        request.GetSubject(),
+		Scope:         strings.Join(request.GetScopes(), " "),
+		Audience:      strings.Join(request.GetAudience(), " "),
+		ExpiredAt:     time.Now().Add(24 * time.Hour),
+	})
+
+	if err != nil {
+		return "", "", time.Time{}, err
+	}
+
+	return token.ID, token.RefreshTokenID, token.ExpiredAt, nil
 }
 
 // TokenRequestByRefreshToken implements the op.Storage interface
@@ -469,24 +480,6 @@ func (s *storage) ValidateJWTProfileScopes(ctx context.Context, userID string, s
 // Health implements the op.Storage interface
 func (s *storage) Health(_ context.Context) error {
 	return nil
-}
-
-func (s *storage) ValidateTokenExchangeRequest(ctx context.Context, request op.TokenExchangeRequest) error {
-	//TODO for what is this function?!?
-	return nil
-}
-
-func (s *storage) CreateTokenExchangeRequest(ctx context.Context, request op.TokenExchangeRequest) error {
-	//TODO for what is this function?!?
-	return nil
-}
-
-func (s *storage) GetPrivateClaimsFromTokenExchangeRequest(ctx context.Context, request op.TokenExchangeRequest) (claims map[string]any, err error) {
-	return s.GetPrivateClaimsFromScopes(ctx, request.GetSubject(), request.GetClientID(), request.GetScopes())
-}
-
-func (s *storage) SetUserinfoFromTokenExchangeRequest(ctx context.Context, userinfo *oidc.UserInfo, request op.TokenExchangeRequest) error {
-	return s.SetUserinfoFromScopes(ctx, userinfo, request.GetSubject(), request.GetClientID(), request.GetScopes())
 }
 
 // ============================================
