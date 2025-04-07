@@ -33,6 +33,8 @@ type Tenant struct {
 	DisplayName  string `json:"display_name" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
 	PasswordType string `json:"password_type" gorm:"type:varchar(100)" maxLength:"100" example:"bcrypt"`
 
+	SigningCertificateID *string `json:"signing_key_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+
 	Groups       []Group           `json:"-" swaggerignore:"true"`
 	Providers    []Provider        `json:"-" swaggerignore:"true"`
 	Templates    []MessageTemplate `json:"-" swaggerignore:"true"`
@@ -73,6 +75,7 @@ type CreateTenant struct {
 // UpdateTenant represents the data required to update an existing tenant.
 // It includes the display name and password type, both of which are required and have a maximum length of 100 characters.
 type UpdateTenant struct {
-	DisplayName  string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	PasswordType string `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	DisplayName          string `json:"display_name" validate:"required,max=100" maxLength:"100"`
+	PasswordType         string `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	SigningCertificateID string `json:"signing_certificate_id" validate:"required,max=25" maxLength:"25"`
 }

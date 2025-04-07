@@ -24,7 +24,9 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
+	"github.com/go-jose/go-jose/v4"
 	"github.com/go-playground/validator/v10"
+	"time"
 )
 
 // CreateTenant creates a new tenant in the system.
@@ -54,7 +56,35 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		return object.Tenant{}, errors.New("password type does not match any known types")
 	}
 
-	return repository.CreateTenant(ctx, is.db, createTenant)
+	tenant, err := repository.CreateTenant(ctx, is.db, createTenant)
+
+	if err != nil {
+		return object.Tenant{}, err
+	}
+
+	certificate, err := is.CreateCertificate(ctx, tenant.ID, object.CreateCertificate{
+		DisplayName: fmt.Sprintf("Signing Key for " + tenant.DisplayName),
+		Algorithm:   string(jose.RS256),
+		BitSize:     2048,
+		ExpiredAt:   time.Now().Add(time.Hour * 24 * 365 * 1),
+	})
+
+	if err != nil {
+		return object.Tenant{}, err
+	}
+
+	err = is.UpdateTenant(ctx, tenant.ID, object.UpdateTenant{
+		DisplayName:          tenant.DisplayName,
+		PasswordType:         tenant.PasswordType,
+		SigningCertificateID: certificate.ID(),
+	})
+
+	if err != nil {
+		return object.Tenant{}, err
+	}
+
+	tenant.SigningCertificateID = &certificate.IDs
+	return tenant, nil
 }
 
 // UpdateTenant updates an existing tenant's information in the system.

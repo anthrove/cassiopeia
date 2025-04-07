@@ -22,8 +22,40 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
+	"log"
 	"time"
 )
+
+type SignCertificate struct {
+	certificate Certificate
+}
+
+func (s SignCertificate) SignatureAlgorithm() jose.SignatureAlgorithm {
+	return s.certificate.Algorithm()
+}
+
+func (s SignCertificate) Key() any {
+	block, _ := pem.Decode([]byte(s.certificate.PrivateKey))
+	enc := x509.IsEncryptedPEMBlock(block)
+	b := block.Bytes
+	var err error
+	if enc {
+		log.Println("is encrypted pem block")
+		b, err = x509.DecryptPEMBlock(block, nil)
+		if err != nil {
+			return nil
+		}
+	}
+	key, err := x509.ParsePKCS1PrivateKey(b)
+	if err != nil {
+		return nil
+	}
+	return key
+}
+
+func (s SignCertificate) ID() string {
+	return s.certificate.ID()
+}
 
 type Certificate struct {
 	IDs      string `json:"id" gorm:"column:id;primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
@@ -43,19 +75,25 @@ type Certificate struct {
 	Applications []Application `json:"-" swaggerignore:"true"`
 }
 
+func (base Certificate) ToSigningCert() SignCertificate {
+	return SignCertificate{
+		certificate: base,
+	}
+}
+
 func (base Certificate) ID() string {
 	return base.IDs
 }
 
-func (base *Certificate) Algorithm() jose.SignatureAlgorithm {
+func (base Certificate) Algorithm() jose.SignatureAlgorithm {
 	return jose.SignatureAlgorithm(base.Algo)
 }
 
-func (base *Certificate) Use() string {
+func (base Certificate) Use() string {
 	return "sig"
 }
 
-func (base *Certificate) Key() any {
+func (base Certificate) Key() any {
 	certPemBlock := []byte(base.Certificate)
 	certDerBlock, _ := pem.Decode(certPemBlock)
 	x509Cert, err := x509.ParseCertificate(certDerBlock.Bytes)

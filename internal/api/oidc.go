@@ -17,6 +17,7 @@
 package api
 
 import (
+	"context"
 	"github.com/anthrove/identity/pkg/logic"
 	"github.com/anthrove/identity/pkg/oidc"
 	"github.com/gin-gonic/gin"
@@ -30,12 +31,17 @@ var (
 	lock      sync.Mutex
 )
 
-func GetProvider(service logic.IdentityService, tenantID string) (*op.Provider, error) {
+func GetProvider(ctx context.Context, service logic.IdentityService, tenantID string) (*op.Provider, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
 	if _, ok := providers[tenantID]; !ok {
-		storage := oidc.NewStorage(service, tenantID)
+		storage, err := oidc.NewStorage(ctx, service, tenantID)
+
+		if err != nil {
+			return nil, err
+		}
+
 		provider, err := oidc.NewProvider(storage, tenantID)
 
 		if err != nil {
@@ -51,7 +57,7 @@ func GetProvider(service logic.IdentityService, tenantID string) (*op.Provider, 
 func (ir IdentityRoutes) OIDCEndpoints(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
-	provider, err := GetProvider(ir.service, tenantID)
+	provider, err := GetProvider(c, ir.service, tenantID)
 
 	if err != nil {
 		_ = c.AbortWithError(http.StatusInternalServerError, err)

@@ -103,9 +103,7 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
-	r.Any("/favicon.ico", func(context *gin.Context) {
-
-	})
+	r.Any("/favicon.ico", func(context *gin.Context) {})
 
 	r.Any("/auth/:tenant_id/login", func(c *gin.Context) {
 		switch c.Request.Method {
@@ -212,7 +210,7 @@ func (ir IdentityRoutes) checkLoginHandler(c *gin.Context) {
 		return
 	}
 
-	provider, err := GetProvider(ir.service, tenantId)
+	provider, err := GetProvider(c, ir.service, tenantId)
 	if err != nil {
 		renderLogin(c.Writer, authRequestID, err)
 	}
