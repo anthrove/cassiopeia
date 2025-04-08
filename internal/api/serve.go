@@ -111,6 +111,13 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.PUT("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.updateAdapter)
 	v1.DELETE("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.killAdapter)
 
+	v1.POST("/tenant/:tenant_id/enforcer", identityRoutes.createEnforcer)
+	v1.GET("/tenant/:tenant_id/enforcer", Pagination(), identityRoutes.findEnforcer)
+	v1.GET("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.findAdapter)
+	v1.PUT("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.updateAdapter)
+	v1.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killAdapter)
+	v1.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
+
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
