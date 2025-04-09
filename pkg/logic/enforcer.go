@@ -84,7 +84,7 @@ func (is IdentityService) Enforce(ctx context.Context, tenantID string, enforcer
 		return false, err
 	}
 
-	adapter, err := is.FindAdapter(ctx, tenantID, enforcer.ModelID)
+	adapter, err := is.FindAdapter(ctx, tenantID, enforcer.AdapterID)
 	if err != nil {
 		return false, err
 	}

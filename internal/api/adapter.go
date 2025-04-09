@@ -23,17 +23,17 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new Adapter
-// @Tags		Adapter API
-// @Accept		json
-// @Produce	json
+//	@Summary	Creates a new Adapter
+//	@Tags		Adapter API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id	path		string								true	"Tenant ID"
+//	@Param		tenant_id	path		string								true	"Tenant ID"
 //
-// @Param		"Adapter"		body		object.CreateAdapter					true	"Create Adapter Data"
-// @Success	200			{object}	HttpResponse{data=object.Adapter{}}	"Adapter"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/adapter [post]
+//	@Param		"Adapter"	body		object.CreateAdapter				true	"Create Adapter Data"
+//	@Success	200			{object}	HttpResponse{data=object.Adapter{}}	"Adapter"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/adapter [post]
 func (ir IdentityRoutes) createAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -61,18 +61,18 @@ func (ir IdentityRoutes) createAdapter(c *gin.Context) {
 	})
 }
 
-// @Summary	Update an existing Adapter
-// @Tags		Adapter API
-// @Accept		json
-// @Produce	json
+//	@Summary	Update an existing Adapter
+//	@Tags		Adapter API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id	path	string				true	"Tenant ID"
-// @Param		adapter_id	path	string				true	"Adapter ID"
+//	@Param		tenant_id	path	string					true	"Tenant ID"
+//	@Param		adapter_id	path	string					true	"Adapter ID"
 //
-// @Param		"Adapter"		body	object.UpdateAdapter	true	"Create Adapter Data"
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [put]
+//	@Param		"Adapter"	body	object.UpdateAdapter	true	"Create Adapter Data"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [put]
 func (ir IdentityRoutes) updateAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	adapterID := c.Param("adapter_id")
@@ -101,17 +101,17 @@ func (ir IdentityRoutes) updateAdapter(c *gin.Context) {
 	})
 }
 
-// @Summary	Kill an existing Adapter
-// @Tags		Adapter API
-// @Accept		json
-// @Produce	json
+//	@Summary	Kill an existing Adapter
+//	@Tags		Adapter API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		adapter_id	path	string	true	"Adapter ID"
+//	@Param		tenant_id	path	string	true	"Tenant ID"
+//	@Param		adapter_id	path	string	true	"Adapter ID"
 //
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [delete]
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [delete]
 func (ir IdentityRoutes) killAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	adapterID := c.Param("adapter_id")
@@ -127,15 +127,15 @@ func (ir IdentityRoutes) killAdapter(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing Adapter
-// @Tags		Adapter API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id	path		string								true	"Tenant ID"
-// @Param		adapter_id	path		string								true	"Adapter ID"
-// @Success	200			{object}	HttpResponse{data=object.Adapter{}}	"Adapter"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [get]
+//	@Summary	Get an existing Adapter
+//	@Tags		Adapter API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path		string								true	"Tenant ID"
+//	@Param		adapter_id	path		string								true	"Adapter ID"
+//	@Success	200			{object}	HttpResponse{data=object.Adapter{}}	"Adapter"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [get]
 func (ir IdentityRoutes) findAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	adapterID := c.Param("adapter_id")
@@ -153,18 +153,18 @@ func (ir IdentityRoutes) findAdapter(c *gin.Context) {
 	})
 }
 
-// @Summary	Get existing Adapters
-// @Tags		Adapter API
-// @Accept		json
-// @Produce	json
+//	@Summary	Get existing Adapters
+//	@Tags		Adapter API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		page		query		string								false	"Page"
-// @Param		page_limit	query		string								false	"Page Limit"
+//	@Param		page		query		string									false	"Page"
+//	@Param		page_limit	query		string									false	"Page Limit"
 //
-// @Param		tenant_id	path		string								true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.Adapter{}}	"Adapter"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/adapter [get]
+//	@Param		tenant_id	path		string									true	"Tenant ID"
+//	@Success	200			{object}	HttpResponse{data=[]object.Adapter{}}	"Adapter"
+//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/adapter [get]
 func (ir IdentityRoutes) findAdapters(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
