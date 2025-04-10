@@ -82,5 +82,6 @@ func Migrate(engine *gorm.DB) error {
 		&object.Token{},
 		&object.Resource{},
 		&object.Model{},
-		&object.Enforcer{})
+		&object.Enforcer{},
+		&object.Permission{})
 }
