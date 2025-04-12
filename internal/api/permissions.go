@@ -27,12 +27,10 @@ import (
 // @Tags		Permission API
 // @Accept		json
 // @Produce	json
-//
-// @Param		tenant_id	path		string								true	"Tenant ID"
-//
-// @Param		"Permission"	body		object.CreatePermission				true	"Create Permission Data"
-// @Success	200			{object}	HttpResponse{data=object.Permission{}}	"Permission"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+// @Param		tenant_id		path		string									true	"Tenant ID"
+// @Param		"Permission"	body		object.CreatePermission					true	"Create Permission Data"
+// @Success	200				{object}	HttpResponse{data=object.Permission{}}	"Permission"
+// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/permission [post]
 func (ir IdentityRoutes) createPermission(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
@@ -65,10 +63,8 @@ func (ir IdentityRoutes) createPermission(c *gin.Context) {
 // @Tags		Permission API
 // @Accept		json
 // @Produce	json
-//
-// @Param		tenant_id	path	string					true	"Tenant ID"
+// @Param		tenant_id		path	string					true	"Tenant ID"
 // @Param		permission_id	path	string					true	"Permission ID"
-//
 // @Param		"Permission"	body	object.UpdatePermission	true	"Create Permission Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
@@ -105,10 +101,8 @@ func (ir IdentityRoutes) updatePermission(c *gin.Context) {
 // @Tags		Permission API
 // @Accept		json
 // @Produce	json
-//
-// @Param		tenant_id	path	string	true	"Tenant ID"
+// @Param		tenant_id		path	string	true	"Tenant ID"
 // @Param		permission_id	path	string	true	"Permission ID"
-//
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/permission/{permission_id} [delete]
@@ -131,10 +125,10 @@ func (ir IdentityRoutes) killPermission(c *gin.Context) {
 // @Tags		Permission API
 // @Accept		json
 // @Produce	json
-// @Param		tenant_id	path		string								true	"Tenant ID"
-// @Param		permission_id	path		string								true	"Permission ID"
-// @Success	200			{object}	HttpResponse{data=object.Permission{}}	"Permission"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+// @Param		tenant_id		path		string									true	"Tenant ID"
+// @Param		permission_id	path		string									true	"Permission ID"
+// @Success	200				{object}	HttpResponse{data=object.Permission{}}	"Permission"
+// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/permission/{permission_id} [get]
 func (ir IdentityRoutes) findPermission(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
@@ -157,13 +151,11 @@ func (ir IdentityRoutes) findPermission(c *gin.Context) {
 // @Tags		Permission API
 // @Accept		json
 // @Produce	json
-//
-// @Param		page		query		string									false	"Page"
-// @Param		page_limit	query		string									false	"Page Limit"
-//
-// @Param		tenant_id	path		string									true	"Tenant ID"
+// @Param		page		query		string										false	"Page"
+// @Param		page_limit	query		string										false	"Page Limit"
+// @Param		tenant_id	path		string										true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Permission{}}	"Permission"
-// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+// @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/permission [get]
 func (ir IdentityRoutes) findPermissions(c *gin.Context) {
 	tenantID := c.Param("tenant_id")

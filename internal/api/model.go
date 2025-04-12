@@ -27,9 +27,7 @@ import (
 // @Tags		Model API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path		string								true	"Tenant ID"
-//
 // @Param		"Model"		body		object.CreateModel					true	"Create Model Data"
 // @Success	200			{object}	HttpResponse{data=object.Model{}}	"Model"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
@@ -65,10 +63,8 @@ func (ir IdentityRoutes) createModel(c *gin.Context) {
 // @Tags		Model API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path	string				true	"Tenant ID"
 // @Param		model_id	path	string				true	"Model ID"
-//
 // @Param		"Model"		body	object.UpdateModel	true	"Create Model Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
@@ -105,10 +101,8 @@ func (ir IdentityRoutes) updateModel(c *gin.Context) {
 // @Tags		Model API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path	string	true	"Tenant ID"
 // @Param		model_id	path	string	true	"Model ID"
-//
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/model/{model_id} [delete]
@@ -157,10 +151,8 @@ func (ir IdentityRoutes) findModel(c *gin.Context) {
 // @Tags		Model API
 // @Accept		json
 // @Produce	json
-//
 // @Param		page		query		string								false	"Page"
 // @Param		page_limit	query		string								false	"Page Limit"
-//
 // @Param		tenant_id	path		string								true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Model{}}	"Model"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"

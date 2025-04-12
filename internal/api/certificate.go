@@ -23,17 +23,15 @@ import (
 	"net/http"
 )
 
-//	@Summary	Creates a new Certificate
-//	@Tags		Certificate API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id		path		string									true	"Tenant ID"
-//
-//	@Param		"Certificate"	body		object.CreateCertificate				true	"Create Certificate Data"
-//	@Success	200				{object}	HttpResponse{data=object.Certificate{}}	"Certificate"
-//	@Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/certificate [post]
+// @Summary	Creates a new Certificate
+// @Tags		Certificate API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id		path		string									true	"Tenant ID"
+// @Param		"Certificate"	body		object.CreateCertificate				true	"Create Certificate Data"
+// @Success	200				{object}	HttpResponse{data=object.Certificate{}}	"Certificate"
+// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/certificate [post]
 func (ir IdentityRoutes) createCertificate(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -61,18 +59,16 @@ func (ir IdentityRoutes) createCertificate(c *gin.Context) {
 	})
 }
 
-//	@Summary	Update an existing Certificate
-//	@Tags		Certificate API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id		path	string						true	"Tenant ID"
-//	@Param		certificate_id	path	string						true	"Certificate ID"
-//
-//	@Param		"Certificate"	body	object.UpdateCertificate	true	"Create Certificate Data"
-//	@Success	204
-//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/certificate/{certificate_id} [put]
+// @Summary	Update an existing Certificate
+// @Tags		Certificate API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id		path	string						true	"Tenant ID"
+// @Param		certificate_id	path	string						true	"Certificate ID"
+// @Param		"Certificate"	body	object.UpdateCertificate	true	"Create Certificate Data"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/certificate/{certificate_id} [put]
 func (ir IdentityRoutes) updateCertificate(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	certificateID := c.Param("certificate_id")
@@ -101,17 +97,15 @@ func (ir IdentityRoutes) updateCertificate(c *gin.Context) {
 	})
 }
 
-//	@Summary	Kill an existing Certificate
-//	@Tags		Certificate API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id		path	string	true	"Tenant ID"
-//	@Param		certificate_id	path	string	true	"Certificate ID"
-//
-//	@Success	204
-//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/certificate/{certificate_id} [delete]
+// @Summary	Kill an existing Certificate
+// @Tags		Certificate API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id		path	string	true	"Tenant ID"
+// @Param		certificate_id	path	string	true	"Certificate ID"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/certificate/{certificate_id} [delete]
 func (ir IdentityRoutes) killCertificate(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	certificateID := c.Param("certificate_id")
@@ -127,15 +121,15 @@ func (ir IdentityRoutes) killCertificate(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-//	@Summary	Get an existing Certificate
-//	@Tags		Certificate API
-//	@Accept		json
-//	@Produce	json
-//	@Param		tenant_id		path		string									true	"Tenant ID"
-//	@Param		certificate_id	path		string									true	"Certificate ID"
-//	@Success	200				{object}	HttpResponse{data=object.Certificate{}}	"Certificate"
-//	@Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/certificate/{certificate_id} [get]
+// @Summary	Get an existing Certificate
+// @Tags		Certificate API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id		path		string									true	"Tenant ID"
+// @Param		certificate_id	path		string									true	"Certificate ID"
+// @Success	200				{object}	HttpResponse{data=object.Certificate{}}	"Certificate"
+// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/certificate/{certificate_id} [get]
 func (ir IdentityRoutes) findCertificate(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	certificateID := c.Param("certificate_id")
@@ -153,18 +147,16 @@ func (ir IdentityRoutes) findCertificate(c *gin.Context) {
 	})
 }
 
-//	@Summary	Get existing Certificates
-//	@Tags		Certificate API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		page		query		string										false	"Page"
-//	@Param		page_limit	query		string										false	"Page Limit"
-//
-//	@Param		tenant_id	path		string										true	"Tenant ID"
-//	@Success	200			{object}	HttpResponse{data=[]object.Certificate{}}	"Certificate"
-//	@Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/certificate [get]
+// @Summary	Get existing Certificates
+// @Tags		Certificate API
+// @Accept		json
+// @Produce	json
+// @Param		page		query		string										false	"Page"
+// @Param		page_limit	query		string										false	"Page Limit"
+// @Param		tenant_id	path		string										true	"Tenant ID"
+// @Success	200			{object}	HttpResponse{data=[]object.Certificate{}}	"Certificate"
+// @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/certificate [get]
 func (ir IdentityRoutes) findCertificates(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 

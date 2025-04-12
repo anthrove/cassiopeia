@@ -23,17 +23,15 @@ import (
 	"net/http"
 )
 
-//	@Summary	Creates a new Enforcer
-//	@Tags		Enforcer API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id	path		string									true	"Tenant ID"
-//
-//	@Param		"Enforcer"	body		object.CreateEnforcer					true	"Create Enforcer Data"
-//	@Success	200			{object}	HttpResponse{data=object.Enforcer{}}	"Enforcer"
-//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/enforcer [post]
+// @Summary	Creates a new Enforcer
+// @Tags		Enforcer API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path		string									true	"Tenant ID"
+// @Param		"Enforcer"	body		object.CreateEnforcer					true	"Create Enforcer Data"
+// @Success	200			{object}	HttpResponse{data=object.Enforcer{}}	"Enforcer"
+// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/enforcer [post]
 func (ir IdentityRoutes) createEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -61,18 +59,16 @@ func (ir IdentityRoutes) createEnforcer(c *gin.Context) {
 	})
 }
 
-//	@Summary	Update an existing Enforcer
-//	@Tags		Enforcer API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id	path	string					true	"Tenant ID"
-//	@Param		enforcer_id	path	string					true	"Enforcer ID"
-//
-//	@Param		"Enforcer"	body	object.UpdateEnforcer	true	"Create Enforcer Data"
-//	@Success	204
-//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [put]
+// @Summary	Update an existing Enforcer
+// @Tags		Enforcer API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path	string					true	"Tenant ID"
+// @Param		enforcer_id	path	string					true	"Enforcer ID"
+// @Param		"Enforcer"	body	object.UpdateEnforcer	true	"Create Enforcer Data"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [put]
 func (ir IdentityRoutes) updateEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	enforcerID := c.Param("enforcer_id")
@@ -101,17 +97,15 @@ func (ir IdentityRoutes) updateEnforcer(c *gin.Context) {
 	})
 }
 
-//	@Summary	Kill an existing Enforcer
-//	@Tags		Enforcer API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id	path	string	true	"Tenant ID"
-//	@Param		enforcer_id	path	string	true	"Enforcer ID"
-//
-//	@Success	204
-//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [delete]
+// @Summary	Kill an existing Enforcer
+// @Tags		Enforcer API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path	string	true	"Tenant ID"
+// @Param		enforcer_id	path	string	true	"Enforcer ID"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [delete]
 func (ir IdentityRoutes) killEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	enforcerID := c.Param("enforcer_id")
@@ -127,15 +121,15 @@ func (ir IdentityRoutes) killEnforcer(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-//	@Summary	Get an existing Enforcer
-//	@Tags		Enforcer API
-//	@Accept		json
-//	@Produce	json
-//	@Param		tenant_id	path		string									true	"Tenant ID"
-//	@Param		enforcer_id	path		string									true	"Enforcer ID"
-//	@Success	200			{object}	HttpResponse{data=object.Enforcer{}}	"Enforcer"
-//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [get]
+// @Summary	Get an existing Enforcer
+// @Tags		Enforcer API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path		string									true	"Tenant ID"
+// @Param		enforcer_id	path		string									true	"Enforcer ID"
+// @Success	200			{object}	HttpResponse{data=object.Enforcer{}}	"Enforcer"
+// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [get]
 func (ir IdentityRoutes) findEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	enforcerID := c.Param("enforcer_id")
@@ -153,18 +147,16 @@ func (ir IdentityRoutes) findEnforcer(c *gin.Context) {
 	})
 }
 
-//	@Summary	Get existing Enforcers
-//	@Tags		Enforcer API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		page		query		string									false	"Page"
-//	@Param		page_limit	query		string									false	"Page Limit"
-//
-//	@Param		tenant_id	path		string									true	"Tenant ID"
-//	@Success	200			{object}	HttpResponse{data=[]object.Enforcer{}}	"Enforcer"
-//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/enforcer [get]
+// @Summary	Get existing Enforcers
+// @Tags		Enforcer API
+// @Accept		json
+// @Produce	json
+// @Param		page		query		string									false	"Page"
+// @Param		page_limit	query		string									false	"Page Limit"
+// @Param		tenant_id	path		string									true	"Tenant ID"
+// @Success	200			{object}	HttpResponse{data=[]object.Enforcer{}}	"Enforcer"
+// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/enforcer [get]
 func (ir IdentityRoutes) findEnforcers(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -195,18 +187,16 @@ func (ir IdentityRoutes) findEnforcers(c *gin.Context) {
 	})
 }
 
-//	@Summary	Check if the request has Permissions
-//	@Tags		Enforcer API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id	path	string	true	"Tenant ID"
-//	@Param		enforcer_id	path	string	true	"Enforcer ID"
-//
-//	@Param		"Enforcer"	body	[]any	true	"Create Enforcer Data"
-//	@Success	200
-//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id}/enforce [post]
+// @Summary	Check if the request has Permissions
+// @Tags		Enforcer API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id	path	string	true	"Tenant ID"
+// @Param		enforcer_id	path	string	true	"Enforcer ID"
+// @Param		"Enforcer"	body	[]any	true	"Create Enforcer Data"
+// @Success	200
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id}/enforce [post]
 func (ir IdentityRoutes) enforce(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	enforcerID := c.Param("enforcer_id")
