@@ -23,9 +23,6 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
-	"github.com/casbin/casbin/v2"
-	"github.com/casbin/casbin/v2/model"
-	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -78,38 +75,13 @@ func (is IdentityService) Enforce(ctx context.Context, tenantID string, enforcer
 		return false, err
 	}
 
-	dbModel, err := is.FindModel(ctx, tenantID, enforcer.ModelID)
+	casbinEnforcer, err := is.GetCasbinEnforcer(ctx, tenantID, enforcer.ModelID, enforcer.AdapterID)
 
 	if err != nil {
 		return false, err
 	}
 
-	adapter, err := is.FindAdapter(ctx, tenantID, enforcer.AdapterID)
-	if err != nil {
-		return false, err
-	}
-
-	var casAdapter *gormadapter.Adapter
-
-	if adapter.ExternalDB {
-		casAdapter, err = gormadapter.NewAdapter(adapter.Driver, "mysql_username:mysql_password@tcp(127.0.0.1:3306)/", adapter.TableName)
-	} else {
-		casAdapter, err = gormadapter.NewAdapterByDBUseTableName(is.db, "", adapter.TableName)
-	}
-
-	casModel, err := model.NewModelFromString(dbModel.Model)
-
-	if err != nil {
-		return false, err
-	}
-
-	casEnforcer, err := casbin.NewEnforcer(casModel, casAdapter)
-
-	if err != nil {
-		return false, err
-	}
-
-	success, err := casEnforcer.Enforce(request...)
+	success, err := casbinEnforcer.Enforce(request...)
 
 	if err != nil {
 		return false, err

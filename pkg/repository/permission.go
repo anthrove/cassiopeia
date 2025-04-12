@@ -77,3 +77,9 @@ func FindPermissions(ctx context.Context, db *gorm.DB, tenantID string, paginati
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
 }
+
+func FindPermissionsByAdapter(ctx context.Context, db *gorm.DB, tenantID string, adapterID string) ([]object.Permission, error) {
+	var data []object.Permission
+	err := db.WithContext(ctx).Where("tenant_id = ? AND adapter_id", tenantID, adapterID).Find(&data).Error
+	return data, err
+}

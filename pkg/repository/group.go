@@ -115,3 +115,39 @@ func FindGroups(ctx context.Context, db *gorm.DB, tenantID string, pagination ob
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
 }
+
+func FindGroupsByParentID(ctx context.Context, db *gorm.DB, tenantID string, parentGroupID string) ([]object.Group, error) {
+	var data []object.Group
+	err := db.WithContext(ctx).Where("tenant_id = ? AND parent_group_id = ?", tenantID, parentGroupID).Find(&data).Error
+	return data, err
+}
+
+func AppendUserToGroup(ctx context.Context, db *gorm.DB, tenantID string, userID string, groupID string) error {
+	return db.WithContext(ctx).Model(object.Group{
+		ID:       groupID,
+		TenantID: tenantID,
+	}).Association("Users").Append(&object.User{
+		ID:       userID,
+		TenantID: tenantID,
+	})
+}
+
+func RemoveUserFromGroup(ctx context.Context, db *gorm.DB, tenantID string, userID string, groupID string) error {
+	return db.WithContext(ctx).Model(object.Group{
+		ID:       groupID,
+		TenantID: tenantID,
+	}).Association("Users").Delete(&object.User{
+		ID:       userID,
+		TenantID: tenantID,
+	})
+}
+
+func FindUsersInGroup(ctx context.Context, db *gorm.DB, tenantID string, groupID string) ([]object.User, error) {
+	var users []object.User
+	err := db.WithContext(ctx).Model(object.Group{
+		ID:       groupID,
+		TenantID: tenantID,
+	}).Association("Users").Find(&users)
+
+	return users, err
+}

@@ -67,3 +67,7 @@ func (is IdentityService) FindPermission(ctx context.Context, tenantID string, p
 func (is IdentityService) FindPermissions(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Permission, error) {
 	return repository.FindPermissions(ctx, is.db, tenantID, pagination)
 }
+
+func (is IdentityService) FindPermissionsByAdapter(ctx context.Context, tenantID string, adapterID string) ([]object.Permission, error) {
+	return repository.FindPermissionsByAdapter(ctx, is.db, tenantID, adapterID)
+}
