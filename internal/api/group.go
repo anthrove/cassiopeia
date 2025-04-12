@@ -27,9 +27,7 @@ import (
 // @Tags		Group API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path		string								true	"Tenant ID"
-//
 // @Param		"Group"		body		object.CreateGroup					true	"Create Group Data"
 // @Success	200			{object}	HttpResponse{data=object.Group{}}	"Group"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
@@ -65,10 +63,8 @@ func (ir IdentityRoutes) createGroup(c *gin.Context) {
 // @Tags		Group API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path	string				true	"Tenant ID"
 // @Param		group_id	path	string				true	"Group ID"
-//
 // @Param		"Group"		body	object.UpdateGroup	true	"Create Group Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
@@ -105,10 +101,8 @@ func (ir IdentityRoutes) updateGroup(c *gin.Context) {
 // @Tags		Group API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id	path	string	true	"Tenant ID"
 // @Param		group_id	path	string	true	"Group ID"
-//
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/group/{group_id} [delete]
@@ -157,10 +151,8 @@ func (ir IdentityRoutes) findGroup(c *gin.Context) {
 // @Tags		Group API
 // @Accept		json
 // @Produce	json
-//
 // @Param		page		query		string								false	"Page"
 // @Param		page_limit	query		string								false	"Page Limit"
-//
 // @Param		tenant_id	path		string								true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Group{}}	"Group"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"

@@ -120,3 +120,19 @@ func (is IdentityService) FindGroup(ctx context.Context, tenantID string, groupI
 func (is IdentityService) FindGroups(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Group, error) {
 	return repository.FindGroups(ctx, is.db, tenantID, pagination)
 }
+
+func (is IdentityService) FindGroupsByParentID(ctx context.Context, tenantID string, parentGroupID string) ([]object.Group, error) {
+	return repository.FindGroupsByParentID(ctx, is.db, tenantID, parentGroupID)
+}
+
+func (is IdentityService) AppendUserToGroup(ctx context.Context, tenantID string, userID string, groupID string) error {
+	return repository.AppendUserToGroup(ctx, is.db, tenantID, userID, groupID)
+}
+
+func (is IdentityService) RemoveUserFromGroup(ctx context.Context, tenantID string, userID string, groupID string) error {
+	return repository.RemoveUserFromGroup(ctx, is.db, tenantID, userID, groupID)
+}
+
+func (is IdentityService) FindUsersInGroup(ctx context.Context, tenantID string, groupID string) ([]object.User, error) {
+	return repository.FindUsersInGroup(ctx, is.db, tenantID, groupID)
+}

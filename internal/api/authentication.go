@@ -22,18 +22,16 @@ import (
 	"net/http"
 )
 
-//	@Summary	Login
-//	@Tags		Authentication API
-//	@Accept		json
-//	@Produce	json
-//
-//	@Param		tenant_id		path	string					true	"Tenant ID"
-//	@Param		application_id	path	string					true	"Application ID"
-//
-//	@Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
-//	@Success	204
-//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [put]
+// @Summary	Login
+// @Tags		Authentication API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id		path	string					true	"Tenant ID"
+// @Param		application_id	path	string					true	"Application ID"
+// @Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
+// @Success	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [put]
 func (ir IdentityRoutes) signIn(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	applicationID := c.Param("application_id")

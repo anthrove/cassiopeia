@@ -23,19 +23,19 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new Application
-// @Tags		Application API
+// @Summary	Creates a new Permission
+// @Tags		Permission API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id		path		string									true	"Tenant ID"
-// @Param		"Application"	body		object.CreateApplication				true	"Create Application Data"
-// @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
+// @Param		"Permission"	body		object.CreatePermission					true	"Create Permission Data"
+// @Success	200				{object}	HttpResponse{data=object.Permission{}}	"Permission"
 // @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application [post]
-func (ir IdentityRoutes) createApplication(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/permission [post]
+func (ir IdentityRoutes) createPermission(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
-	var body object.CreateApplication
+	var body object.CreatePermission
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -45,7 +45,7 @@ func (ir IdentityRoutes) createApplication(c *gin.Context) {
 		return
 	}
 
-	application, err := ir.service.CreateApplication(c, tenantID, body)
+	permission, err := ir.service.CreatePermission(c, tenantID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -55,25 +55,25 @@ func (ir IdentityRoutes) createApplication(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, HttpResponse{
-		Data: application,
+		Data: permission,
 	})
 }
 
-// @Summary	Update an existing Application
-// @Tags		Application API
+// @Summary	Update an existing Permission
+// @Tags		Permission API
 // @Accept		json
 // @Produce	json
-// @Param		tenant_id		path	string						true	"Tenant ID"
-// @Param		application_id	path	string						true	"Application ID"
-// @Param		"Application"	body	object.UpdateApplication	true	"Create Application Data"
+// @Param		tenant_id		path	string					true	"Tenant ID"
+// @Param		permission_id	path	string					true	"Permission ID"
+// @Param		"Permission"	body	object.UpdatePermission	true	"Create Permission Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id} [put]
-func (ir IdentityRoutes) updateApplication(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/permission/{permission_id} [put]
+func (ir IdentityRoutes) updatePermission(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	applicationID := c.Param("application_id")
+	permissionID := c.Param("permission_id")
 
-	var body object.UpdateApplication
+	var body object.UpdatePermission
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -83,7 +83,7 @@ func (ir IdentityRoutes) updateApplication(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateApplication(c, tenantID, applicationID, body)
+	err = ir.service.UpdatePermission(c, tenantID, permissionID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -97,22 +97,20 @@ func (ir IdentityRoutes) updateApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	Kill an existing Application
-// @Tags		Application API
+// @Summary	Kill an existing Permission
+// @Tags		Permission API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id		path	string	true	"Tenant ID"
-// @Param		application_id	path	string	true	"Application ID"
-//
+// @Param		permission_id	path	string	true	"Permission ID"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id} [delete]
-func (ir IdentityRoutes) killApplication(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/permission/{permission_id} [delete]
+func (ir IdentityRoutes) killPermission(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	applicationID := c.Param("application_id")
+	permissionID := c.Param("permission_id")
 
-	err := ir.service.KillApplication(c, tenantID, applicationID)
+	err := ir.service.KillPermission(c, tenantID, permissionID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -123,20 +121,20 @@ func (ir IdentityRoutes) killApplication(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing Application
-// @Tags		Application API
+// @Summary	Get an existing Permission
+// @Tags		Permission API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id		path		string									true	"Tenant ID"
-// @Param		application_id	path		string									true	"Application ID"
-// @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
+// @Param		permission_id	path		string									true	"Permission ID"
+// @Success	200				{object}	HttpResponse{data=object.Permission{}}	"Permission"
 // @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id} [get]
-func (ir IdentityRoutes) findApplication(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/permission/{permission_id} [get]
+func (ir IdentityRoutes) findPermission(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	applicationID := c.Param("application_id")
+	permissionID := c.Param("permission_id")
 
-	application, err := ir.service.FindApplication(c, tenantID, applicationID)
+	permission, err := ir.service.FindPermission(c, tenantID, permissionID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
 			Error: err.Error(),
@@ -145,21 +143,21 @@ func (ir IdentityRoutes) findApplication(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: application,
+		Data: permission,
 	})
 }
 
-// @Summary	Get existing Applications
-// @Tags		Application API
+// @Summary	Get existing Permissions
+// @Tags		Permission API
 // @Accept		json
 // @Produce	json
 // @Param		page		query		string										false	"Page"
 // @Param		page_limit	query		string										false	"Page Limit"
 // @Param		tenant_id	path		string										true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.Application{}}	"Application"
+// @Success	200			{object}	HttpResponse{data=[]object.Permission{}}	"Permission"
 // @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application [get]
-func (ir IdentityRoutes) findApplications(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/permission [get]
+func (ir IdentityRoutes) findPermissions(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
 	pagination, ok := c.Get("pagination")
@@ -176,7 +174,7 @@ func (ir IdentityRoutes) findApplications(c *gin.Context) {
 		return
 	}
 
-	applications, err := ir.service.FindApplications(c, tenantID, paginationObj)
+	permissions, err := ir.service.FindPermissions(c, tenantID, paginationObj)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
@@ -185,6 +183,6 @@ func (ir IdentityRoutes) findApplications(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: applications,
+		Data: permissions,
 	})
 }

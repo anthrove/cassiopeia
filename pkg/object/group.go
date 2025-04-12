@@ -35,6 +35,8 @@ type Group struct {
 	ParentGroup   *Group  `json:"-"`
 
 	DisplayName string `json:"displayName" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
+
+	Users []User `gorm:"many2many:user_groups;"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.

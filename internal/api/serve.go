@@ -99,6 +99,31 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.GET("/tenant/:tenant_id/resource/:resource_id", identityRoutes.findResource)
 	v1.DELETE("/tenant/:tenant_id/resource/:resource_id", identityRoutes.killResource)
 
+	v1.POST("/tenant/:tenant_id/model", identityRoutes.createModel)
+	v1.GET("/tenant/:tenant_id/model", Pagination(), identityRoutes.findModel)
+	v1.GET("/tenant/:tenant_id/model/:model_id", identityRoutes.findModel)
+	v1.PUT("/tenant/:tenant_id/model/:model_id", identityRoutes.updateModel)
+	v1.DELETE("/tenant/:tenant_id/model/:model_id", identityRoutes.killModel)
+
+	v1.POST("/tenant/:tenant_id/adapter", identityRoutes.createAdapter)
+	v1.GET("/tenant/:tenant_id/adapter", Pagination(), identityRoutes.findAdapter)
+	v1.GET("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.findAdapter)
+	v1.PUT("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.updateAdapter)
+	v1.DELETE("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.killAdapter)
+
+	v1.POST("/tenant/:tenant_id/permission", identityRoutes.createPermission)
+	v1.GET("/tenant/:tenant_id/permission", Pagination(), identityRoutes.findPermissions)
+	v1.GET("/tenant/:tenant_id/permission/:permission_id", identityRoutes.findPermission)
+	v1.PUT("/tenant/:tenant_id/permission/:permission_id", identityRoutes.updatePermission)
+	v1.DELETE("/tenant/:tenant_id/permission/:permission_id", identityRoutes.killPermission)
+
+	v1.POST("/tenant/:tenant_id/enforcer", identityRoutes.createEnforcer)
+	v1.GET("/tenant/:tenant_id/enforcer", Pagination(), identityRoutes.findEnforcers)
+	v1.GET("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.findEnforcer)
+	v1.PUT("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.updateEnforcer)
+	v1.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killEnforcer)
+	v1.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
+
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)

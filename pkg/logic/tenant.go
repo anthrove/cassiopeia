@@ -63,7 +63,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 	}
 
 	certificate, err := is.CreateCertificate(ctx, tenant.ID, object.CreateCertificate{
-		DisplayName: fmt.Sprintf("Signing Key for " + tenant.DisplayName),
+		DisplayName: fmt.Sprintf("Signing Key for %s", tenant.DisplayName),
 		Algorithm:   string(jose.RS256),
 		BitSize:     2048,
 		ExpiredAt:   time.Now().Add(time.Hour * 24 * 365 * 1),

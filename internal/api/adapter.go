@@ -23,19 +23,19 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new User
-// @Tags		User API
+// @Summary	Creates a new Adapter
+// @Tags		Adapter API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path		string								true	"Tenant ID"
-// @Param		"User"		body		object.CreateUser					true	"Create User Data"
-// @Success	200			{object}	HttpResponse{data=object.User{}}	"User"
+// @Param		"Adapter"	body		object.CreateAdapter				true	"Create Adapter Data"
+// @Success	200			{object}	HttpResponse{data=object.Adapter{}}	"Adapter"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/user [post]
-func (ir IdentityRoutes) createUser(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/adapter [post]
+func (ir IdentityRoutes) createAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
-	var body object.CreateUser
+	var body object.CreateAdapter
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -45,7 +45,7 @@ func (ir IdentityRoutes) createUser(c *gin.Context) {
 		return
 	}
 
-	user, err := ir.service.CreateUser(c, tenantID, body)
+	adapter, err := ir.service.CreateAdapter(c, tenantID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -55,25 +55,25 @@ func (ir IdentityRoutes) createUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, HttpResponse{
-		Data: user,
+		Data: adapter,
 	})
 }
 
-// @Summary	Update an existing User
-// @Tags		User API
+// @Summary	Update an existing Adapter
+// @Tags		Adapter API
 // @Accept		json
 // @Produce	json
-// @Param		tenant_id	path	string				true	"Tenant ID"
-// @Param		user_id		path	string				true	"User ID"
-// @Param		"User"		body	object.UpdateUser	true	"Update User Data"
+// @Param		tenant_id	path	string					true	"Tenant ID"
+// @Param		adapter_id	path	string					true	"Adapter ID"
+// @Param		"Adapter"	body	object.UpdateAdapter	true	"Create Adapter Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [put]
-func (ir IdentityRoutes) updateUser(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [put]
+func (ir IdentityRoutes) updateAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	userID := c.Param("user_id")
+	adapterID := c.Param("adapter_id")
 
-	var body object.UpdateUser
+	var body object.UpdateAdapter
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -83,7 +83,7 @@ func (ir IdentityRoutes) updateUser(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateUser(c, tenantID, userID, body)
+	err = ir.service.UpdateAdapter(c, tenantID, adapterID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -97,20 +97,20 @@ func (ir IdentityRoutes) updateUser(c *gin.Context) {
 	})
 }
 
-// @Summary	Delete an existing User
-// @Tags		User API
+// @Summary	Kill an existing Adapter
+// @Tags		Adapter API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		user_id		path	string	true	"User ID"
+// @Param		adapter_id	path	string	true	"Adapter ID"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [delete]
-func (ir IdentityRoutes) killUser(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [delete]
+func (ir IdentityRoutes) killAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	userID := c.Param("user_id")
+	adapterID := c.Param("adapter_id")
 
-	err := ir.service.KillUser(c, tenantID, userID)
+	err := ir.service.KillAdapter(c, tenantID, adapterID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -121,20 +121,20 @@ func (ir IdentityRoutes) killUser(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing User
-// @Tags		User API
+// @Summary	Get an existing Adapter
+// @Tags		Adapter API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path		string								true	"Tenant ID"
-// @Param		user_id		path		string								true	"User ID"
-// @Success	200			{object}	HttpResponse{data=object.User{}}	"User"
+// @Param		adapter_id	path		string								true	"Adapter ID"
+// @Success	200			{object}	HttpResponse{data=object.Adapter{}}	"Adapter"
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/user/{user_id} [get]
-func (ir IdentityRoutes) findUser(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/adapter/{adapter_id} [get]
+func (ir IdentityRoutes) findAdapter(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	userID := c.Param("user_id")
+	adapterID := c.Param("adapter_id")
 
-	user, err := ir.service.FindUser(c, tenantID, userID)
+	adapter, err := ir.service.FindAdapter(c, tenantID, adapterID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
 			Error: err.Error(),
@@ -143,21 +143,21 @@ func (ir IdentityRoutes) findUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: user,
+		Data: adapter,
 	})
 }
 
-// @Summary	Get existing Users
-// @Tags		User API
+// @Summary	Get existing Adapters
+// @Tags		Adapter API
 // @Accept		json
 // @Produce	json
-// @Param		page		query		string								false	"Page"
-// @Param		page_limit	query		string								false	"Page Limit"
-// @Param		tenant_id	path		string								true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.User{}}	"User"
-// @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/user [get]
-func (ir IdentityRoutes) findUsers(c *gin.Context) {
+// @Param		page		query		string									false	"Page"
+// @Param		page_limit	query		string									false	"Page Limit"
+// @Param		tenant_id	path		string									true	"Tenant ID"
+// @Success	200			{object}	HttpResponse{data=[]object.Adapter{}}	"Adapter"
+// @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/tenant/{tenant_id}/adapter [get]
+func (ir IdentityRoutes) findAdapters(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
 	pagination, ok := c.Get("pagination")
@@ -174,7 +174,7 @@ func (ir IdentityRoutes) findUsers(c *gin.Context) {
 		return
 	}
 
-	users, err := ir.service.FindUsers(c, tenantID, paginationObj)
+	adapters, err := ir.service.FindAdapters(c, tenantID, paginationObj)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
@@ -183,6 +183,6 @@ func (ir IdentityRoutes) findUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: users,
+		Data: adapters,
 	})
 }

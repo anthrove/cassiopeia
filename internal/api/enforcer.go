@@ -23,19 +23,19 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new Provider
-// @Tags		Provider API
+// @Summary	Creates a new Enforcer
+// @Tags		Enforcer API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path		string									true	"Tenant ID"
-// @Param		"Provider"	body		object.CreateProvider					true	"Create Provider Data"
-// @Success	200			{object}	HttpResponse{data=object.Provider{}}	"Provider"
+// @Param		"Enforcer"	body		object.CreateEnforcer					true	"Create Enforcer Data"
+// @Success	200			{object}	HttpResponse{data=object.Enforcer{}}	"Enforcer"
 // @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider [post]
-func (ir IdentityRoutes) createProvider(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/enforcer [post]
+func (ir IdentityRoutes) createEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
-	var body object.CreateProvider
+	var body object.CreateEnforcer
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -45,7 +45,7 @@ func (ir IdentityRoutes) createProvider(c *gin.Context) {
 		return
 	}
 
-	provider, err := ir.service.CreateProvider(c, tenantID, body)
+	enforcer, err := ir.service.CreateEnforcer(c, tenantID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -55,25 +55,25 @@ func (ir IdentityRoutes) createProvider(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, HttpResponse{
-		Data: provider,
+		Data: enforcer,
 	})
 }
 
-// @Summary	Update an existing Provider
-// @Tags		Provider API
+// @Summary	Update an existing Enforcer
+// @Tags		Enforcer API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path	string					true	"Tenant ID"
-// @Param		provider_id	path	string					true	"Provider ID"
-// @Param		"Provider"	body	object.UpdateProvider	true	"Create Provider Data"
+// @Param		enforcer_id	path	string					true	"Enforcer ID"
+// @Param		"Enforcer"	body	object.UpdateEnforcer	true	"Create Enforcer Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [put]
-func (ir IdentityRoutes) updateProvider(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [put]
+func (ir IdentityRoutes) updateEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	providerID := c.Param("provider_id")
+	enforcerID := c.Param("enforcer_id")
 
-	var body object.UpdateProvider
+	var body object.UpdateEnforcer
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -83,7 +83,7 @@ func (ir IdentityRoutes) updateProvider(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateProvider(c, tenantID, providerID, body)
+	err = ir.service.UpdateEnforcer(c, tenantID, enforcerID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -92,23 +92,25 @@ func (ir IdentityRoutes) updateProvider(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: gin.H{},
+	})
 }
 
-// @Summary	Kill an existing Provider
-// @Tags		Provider API
+// @Summary	Kill an existing Enforcer
+// @Tags		Enforcer API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		provider_id	path	string	true	"Provider ID"
+// @Param		enforcer_id	path	string	true	"Enforcer ID"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [delete]
-func (ir IdentityRoutes) killProvider(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [delete]
+func (ir IdentityRoutes) killEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	providerID := c.Param("provider_id")
+	enforcerID := c.Param("enforcer_id")
 
-	err := ir.service.KillProvider(c, tenantID, providerID)
+	err := ir.service.KillEnforcer(c, tenantID, enforcerID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -119,20 +121,20 @@ func (ir IdentityRoutes) killProvider(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing Provider
-// @Tags		Provider API
+// @Summary	Get an existing Enforcer
+// @Tags		Enforcer API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path		string									true	"Tenant ID"
-// @Param		provider_id	path		string									true	"Provider ID"
-// @Success	200			{object}	HttpResponse{data=object.Provider{}}	"Provider"
+// @Param		enforcer_id	path		string									true	"Enforcer ID"
+// @Success	200			{object}	HttpResponse{data=object.Enforcer{}}	"Enforcer"
 // @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/{provider_id} [get]
-func (ir IdentityRoutes) findProvider(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id} [get]
+func (ir IdentityRoutes) findEnforcer(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	providerID := c.Param("provider_id")
+	enforcerID := c.Param("enforcer_id")
 
-	provider, err := ir.service.FindProvider(c, tenantID, providerID)
+	enforcer, err := ir.service.FindEnforcer(c, tenantID, enforcerID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
 			Error: err.Error(),
@@ -141,21 +143,21 @@ func (ir IdentityRoutes) findProvider(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: provider,
+		Data: enforcer,
 	})
 }
 
-// @Summary	Get existing Providers
-// @Tags		Provider API
+// @Summary	Get existing Enforcers
+// @Tags		Enforcer API
 // @Accept		json
 // @Produce	json
 // @Param		page		query		string									false	"Page"
 // @Param		page_limit	query		string									false	"Page Limit"
 // @Param		tenant_id	path		string									true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.Provider{}}	"Provider"
+// @Success	200			{object}	HttpResponse{data=[]object.Enforcer{}}	"Enforcer"
 // @Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider [get]
-func (ir IdentityRoutes) findProviders(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/enforcer [get]
+func (ir IdentityRoutes) findEnforcers(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
 	pagination, ok := c.Get("pagination")
@@ -172,7 +174,7 @@ func (ir IdentityRoutes) findProviders(c *gin.Context) {
 		return
 	}
 
-	providers, err := ir.service.FindProviders(c, tenantID, paginationObj)
+	enforcers, err := ir.service.FindEnforcers(c, tenantID, paginationObj)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
@@ -181,24 +183,25 @@ func (ir IdentityRoutes) findProviders(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: providers,
+		Data: enforcers,
 	})
 }
 
-// @Summary	Send Mail from Provider
-// @Tags		Provider API
+// @Summary	Check if the request has Permissions
+// @Tags		Enforcer API
 // @Accept		json
 // @Produce	json
 // @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		provider_id	path	string	true	"Provider ID"
-// @Success	204
+// @Param		enforcer_id	path	string	true	"Enforcer ID"
+// @Param		"Enforcer"	body	[]any	true	"Create Enforcer Data"
+// @Success	200
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/provider/:provider-id/mail [post]
-func (ir IdentityRoutes) SendMail(c *gin.Context) {
+// @Router		/api/v1/tenant/{tenant_id}/enforcer/{enforcer_id}/enforce [post]
+func (ir IdentityRoutes) enforce(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
-	providerID := c.Param("provider_id")
+	enforcerID := c.Param("enforcer_id")
 
-	var body object.SendMailData
+	var body []any
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -208,7 +211,8 @@ func (ir IdentityRoutes) SendMail(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.SendMail(c, tenantID, providerID, body)
+	success, err := ir.service.Enforce(c, tenantID, enforcerID, body)
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -216,5 +220,7 @@ func (ir IdentityRoutes) SendMail(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: success,
+	})
 }
