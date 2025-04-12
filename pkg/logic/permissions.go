@@ -36,7 +36,15 @@ func (is IdentityService) CreatePermission(ctx context.Context, tenantID string,
 		}
 	}
 
-	return repository.CreatePermission(ctx, is.db, tenantID, createPermission)
+	permission, err := repository.CreatePermission(ctx, is.db, tenantID, createPermission)
+
+	if err != nil {
+		return object.Permission{}, err
+	}
+
+	err = is.SyncCasbinPermissions(ctx, tenantID, permission.EnforcerID)
+
+	return permission, err
 }
 
 func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string, permissionID string, updatePermission object.UpdatePermission) error {
@@ -53,7 +61,15 @@ func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string,
 		}
 	}
 
-	return repository.UpdatePermission(ctx, is.db, tenantID, permissionID, updatePermission)
+	err = repository.UpdatePermission(ctx, is.db, tenantID, permissionID, updatePermission)
+
+	if err != nil {
+		return err
+	}
+
+	err = is.SyncCasbinPermissions(ctx, tenantID, updatePermission.EnforcerID)
+
+	return err
 }
 
 func (is IdentityService) KillPermission(ctx context.Context, tenantID string, permissionID string) error {
@@ -68,6 +84,6 @@ func (is IdentityService) FindPermissions(ctx context.Context, tenantID string, 
 	return repository.FindPermissions(ctx, is.db, tenantID, pagination)
 }
 
-func (is IdentityService) FindPermissionsByAdapter(ctx context.Context, tenantID string, adapterID string) ([]object.Permission, error) {
-	return repository.FindPermissionsByAdapter(ctx, is.db, tenantID, adapterID)
+func (is IdentityService) FindPermissionsByEnforcer(ctx context.Context, tenantID string, enforcerID string) ([]object.Permission, error) {
+	return repository.FindPermissionsByEnforcer(ctx, is.db, tenantID, enforcerID)
 }

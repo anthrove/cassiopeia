@@ -25,7 +25,7 @@ import (
 func CreatePermission(ctx context.Context, db *gorm.DB, tenantId string, createPermission object.CreatePermission) (object.Permission, error) {
 	permission := object.Permission{
 		TenantID:    tenantId,
-		AdapterID:   createPermission.AdapterID,
+		EnforcerID:  createPermission.EnforcerID,
 		Name:        createPermission.Name,
 		Description: createPermission.Description,
 		Users:       createPermission.Users,
@@ -45,7 +45,7 @@ func CreatePermission(ctx context.Context, db *gorm.DB, tenantId string, createP
 func UpdatePermission(ctx context.Context, db *gorm.DB, tenantID string, permissionId string, updatePermission object.UpdatePermission) error {
 	permission := object.Permission{
 		TenantID:    tenantID,
-		AdapterID:   updatePermission.AdapterID,
+		EnforcerID:  updatePermission.EnforcerID,
 		Name:        updatePermission.Name,
 		Description: updatePermission.Description,
 		Users:       updatePermission.Users,
@@ -78,8 +78,8 @@ func FindPermissions(ctx context.Context, db *gorm.DB, tenantID string, paginati
 	return data, err
 }
 
-func FindPermissionsByAdapter(ctx context.Context, db *gorm.DB, tenantID string, adapterID string) ([]object.Permission, error) {
+func FindPermissionsByEnforcer(ctx context.Context, db *gorm.DB, tenantID string, enforcerID string) ([]object.Permission, error) {
 	var data []object.Permission
-	err := db.WithContext(ctx).Where("tenant_id = ? AND adapter_id", tenantID, adapterID).Find(&data).Error
+	err := db.WithContext(ctx).Where("tenant_id = ? AND enforcer_id", tenantID, enforcerID).Find(&data).Error
 	return data, err
 }

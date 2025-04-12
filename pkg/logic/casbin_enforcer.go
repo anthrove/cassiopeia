@@ -59,12 +59,28 @@ func (is IdentityService) GetCasbinEnforcer(ctx context.Context, tenantID string
 	return casEnforcer, nil
 }
 
-/*
 func (is IdentityService) SyncCasbinPermissions(ctx context.Context, tenantID string, enforcerID string) error {
 	enforcer, err := is.FindEnforcer(ctx, tenantID, enforcerID)
 
 	if err != nil {
 		return err
+	}
+
+	permissions, err := is.FindPermissionsByEnforcer(ctx, tenantID, enforcerID)
+
+	if err != nil {
+		return err
+	}
+
+	policies := make([][]string, 0)
+	for _, permission := range permissions {
+		policy, err := is.propergatePermissionToPolicies(ctx, permission)
+
+		if err != nil {
+			return err
+		}
+
+		policies = append(policies, policy...)
 	}
 
 	casbinEnforcer, err := is.GetCasbinEnforcer(ctx, tenantID, enforcer.ModelID, enforcer.AdapterID)
@@ -73,18 +89,17 @@ func (is IdentityService) SyncCasbinPermissions(ctx context.Context, tenantID st
 		return err
 	}
 
-	permissions, err := is.FindPermissionsByAdapter(ctx, tenantID, enforcer.AdapterID)
+	casbinEnforcer.ClearPolicy()
+	for _, policy := range policies {
+		_, err := casbinEnforcer.AddPolicy(policy)
 
-	if err != nil {
-		return err
+		if err != nil {
+			return err
+		}
 	}
 
-	policies := make([][]string, 0)
-	for _, permission := range permissions {
-
-	}
-
-}*/
+	return casbinEnforcer.SavePolicy()
+}
 
 func (is IdentityService) propergatePermissionToPolicies(ctx context.Context, permission object.Permission) ([][]string, error) {
 	users := make([]string, 0)
@@ -105,7 +120,9 @@ func (is IdentityService) propergatePermissionToPolicies(ctx context.Context, pe
 		groups = append(groups, gIDs...)
 	}
 
-	return nil, nil
+	rules := crossJoin(append(users, groups...), permission.V1, permission.V2, permission.V3, permission.V4, permission.V5)
+
+	return rules, nil
 }
 
 func (is IdentityService) propergateGroupToUsers(ctx context.Context, tenantID string, groupID string) ([]string, []string, error) {

@@ -22,9 +22,9 @@ import (
 )
 
 type Permission struct {
-	ID        string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	TenantID  string `json:"tenant_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	AdapterID string `json:"adapter_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ID         string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	TenantID   string `json:"tenant_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	EnforcerID string `json:"enforcer_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -56,7 +56,7 @@ type CreatePermission struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description"`
 
-	AdapterID string `json:"adapter_id" validate:"required"`
+	EnforcerID string `json:"enforcer_id" validate:"required"`
 
 	Users  []string `json:"users"`
 	Groups []string `json:"groups"`
@@ -72,7 +72,7 @@ type UpdatePermission struct {
 	Name        string `json:"name" validate:"required"`
 	Description string `json:"description"`
 
-	AdapterID string `json:"adapter_id" validate:"required"`
+	EnforcerID string `json:"enforcer_id" validate:"required"`
 
 	Users  []string `json:"users"`
 	Groups []string `json:"groups"`
