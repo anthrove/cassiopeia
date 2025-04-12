@@ -153,10 +153,8 @@ func (ir IdentityRoutes) findApplication(c *gin.Context) {
 // @Tags		Application API
 // @Accept		json
 // @Produce	json
-//
 // @Param		page		query		string										false	"Page"
 // @Param		page_limit	query		string										false	"Page Limit"
-//
 // @Param		tenant_id	path		string										true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Application{}}	"Application"
 // @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
