@@ -188,3 +188,40 @@ func (ir IdentityRoutes) findApplications(c *gin.Context) {
 		Data: applications,
 	})
 }
+
+type ApplicationDomain struct {
+	Domain string `json:"domain"`
+}
+
+// @Summary	Get an existing Application by Domain
+// @Tags		Application API
+// @Accept		json
+// @Produce	json
+// @Param		tenant_id		path		string									true	"Tenant ID"
+// @Param		"Domain"	body		ApplicationDomain				true	"Application Data"
+// @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
+// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
+// @Router		/api/v1/application/domain [get]
+func (ir IdentityRoutes) findApplicatioByDomain(c *gin.Context) {
+	var body ApplicationDomain
+	err := c.ShouldBind(&body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	application, err := ir.service.FindApplicationByDomain(c, body.Domain)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: application,
+	})
+}

@@ -128,6 +128,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
 
+	v1.GET("/application/domain", identityRoutes.findApplicatioByDomain)
+
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
 	r.Use(static.Serve("/web", static.LocalFile("./web/build", true)))

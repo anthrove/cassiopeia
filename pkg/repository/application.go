@@ -62,14 +62,20 @@ func KillApplication(ctx context.Context, db *gorm.DB, tenantID string, applicat
 	return db.WithContext(ctx).Delete(&object.Application{}, "id = ? AND tenant_id = ?", applicationID, tenantID).Error
 }
 
-func FindApplication(ctx context.Context, db *gorm.DB, tenantID string, groupID string) (object.Application, error) {
-	var group object.Application
-	err := db.WithContext(ctx).Take(&group, "id = ? AND tenant_id = ?", groupID, tenantID).Error
-	return group, err
+func FindApplication(ctx context.Context, db *gorm.DB, tenantID string, applicationID string) (object.Application, error) {
+	var data object.Application
+	err := db.WithContext(ctx).Take(&data, "id = ? AND tenant_id = ?", applicationID, tenantID).Error
+	return data, err
 }
 
 func FindApplications(ctx context.Context, db *gorm.DB, tenantID string, pagination object.Pagination) ([]object.Application, error) {
 	var data []object.Application
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
+	return data, err
+}
+
+func FindApplicationByDomain(ctx context.Context, db *gorm.DB, domain string) (object.Application, error) {
+	var data object.Application
+	err := db.WithContext(ctx).Take(&data, "sign_in_url LIKE '%' || ? || '%' OR sign_up_url LIKE '%' || ? || '%' OR forget_url LIKE '%' || ? || '%'", domain, domain, domain).Error
 	return data, err
 }

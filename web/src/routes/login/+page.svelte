@@ -13,15 +13,16 @@
   - See the License for the specific language governing permissions and
   - limitations under the License.
   -->
-<script>
-
+<script lang="ts">
     import {goto} from "$app/navigation";
+    import type {PageProps} from './$types';
+
+    let { data }: PageProps = $props();
 
     const urlParams = new URLSearchParams(window.location.search)
-
-    // static variables right now... we need to get it dynamically later
-    let tenantID = 'TK8ZPdka-YEGQjJepmPlTgOEm';
-    let applicationID = 'OHqVwht2rT_WDt-jYugzUUyWB';
+    
+    let tenantID = data.data.tenant_id;
+    let applicationID = data.data.id;
 
     let requestID = urlParams.get("request_id")
     let email = '';
@@ -44,9 +45,10 @@
             })
         });
         const body = await response.json();
-        console.log(body);
 
-        goto(body.data.redirect_uri)
+        if (body.data && typeof body.data.redirect_uri === 'string' && body.data.redirect_uri.trim() !== '') {
+            goto(body.data.redirect_uri);
+        }
     };
 </script>
 

@@ -67,3 +67,7 @@ func (is IdentityService) FindApplication(ctx context.Context, tenantID string, 
 func (is IdentityService) FindApplications(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Application, error) {
 	return repository.FindApplications(ctx, is.db, tenantID, pagination)
 }
+
+func (is IdentityService) FindApplicationByDomain(ctx context.Context, domain string) (object.Application, error) {
+	return repository.FindApplicationByDomain(ctx, is.db, domain)
+}
