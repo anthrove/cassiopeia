@@ -20,7 +20,7 @@
     let { data }: PageProps = $props();
 
     const urlParams = new URLSearchParams(window.location.search)
-    
+
     let tenantID = data.data.tenant_id;
     let applicationID = data.data.id;
 
@@ -48,6 +48,8 @@
 
         if (body.data && typeof body.data.redirect_uri === 'string' && body.data.redirect_uri.trim() !== '') {
             goto(body.data.redirect_uri);
+        } else {
+            goto("/web/profile")
         }
     };
 </script>

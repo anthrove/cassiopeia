@@ -25,10 +25,10 @@ import (
 	"time"
 )
 
-// @Summary	Login
+// @Summary	    Login
 // @Tags		Authentication API
 // @Accept		json
-// @Produce	json
+// @Produce	    json
 // @Param		tenant_id		path	string					true	"Tenant ID"
 // @Param		application_id	path	string					true	"Application ID"
 // @Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
@@ -119,10 +119,16 @@ func (ir IdentityRoutes) signIn(c *gin.Context) {
 	})
 }
 
-func SignUp(c *gin.Context) {
+func (ir IdentityRoutes) profile(c *gin.Context) {
+	session, exists := c.Get("session")
 
-}
+	if !exists {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: "internal session information are missing",
+		})
+	}
 
-func SignOut(c *gin.Context) {
-
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: session,
+	})
 }
