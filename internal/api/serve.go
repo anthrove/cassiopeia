@@ -130,19 +130,14 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
-	r.Use(static.Serve("/favicon.ico", static.LocalFile("./web/static/favicon.png", false)))
 	r.Use(static.Serve("/web", static.LocalFile("./web/build", true)))
+	r.Use(static.Serve("/favicon.ico", static.LocalFile("./web/static/favicon.png", false)))
 
-	r.Any("/auth/:tenant_id/login", func(c *gin.Context) {
-		switch c.Request.Method {
-		case "GET":
-			loginHandler(c.Writer, c.Request)
-		case "POST":
-			identityRoutes.checkLoginHandler(c)
-		default:
-			c.Status(http.StatusMethodNotAllowed)
-			return
-		}
+	r.GET("/auth/:tenant_id/login", func(c *gin.Context) {
+		loginHandler(c.Writer, c.Request)
+	})
+	r.POST("/auth/:tenant_id/login", func(c *gin.Context) {
+		identityRoutes.checkLoginHandler(c)
 	})
 	r.Any("/:tenant_id/*any", identityRoutes.OIDCEndpoints)
 

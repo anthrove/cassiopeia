@@ -17,9 +17,12 @@
 package api
 
 import (
+	"database/sql"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
+	"github.com/zitadel/oidc/v3/pkg/op"
 	"net/http"
+	"time"
 )
 
 // @Summary	Login
@@ -29,7 +32,7 @@ import (
 // @Param		tenant_id		path	string					true	"Tenant ID"
 // @Param		application_id	path	string					true	"Application ID"
 // @Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
-// @Success	204
+// @Success	200 {object}    HttpResponse{data=object.User} "Success"
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [put]
 func (ir IdentityRoutes) signIn(c *gin.Context) {
@@ -55,9 +58,64 @@ func (ir IdentityRoutes) signIn(c *gin.Context) {
 		return
 	}
 
+	var callbackURL string
+	if body.RequestID != "" {
+		authRequest, err := ir.service.FindAuthRequest(c, tenantID, body.RequestID)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, HttpResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+
+		if authRequest.ApplicationID != applicationID {
+			c.JSON(http.StatusBadRequest, HttpResponse{
+				Error: "Application ID mismatch",
+			})
+			return
+		}
+
+		err = ir.service.UpdateAuthRequest(c, tenantID, body.RequestID, object.UpdateAuthRequest{
+			UserID: sql.NullString{
+				String: user.ID,
+				Valid:  true,
+			},
+			Authenticated:   true,
+			AuthenticatedAt: time.Now(),
+		})
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, HttpResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+
+		provider, err := GetProvider(c, ir.service, tenantID)
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, HttpResponse{
+				Error: err.Error(),
+			})
+			return
+		}
+
+		callbackURLFn := op.AuthCallbackURL(provider)
+		callbackURL = "/" + tenantID + callbackURLFn(c, body.RequestID)
+	}
+
 	c.SetCookie("identity_session_id", session, 60*60*24*30, "", "", false, true)
+
+	type resp struct {
+		User        object.User `json:"user"`
+		RedirectURI string      `json:"redirect_uri,omitempty"`
+	}
+
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: user,
+		Data: resp{
+			user,
+			callbackURL,
+		},
 	})
 }
 
