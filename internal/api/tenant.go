@@ -110,7 +110,7 @@ func (ir IdentityRoutes) updateTenant(c *gin.Context) {
 //	@Tags		Tenant API
 //	@Accept		json
 //	@Produce	json
-//	@Param		id	body	string	true	"Tenant ID"
+//	@Param		tenant_id	path	string	true	"Tenant ID"
 //	@Success	204
 //	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 //	@Router		/api/v1/tenant/{tenant_id} [delete]

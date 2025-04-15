@@ -22,6 +22,7 @@ import (
 	"github.com/anthrove/identity/docs"
 	"github.com/anthrove/identity/pkg/logic"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -45,6 +46,7 @@ type IdentityRoutes struct {
 //   - service: an instance of IdentityService containing the business logic for identity management.
 func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	docs.SwaggerInfo.BasePath = ""
+	docs.SwaggerInfo.Title = "Identity API"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	identityRoutes := &IdentityRoutes{service}
@@ -128,7 +130,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
-	r.Any("/favicon.ico", func(context *gin.Context) {})
+	r.Use(static.Serve("/favicon.ico", static.LocalFile("./web/static/favicon.png", false)))
+	r.Use(static.Serve("/web", static.LocalFile("./web/build", true)))
 
 	r.Any("/auth/:tenant_id/login", func(c *gin.Context) {
 		switch c.Request.Method {
