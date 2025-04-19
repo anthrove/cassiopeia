@@ -23,15 +23,15 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a new Application
-// @Tags		Application API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id		path		string									true	"Tenant ID"
-// @Param		"Application"	body		object.CreateApplication				true	"Create Application Data"
-// @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
-// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application [post]
+//	@Summary	Creates a new Application
+//	@Tags		Application API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id		path		string									true	"Tenant ID"
+//	@Param		"Application"	body		object.CreateApplication				true	"Create Application Data"
+//	@Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
+//	@Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application [post]
 func (ir IdentityRoutes) createApplication(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -59,16 +59,16 @@ func (ir IdentityRoutes) createApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	Update an existing Application
-// @Tags		Application API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id		path	string						true	"Tenant ID"
-// @Param		application_id	path	string						true	"Application ID"
-// @Param		"Application"	body	object.UpdateApplication	true	"Create Application Data"
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id} [put]
+//	@Summary	Update an existing Application
+//	@Tags		Application API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id		path	string						true	"Tenant ID"
+//	@Param		application_id	path	string						true	"Application ID"
+//	@Param		"Application"	body	object.UpdateApplication	true	"Create Application Data"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id} [put]
 func (ir IdentityRoutes) updateApplication(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	applicationID := c.Param("application_id")
@@ -97,17 +97,17 @@ func (ir IdentityRoutes) updateApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	Kill an existing Application
-// @Tags		Application API
-// @Accept		json
-// @Produce	json
+//	@Summary	Kill an existing Application
+//	@Tags		Application API
+//	@Accept		json
+//	@Produce	json
 //
-// @Param		tenant_id		path	string	true	"Tenant ID"
-// @Param		application_id	path	string	true	"Application ID"
+//	@Param		tenant_id		path	string	true	"Tenant ID"
+//	@Param		application_id	path	string	true	"Application ID"
 //
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id} [delete]
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id} [delete]
 func (ir IdentityRoutes) killApplication(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	applicationID := c.Param("application_id")
@@ -123,15 +123,15 @@ func (ir IdentityRoutes) killApplication(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
-// @Summary	Get an existing Application
-// @Tags		Application API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id		path		string									true	"Tenant ID"
-// @Param		application_id	path		string									true	"Application ID"
-// @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
-// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id} [get]
+//	@Summary	Get an existing Application
+//	@Tags		Application API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id		path		string									true	"Tenant ID"
+//	@Param		application_id	path		string									true	"Application ID"
+//	@Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
+//	@Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id} [get]
 func (ir IdentityRoutes) findApplication(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	applicationID := c.Param("application_id")
@@ -149,16 +149,16 @@ func (ir IdentityRoutes) findApplication(c *gin.Context) {
 	})
 }
 
-// @Summary	Get existing Applications
-// @Tags		Application API
-// @Accept		json
-// @Produce	json
-// @Param		page		query		string										false	"Page"
-// @Param		page_limit	query		string										false	"Page Limit"
-// @Param		tenant_id	path		string										true	"Tenant ID"
-// @Success	200			{object}	HttpResponse{data=[]object.Application{}}	"Application"
-// @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application [get]
+//	@Summary	Get existing Applications
+//	@Tags		Application API
+//	@Accept		json
+//	@Produce	json
+//	@Param		page		query		string										false	"Page"
+//	@Param		page_limit	query		string										false	"Page Limit"
+//	@Param		tenant_id	path		string										true	"Tenant ID"
+//	@Success	200			{object}	HttpResponse{data=[]object.Application{}}	"Application"
+//	@Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application [get]
 func (ir IdentityRoutes) findApplications(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 
@@ -193,15 +193,15 @@ type ApplicationDomain struct {
 	Domain string `json:"domain"`
 }
 
-// @Summary	Get an existing Application by Domain
-// @Tags		Application API
-// @Accept		json
-// @Produce	json
-// @Param		tenant_id		path		string									true	"Tenant ID"
-// @Param		"Domain"	body		ApplicationDomain				true	"Application Data"
-// @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
-// @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
-// @Router		/api/v1/application/domain [get]
+//	@Summary	Get an existing Application by Domain
+//	@Tags		Application API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id	path		string									true	"Tenant ID"
+//	@Param		"Domain"	body		ApplicationDomain						true	"Application Data"
+//	@Success	200			{object}	HttpResponse{data=object.Application{}}	"Application"
+//	@Failure	400			{object}	HttpResponse{data=nil}					"Bad Request"
+//	@Router		/api/v1/application/domain [get]
 func (ir IdentityRoutes) findApplicatioByDomain(c *gin.Context) {
 	var body ApplicationDomain
 	err := c.ShouldBind(&body)
