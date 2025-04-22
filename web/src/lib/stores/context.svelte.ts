@@ -19,7 +19,7 @@ if (browser) {
                 url.searchParams.delete('tenant')
             }
             goto(`${url.pathname}?${url.searchParams.toString()}`, {
-                replaceState: true,
+                //replaceState: true,
                 noScroll: true
             });
         }

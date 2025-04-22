@@ -6,7 +6,8 @@
         placeholder = "",
         required = false,
         name = "",
-        class:classList=''
+        class:classList='',
+        readonly = false
     } = $props();
 </script>
 
@@ -22,12 +23,13 @@
         </div>
         {/if}
         <input
+            {readonly}
             type="text"
             {required}
             {name}
             placeholder={placeholder || label}
             bind:value
-            class="p-2 border-zinc-200"
+            class="{readonly?'cursor-not-allowed text-zinc-400':''} p-2 border-zinc-200"
         />
     </label>
 {:else}

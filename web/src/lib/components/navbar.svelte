@@ -40,9 +40,10 @@
         },
     ];
 
-    let tenants: Tenant[] = [];
-    onMount(async () => {
-        const apitenants = (await api<Tenant[]>("v1/tenant")) || [];
+    import { readAll as readAllTenants } from '$lib/logic/tenant.svelte'
+    let tenants: Tenant[] = $state([]);
+    async function loadData(){
+        const apitenants = await readAllTenants();
         if (!apitenants.map((t) => t.id).includes($context)) {
             context.set("");
         }
@@ -52,7 +53,8 @@
                 display_name: "-/-",
             },
         ];
-    });
+    }
+    onMount(loadData);
 
     import { context } from "$lib/stores/context.svelte";
 
@@ -61,77 +63,78 @@
     }
 
     import Link from "./link.svelte";
-    import Button from "./Button.svelte";
 </script>
 
-<nav class="p-4 bg-white text-black shadow flex gap-4 items-center">
-    <b>
-        <Link
-            class="hover:before:content-['OwO'] before:text-rose-600 before:mr-1.5"
-            href="/">WhoDis</Link
-        >
-    </b>
-    <ul class="flex space-x-4 h-full">
-        {#each navItems as item}
-            <li class="relative group h-full flex items-center">
-                {#if item.subItems}
-                    <Link
-                        href={item.link}
-                        class="h-full flex items-center px-4"
-                        disabled={item.tenantRequired&&!$context}
-                        >{item.name}</Link
-                    >
-                    {#if !item.tenantRequired || $context}
-                    <ul
-                        class="absolute left-4 top-4 pt-4 min-w-full mt-2 rounded shadow-lg hidden group-hover:block transition duration-300 ease-in-out transform opacity-0 group-hover:opacity-100 group-hover:translate-y-0"
-                    >
-                        {#each item.subItems as subItem}
-                            <li
-                                class="hover:bg-zinc-50 border-zinc-200 border-b-[0.5px] bg-white text-black"
-                            >
-                                <Link
-                                    href={subItem.link}
-                                    class="hover:text-zinc-600 py-2 px-4 inline-block"
-                                    >{subItem.name}</Link
-                                >
-                            </li>
-                        {/each}
-                    </ul>
-                    {/if}
-                {:else}
-                    <Link
-                        href={item.link}
-                        class="hover:text-gray-400 h-full flex items-center px-4"
-                        >{item.name}</Link
-                    >
-                {/if}
-            </li>
-        {/each}
-    </ul>
-    <div class="ml-auto">
-        <li class="relative group h-full flex items-center">
+<nav class=" bg-white text-black shadow">
+    <nav class="p-4 container mx-auto flex gap-4 items-center">
+        <b>
             <Link
-                disabled={!$context}
-                href="/tenant/{$context}"
-                class="cursor-pointer h-full flex items-center px-4 italic"
-                >{tenants.find(t=>t.id == $context)?.display_name || "No tenant"}</Link
+                class="hover:before:content-['OwO'] before:text-rose-600 before:mr-1.5"
+                href="/">WhoDis</Link
             >
-            <ul
-                class="absolute right-0 top-4 pt-4 min-w-full mt-2 rounded shadow-lg hidden group-hover:block transition duration-300 ease-in-out transform opacity-0 group-hover:opacity-100 group-hover:translate-y-0"
-            >
-                {#each tenants as tenant}
-                    <li
-                        class="hover:bg-zinc-50 border-zinc-200 border-b-[0.5px] bg-white text-black"
-                    >
+        </b>
+        <ul class="flex space-x-4 h-full">
+            {#each navItems as item}
+                <li class="relative group h-full flex items-center">
+                    {#if item.subItems}
                         <Link
-                            href="{$context == tenant.id?`/tenant/${$context}`:''}"
-                            onclick={() => setCurentTenant(tenant.id)}
-                            class="{$context == tenant.id?'text-primary-500 hover:text-primary-300':'hover:text-zinc-600'} py-2 px-4 inline-block cursor-pointer w-full"
-                            >{tenant.display_name}</Link
+                            href={item.link}
+                            class="h-full flex items-center px-4"
+                            disabled={item.tenantRequired&&!$context}
+                            >{item.name}</Link
                         >
-                    </li>
-                {/each}
-            </ul>
-        </li>
-    </div>
+                        {#if !item.tenantRequired || $context}
+                        <ul
+                            class="absolute left-4 top-4 pt-4 min-w-full mt-2 rounded shadow-lg hidden group-hover:block transition duration-300 ease-in-out transform opacity-0 group-hover:opacity-100 group-hover:translate-y-0"
+                        >
+                            {#each item.subItems as subItem}
+                                <li
+                                    class="hover:bg-zinc-50 border-zinc-200 border-b-[0.5px] bg-white text-black"
+                                >
+                                    <Link
+                                        href={subItem.link}
+                                        class="hover:text-zinc-600 py-2 px-4 inline-block"
+                                        >{subItem.name}</Link
+                                    >
+                                </li>
+                            {/each}
+                        </ul>
+                        {/if}
+                    {:else}
+                        <Link
+                            href={item.link}
+                            class="hover:text-gray-400 h-full flex items-center px-4"
+                            >{item.name}</Link
+                        >
+                    {/if}
+                </li>
+            {/each}
+        </ul>
+        <div class="ml-auto">
+            <li class="relative group h-full flex items-center">
+                <Link
+                    disabled={!$context}
+                    href="/tenant"
+                    class="cursor-pointer h-full flex items-center px-4 italic"
+                    >{tenants.find(t=>t.id == $context)?.display_name || "No tenant"}</Link
+                >
+                <ul
+                    class="absolute right-0 top-4 pt-4 min-w-full mt-2 rounded shadow-lg hidden group-hover:block transition duration-300 ease-in-out transform opacity-0 group-hover:opacity-100 group-hover:translate-y-0"
+                >
+                    {#each tenants as tenant}
+                        <li
+                            class="hover:bg-zinc-50 border-zinc-200 border-b-[0.5px] bg-white text-black"
+                        >
+                            <Link
+                                href={$context==tenant.id?"/tenant":""}
+                                onclick={() => setCurentTenant(tenant.id)}
+                                class="{$context == tenant.id?'text-primary-500 hover:text-primary-300':'hover:text-zinc-600'} py-2 px-4 inline-block cursor-pointer w-full"
+                                >{tenant.display_name}</Link
+                            >
+                        </li>
+                    {/each}
+                </ul>
+            </li>
+        </div>
+    </nav>
 </nav>

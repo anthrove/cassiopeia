@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { Snippet } from "svelte";
     import Button from "../Button.svelte";
     import Dropdown from "./Dropdown.svelte";
     import Input from "./input.svelte";
@@ -19,7 +20,7 @@
         state: formState = $bindable({}),
         descriptor = {} as FormDescriptor,
         onsubmit = () => {},
-        submit = 'Submit'
+        submit = <Snippet|string>'Submit'
     } = $props();
 
     // hydrate state descriptors
@@ -32,6 +33,7 @@
                 type: "string",
                 required: true,
                 label: key,
+                readonly:false
             };
             initialState[key] = "";
         } else if (fieldDescriptor === Number) {
@@ -39,6 +41,7 @@
                 type: "number",
                 required: true,
                 label: key,
+                readonly:false
             };
             initialState[key] = 0;
         } else if (fieldDescriptor === Boolean) {
@@ -46,6 +49,7 @@
                 type: "boolean",
                 required: true,
                 label: key,
+                readonly:false
             };
         } else if (Array.isArray(fieldDescriptor)) {
             explicitDescriptor = {
@@ -56,6 +60,7 @@
 
                 required: true,
                 label: key,
+                readonly:false
             };
             initialState[key] = explicitDescriptor.default;
         } else {
@@ -80,6 +85,7 @@
     {#each descriptors as descriptor, descriptorIndex}
         {#if descriptor.type == "string"}
             <Input
+                readonly={descriptor.readonly}
                 required={descriptor.required}
                 label={descriptor.label}
                 type="text"
@@ -88,10 +94,12 @@
             />
         {:else if descriptor.type == "select:single"}
             <Dropdown
+                readonly={descriptor.readonly}
                 required={descriptor.required}
                 label={descriptor.label}
                 options={descriptor.options}
                 bind:value={formState[keylist[descriptorIndex]]}
+                labeler={descriptor.labeler}
                 class="mb-4"
             />
         {:else}
@@ -101,5 +109,11 @@
         {/if}
     {/each}
 
-    <Button>{submit}</Button>
+    {#if submit}
+        {#if typeof submit === 'string'}
+            <Button>{submit}</Button>
+        {:else}
+            {@render submit()}
+        {/if}
+    {/if}
 </form>

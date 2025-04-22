@@ -36,6 +36,9 @@ const config = {
 		}),
 		paths: {
 			base: '/web'
+		},
+		alias:{
+			'$data/*':'./data'
 		}
 	}
 };

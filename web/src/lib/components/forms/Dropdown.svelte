@@ -2,12 +2,14 @@
     let {
         value = $bindable(""),
         options = $bindable([]),
-        label = "",
+        label = <string|LabelerFunction>"",
+        labeler= <LabelerFunction>(id:string)=>id,
         type: inputType = "text",
         placeholder = "",
         required = false,
         name = "",
-        class:classList=''
+        class:classList='',
+        readonly=false
     } = $props();
 </script>
 
@@ -19,9 +21,9 @@
         >
         <div class="absolute w-full h-[0.5px] bg-zinc-200"></div>
     </div>
-    <select {name} {placeholder} {required} class="{classList} w-full" bind:value={value}>
+    <select disabled={readonly} {name} {placeholder} {required} class="{classList} w-full" bind:value={value}>
         {#each options as option}
-            <option value="{option}">{option}</option>
+            <option value="{option}">{labeler(option)}</option>
         {/each}
     </select>
 </div>

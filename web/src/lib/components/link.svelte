@@ -7,9 +7,10 @@
         href,
         target = "",
         children,
-        class: classList,
+        class: classList = "",
         disabled = false,
         onclick = () => {},
+        type='button'
     } = $props();
 
     const computedHref = $derived.by(() => {
@@ -27,6 +28,7 @@
 
 <svelte:element
     this={isButton ? "button" : "a"}
+    {type}
     onclick={() => {
         onclick();
     }}

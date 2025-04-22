@@ -10,8 +10,16 @@ interface RequestOptions extends RequestInit {
     body?: any; // Allow any type, e.g., object, string, FormData, etc.
 }
 
+type APIResponse<T> = {
+    data:T,
+    error:null
+} | {
+    data: null,
+    error: string
+}
+
 export function useApiFetch(event?: import('@sveltejs/kit').RequestEvent) {
-    return async <T>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
+    return async <T>(endpoint: string, options: RequestOptions = {}): Promise<APIResponse<T>> => {
         let token: string | undefined;
 
         if (browser) {
@@ -45,11 +53,22 @@ export function useApiFetch(event?: import('@sveltejs/kit').RequestEvent) {
             let body = ""
             try {
                 body = await res.json()
-            } catch { }
+            } catch { 
+                return {
+                    data: null,
+                    error: `${res.status}: ${res.statusText}. No body`
+                }
+            }
             throw new NetworkError(res.statusText, res.status, body)
         }
-
-        const responseBody = await res.json();
-        return responseBody.data
+        try{
+            return await res.json()
+        }catch{
+            return {
+                data: null,
+                error: 'No body'
+            }
+        }
+        //return responseBody.data
     };
 }

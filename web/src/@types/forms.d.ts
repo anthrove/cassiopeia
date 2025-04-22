@@ -3,39 +3,34 @@ type FormDescriptor = {
     [key:string]: FormFieldDescriptor
 }
 
+type LabelerFunction = (string)=>string
+type CommonFieldDescriptorOptions = {
+    default: any
+    label: string
+    required: boolean,
+    readonly: boolean
+}
+
 // Describes a single Form field with optional additional configuration
-type ExplicitFormFieldDescriptor = {
+
+type ExplicitFormFieldDescriptor = Partial<CommonFieldDescriptorOptions>&({
     type: "string"
     multiline?: boolean
     min?: number
     max?:number
-
-    default?: any
-    label?: string
-    required?: boolean
 }|{
     type: "number"
     min?: number
     max?: number
     step?: number
 
-    default?: any
-    label?: string
-    required?: boolean
 } | {
     type: "boolean"
-
-    default?: any
-    label?: string
-    required?: boolean
 }| {
     type: "select:single"
-
     options: any[],
-    
-    default?: any
-    label?: string
-    required?: boolean    
-}
+    label: string
+    labeler?: LabelerFunction
+})
 
 type FormFieldDescriptor = ExplicitFormFieldDescriptor | StringConstructor | NumberConstructor | BooleanConstructor| string[]
