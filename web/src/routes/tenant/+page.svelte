@@ -72,8 +72,8 @@
     });
 
     async function onSaveChanges(tenantConfig: Tenant) {
-        updateTenant(tenantConfig);
-        console.log(tenantConfig);
+        await updateTenant(tenantConfig);
+        window.location.reload()
     }
 
     let hasChanges = $derived(
@@ -94,10 +94,13 @@
 <Modal bind:open={showConfirmDeleteModal}>
     <div class="prose">
         <h2 class="text-rose-600">
-            Delete "{tenantData.display_name}""
+            Delete "{tenantData.display_name}"
         </h2>
         <p>This action cannot be undone. Are you sure you want to do this?</p>
-        <Button variant="danger" onclick={confirmDeleteTenant}>Delete tenant</Button>
+        <div class="flex items-center gap-4 flex-wrap">
+            <Button variant="danger" onclick={confirmDeleteTenant}>Confirm permanent deletion</Button>
+            <Button variant="secondary" onclick={()=>{showConfirmDeleteModal=false}}>Cancel</Button>
+        </div>
     </div>
 </Modal>
 
