@@ -17,7 +17,8 @@
 package object
 
 type SignInRequest struct {
-	RequestID string `json:"request_id"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
+	RequestID string         `json:"request_id"`
+	Username  string         `json:"username"`
+	Type      string         `json:"type"`
+	Metadata  map[string]any `json:"metadata"`
 }

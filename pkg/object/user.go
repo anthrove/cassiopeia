@@ -37,9 +37,6 @@ type User struct {
 	Email                  string `json:"email" gorm:"type:varchar(100);index"`
 	EmailVerified          bool   `json:"email_verified"`
 	EmailVerificationToken string `json:"-" gorm:"type:char(6)"`
-	PasswordHash           string `json:"-" gorm:"type:varchar(150)"`
-	PasswordSalt           string `json:"-" gorm:"type:varchar(100)"`
-	PasswordType           string `json:"-" gorm:"type:varchar(100)"`
 
 	Groups []Group `json:"groups" gorm:"many2many:user_groups;"`
 }

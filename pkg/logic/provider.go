@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider/auth"
 	"github.com/anthrove/identity/pkg/provider/email"
 	"github.com/anthrove/identity/pkg/provider/storage"
 	"github.com/anthrove/identity/pkg/repository"
@@ -86,12 +87,12 @@ func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, p
 	return repository.UpdateProvider(ctx, is.db, tenantID, providerID, updateProvider)
 }
 
-func (is IdentityService) KillProvider(ctx context.Context, tenantID string, groupID string) error {
-	return repository.KillProvider(ctx, is.db, tenantID, groupID)
+func (is IdentityService) KillProvider(ctx context.Context, tenantID string, providerID string) error {
+	return repository.KillProvider(ctx, is.db, tenantID, providerID)
 }
 
-func (is IdentityService) FindProvider(ctx context.Context, tenantID string, groupID string) (object.Provider, error) {
-	return repository.FindProvider(ctx, is.db, tenantID, groupID)
+func (is IdentityService) FindProvider(ctx context.Context, tenantID string, providerID string) (object.Provider, error) {
+	return repository.FindProvider(ctx, is.db, tenantID, providerID)
 }
 
 func (is IdentityService) FindProviders(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Provider, error) {
@@ -109,6 +110,8 @@ func validateProvider(providerObj object.Provider) error {
 		provider, err = email.GetEMailProvider(providerObj)
 	case "storage":
 		provider, err = storage.GetStorageProvider(providerObj)
+	case "auth":
+		provider, err = auth.GetAuthProvider(providerObj)
 	default:
 		return errors.New("invalid provider category")
 	}

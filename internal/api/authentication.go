@@ -17,25 +17,57 @@
 package api
 
 import (
-	"database/sql"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
-	"github.com/zitadel/oidc/v3/pkg/op"
 	"net/http"
-	"time"
 )
 
 //	@Summary	Login
 //	@Tags		Authentication API
 //	@Accept		json
 //	@Produce	json
-//	@Param		tenant_id		path		string							true	"Tenant ID"
-//	@Param		application_id	path		string							true	"Application ID"
-//	@Param		"Sign In"		body		object.SignInRequest			true	"SignIn Data"
-//	@Success	200				{object}	HttpResponse{data=object.User}	"Success"
-//	@Failure	400				{object}	HttpResponse{data=nil}			"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [put]
-func (ir IdentityRoutes) signIn(c *gin.Context) {
+//	@Param		tenant_id		path	string	true	"Tenant ID"
+//	@Param		application_id	path	string	true	"Application ID"
+//	@Param		username		query	string	true	"Username"
+//	@Param		type			query	string	true	"Type"
+//	@Success	200
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login/begin [get]
+func (ir IdentityRoutes) signInBegin(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
+	applicationID := c.Param("application_id")
+
+	username := c.Query("username")
+	credentialType := c.Query("type")
+
+	data, err := ir.service.SignInStart(c, tenantID, applicationID, object.SignInRequest{
+		Username: username,
+		Type:     credentialType,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: data,
+	})
+}
+
+//	@Summary	Login
+//	@Tags		Authentication API
+//	@Accept		json
+//	@Produce	json
+//	@Param		tenant_id		path	string					true	"Tenant ID"
+//	@Param		application_id	path	string					true	"Application ID"
+//	@Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
+//	@Success	200
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [post]
+func (ir IdentityRoutes) signInSubmit(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	applicationID := c.Param("application_id")
 
@@ -49,7 +81,7 @@ func (ir IdentityRoutes) signIn(c *gin.Context) {
 		return
 	}
 
-	session, user, err := ir.service.SignIn(c, tenantID, applicationID, body)
+	session, user, err := ir.service.SignInSubmit(c, tenantID, applicationID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -58,77 +90,8 @@ func (ir IdentityRoutes) signIn(c *gin.Context) {
 		return
 	}
 
-	var callbackURL string
-	if body.RequestID != "" {
-		authRequest, err := ir.service.FindAuthRequest(c, tenantID, body.RequestID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, HttpResponse{
-				Error: err.Error(),
-			})
-			return
-		}
-
-		if authRequest.ApplicationID != applicationID {
-			c.JSON(http.StatusBadRequest, HttpResponse{
-				Error: "Application ID mismatch",
-			})
-			return
-		}
-
-		err = ir.service.UpdateAuthRequest(c, tenantID, body.RequestID, object.UpdateAuthRequest{
-			UserID: sql.NullString{
-				String: user.ID,
-				Valid:  true,
-			},
-			Authenticated:   true,
-			AuthenticatedAt: time.Now(),
-		})
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, HttpResponse{
-				Error: err.Error(),
-			})
-			return
-		}
-
-		provider, err := GetProvider(c, ir.service, tenantID)
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, HttpResponse{
-				Error: err.Error(),
-			})
-			return
-		}
-
-		callbackURLFn := op.AuthCallbackURL(provider)
-		callbackURL = "/" + tenantID + callbackURLFn(c, body.RequestID)
-	}
-
 	c.SetCookie("identity_session_id", session, 60*60*24*30, "", "", false, true)
-
-	type resp struct {
-		User        object.User `json:"user"`
-		RedirectURI string      `json:"redirect_uri,omitempty"`
-	}
-
 	c.JSON(http.StatusOK, HttpResponse{
-		Data: resp{
-			user,
-			callbackURL,
-		},
-	})
-}
-
-func (ir IdentityRoutes) profile(c *gin.Context) {
-	session, exists := c.Get("session")
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, HttpResponse{
-			Error: "internal session information are missing",
-		})
-	}
-
-	c.JSON(http.StatusOK, HttpResponse{
-		Data: session,
+		Data: user,
 	})
 }

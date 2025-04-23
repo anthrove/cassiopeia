@@ -19,7 +19,6 @@ package api
 import (
 	"github.com/anthrove/identity/docs"
 	"github.com/anthrove/identity/pkg/logic"
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -39,7 +38,6 @@ type IdentityRoutes struct {
 //   - service: an instance of IdentityService containing the business logic for identity management.
 func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	docs.SwaggerInfo.BasePath = ""
-	docs.SwaggerInfo.Title = "Identity API"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	identityRoutes := &IdentityRoutes{service}
@@ -119,19 +117,12 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killEnforcer)
 	v1.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
 
-	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
-
-	v1.GET("/application/domain", identityRoutes.findApplicatioByDomain)
-
-	auth := v1.Group("/auth", identityRoutes.Authorization())
-	{
-		auth.GET("/profile", identityRoutes.profile)
-	}
+	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
+	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
-	r.Use(static.Serve("/web", static.LocalFile("./web/build", true)))
-	r.Use(static.Serve("/favicon.ico", static.LocalFile("./web/static/favicon.png", false)))
+	r.Any("/favicon.ico", func(context *gin.Context) {})
 
 	r.Any("/:tenant_id/*any", identityRoutes.OIDCEndpoints)
 
