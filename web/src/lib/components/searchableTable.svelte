@@ -5,7 +5,7 @@
         [key: string]: any;
     };
 
-    let { rows, columns, row, header,empty } = $props();
+    let { rows, columns=[], row, header,empty } = $props();
 
     let search = $state("");
 

@@ -1,19 +1,21 @@
 <script lang="ts">
-    let { open = $bindable(false), children } = $props();
+    let { open = $bindable(false), children, onclose=()=>{} } = $props();
 
     function closeSelf(event:Event) {
         if (event.target === event.currentTarget) {
+            onclose()
             open = false
         }
     }
     function close(){
+        onclose()
         open = false
     }
 </script>
 
 {#if open}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <div role="dialog" tabindex="0" class="absolute flex items-start inset-0 bg-black/40 z-20 text-start" onclick={closeSelf}>
+    <div role="dialog" tabindex="0" class="absolute overflow-y-auto h-screen flex items-start inset-0 bg-black/40 z-20 text-start" onclick={closeSelf}>
         <div class="mt-16 p-4 flex-1">
             <div class="container mx-auto p-4 bg-white rounded shadow block relative">
                 <button aria-label="close" class="absolute top-2 right-2 p-2 cursor-pointer hover:text-primary-500" onclick={close}>

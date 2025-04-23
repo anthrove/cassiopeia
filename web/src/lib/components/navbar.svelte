@@ -73,7 +73,7 @@
                 href="/">WhoDis</Link
             >
         </b>
-        <ul class="flex space-x-4 h-full">
+        <ul class="flex space-x-4 h-full z-10">
             {#each navItems as item}
                 <li class="relative group h-full flex items-center">
                     {#if item.subItems}

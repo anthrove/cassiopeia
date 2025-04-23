@@ -33,7 +33,7 @@
         <div class="prose">
             <h2>Create new Tenant</h2>
             <Form
-                submit="Create tennant"
+                submit="Create"
                 descriptor={createTenantModal_descriptor}
                 onsubmit={createTenant}
             />

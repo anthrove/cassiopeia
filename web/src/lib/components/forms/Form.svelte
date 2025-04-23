@@ -23,62 +23,73 @@
         submit = <Snippet|string>'Submit'
     } = $props();
 
+    let descriptors: ExplicitFormFieldDescriptor[] = $state([]);
+    //let formState: { [key: string]: any } = $state({});
+    let keylist = $state<string[]>([])
+
+    let doRender = $state(false)
     // hydrate state descriptors
-    let descriptors: ExplicitFormFieldDescriptor[] = [];
-    let initialState: { [key: string]: any } = {};
-    for (const [key, fieldDescriptor] of Object.entries(descriptor)) {
-        let explicitDescriptor: ExplicitFormFieldDescriptor;
-        if (fieldDescriptor === String) {
-            explicitDescriptor = {
-                type: "string",
-                required: true,
-                label: key,
-                readonly:false
-            };
-            initialState[key] = "";
-        } else if (fieldDescriptor === Number) {
-            explicitDescriptor = {
-                type: "number",
-                required: true,
-                label: key,
-                readonly:false
-            };
-            initialState[key] = 0;
-        } else if (fieldDescriptor === Boolean) {
-            explicitDescriptor = {
-                type: "boolean",
-                required: true,
-                label: key,
-                readonly:false
-            };
-        } else if (Array.isArray(fieldDescriptor)) {
-            explicitDescriptor = {
-                type: "select:single",
-
-                options: fieldDescriptor,
-                default: fieldDescriptor[0],
-
-                required: true,
-                label: key,
-                readonly:false
-            };
-            initialState[key] = explicitDescriptor.default;
-        } else {
-            explicitDescriptor = <ExplicitFormFieldDescriptor>fieldDescriptor;
-            initialState[key] =
-                explicitDescriptor.default ||
-                {
-                    boolean: false,
-                    number: 0,
-                    string: "",
-                    //@ts-expect-error This path is only hit for select:single in which case this value exitsts.
-                    "select:single": explicitDescriptor?.options?.at(0),
-                }[explicitDescriptor.type];
+    function hydrate(descriptor:FormDescriptor){
+        //formState = {}
+        keylist = Object.keys(descriptor);
+        for (const [key, fieldDescriptor] of Object.entries(descriptor)) {
+            let explicitDescriptor: ExplicitFormFieldDescriptor;
+            if (fieldDescriptor === String) {
+                formState[key] = formState[key] || "";
+                explicitDescriptor = {
+                    type: "string",
+                    required: true,
+                    label: key,
+                    readonly:false
+                };
+            } else if (fieldDescriptor === Number) {
+                formState[key] = formState[key] || 0;
+                explicitDescriptor = {
+                    type: "number",
+                    required: true,
+                    label: key,
+                    readonly:false
+                };
+            } else if (fieldDescriptor === Boolean) {
+                formState[key] = !!formState[key]
+                explicitDescriptor = {
+                    type: "boolean",
+                    required: true,
+                    label: key,
+                    readonly:false
+                };
+            } else if (Array.isArray(fieldDescriptor)) {
+                formState[key] = formState[key] || fieldDescriptor[0];
+                explicitDescriptor = {
+                    type: "select:single",
+    
+                    options: fieldDescriptor,
+                    default: fieldDescriptor[0],
+    
+                    required: true,
+                    label: key,
+                    readonly:false
+                };
+            } else {
+                explicitDescriptor = <ExplicitFormFieldDescriptor>fieldDescriptor;
+                formState[key] =
+                    formState[key]
+                    explicitDescriptor.default ||
+                    {
+                        boolean: false,
+                        number: 0,
+                        string: "",
+                        //@ts-expect-error This path is only hit for select:single in which case this value exitsts.
+                        "select:single": explicitDescriptor?.options?.at(0),
+                    }[explicitDescriptor.type];
+            }
+            descriptors.push(explicitDescriptor);
         }
-        descriptors.push(explicitDescriptor);
     }
-    formState = initialState;
-    const keylist = Object.keys(initialState);
+
+    hydrate(descriptor)
+    $effect(()=>{
+    })
 </script>
 
 <form onsubmit={onFormSubmit}>
@@ -111,7 +122,7 @@
 
     {#if submit}
         {#if typeof submit === 'string'}
-            <Button>{submit}</Button>
+            <Button type="submit">{submit}</Button>
         {:else}
             {@render submit()}
         {/if}
