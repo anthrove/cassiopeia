@@ -1,0 +1,5 @@
+{
+    "tenant":{
+        "password_types":["bcrypt", "argon2id", "pbkdf2", "scrypt"]
+    }
+}
