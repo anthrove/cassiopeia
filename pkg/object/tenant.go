@@ -33,7 +33,7 @@ type Tenant struct {
 	DisplayName  string `json:"display_name" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
 	PasswordType string `json:"password_type" gorm:"type:varchar(100)" maxLength:"100" example:"bcrypt"`
 
-	SigningCertificateID *string `json:"signing_key_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	SigningCertificateID *string `json:"signing_certificate_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
 	Groups       []Group           `json:"-" swaggerignore:"true"`
 	Providers    []Provider        `json:"-" swaggerignore:"true"`
