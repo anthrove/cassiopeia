@@ -25,7 +25,7 @@ import (
 // Tenant represents a tenant entity in the system.
 // It contains information about the tenant such as its ID, timestamps, display name, password type, and associated groups.
 type Tenant struct {
-	ID string `json:"id" gorm:"primaryKey;type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ID string `json:"id" gorm:"primaryKey;type:char(25)" maxLength:"25" minLength:"25" example:"BsOOa4igppKxYwhAQQrD3GCRZ"`
 
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	UpdatedAt time.Time `json:"updated_at" format:"date-time"`
