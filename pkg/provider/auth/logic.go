@@ -17,21 +17,33 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"github.com/anthrove/identity/pkg/object"
 )
 
+type ProviderContext struct {
+	Tenant     object.Tenant
+	User       object.User
+	Credential object.Credentials
+
+	SendMail func(ctx context.Context, data object.SendMailData)
+}
+
 type Provider interface {
 	GetConfigurationFields() []object.ProviderConfigurationField
 	ValidateConfigurationFields() error
-	Configure(identifier object.User, data map[string]any) error
-	Begin(identifier object.User) (map[string]any, error)
-	Submit(identifier object.User, data map[string]any) error
+	// Configure is used for set up a new credential object. It returns the finished metadata which can be saved.
+	Configure(ctx context.Context, providerContext ProviderContext, data map[string]any) (map[string]any, error)
+	Validate(ctx context.Context, providerContext ProviderContext, data map[string]any) (bool, map[string]any, error)
+	Begin(ctx context.Context, providerContext ProviderContext) (map[string]any, error)
+	Submit(ctx context.Context, providerContext ProviderContext, data map[string]any) (bool, error)
 }
 
 func GetAuthProvider(provider object.Provider) (Provider, error) {
 	switch provider.ProviderType {
-
+	case "password":
+		return newPasswordAuth(provider), nil
 	}
 	return nil, errors.New("unknown auth provider: " + provider.ProviderType)
 }

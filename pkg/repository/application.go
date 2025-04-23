@@ -64,7 +64,7 @@ func KillApplication(ctx context.Context, db *gorm.DB, tenantID string, applicat
 
 func FindApplication(ctx context.Context, db *gorm.DB, tenantID string, groupID string) (object.Application, error) {
 	var group object.Application
-	err := db.WithContext(ctx).Take(&group, "id = ? AND tenant_id = ?", groupID, tenantID).Error
+	err := db.WithContext(ctx).Preload("AuthProvider").Take(&group, "id = ? AND tenant_id = ?", groupID, tenantID).Error
 	return group, err
 }
 

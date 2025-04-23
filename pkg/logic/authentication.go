@@ -22,6 +22,7 @@ import (
 	"errors"
 	"github.com/anthrove/identity/pkg/crypto"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider/auth"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"time"
 )
@@ -89,4 +90,73 @@ func (is IdentityService) SignIn(ctx context.Context, tenantID string, applicati
 	}
 
 	return sessionID, user, nil
+}
+
+func (is IdentityService) SignInStart(ctx context.Context, tenantID string, applicationID string, signInData object.SignInRequest) (map[string]any, error) {
+	tenant, err := is.FindTenant(ctx, tenantID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// get for making sure application exists and also later its planed you can enable and disable signin and stuff
+	application, err := is.FindApplication(ctx, tenantID, applicationID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := is.FindUserByUsername(ctx, tenantID, signInData.Username)
+
+	if err != nil {
+		return nil, err
+	}
+
+	userCredentials, err := is.FindCredentialsByUser(ctx, tenantID, user.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var selectedCredential object.Credentials
+	for _, userCred := range userCredentials {
+		if signInData.Type == userCred.Type {
+			selectedCredential = userCred
+			break
+		}
+	}
+
+	if len(selectedCredential.ID) == 0 {
+		return nil, errors.New("no configured credential found")
+	}
+
+	var authProviderObj object.Provider
+	for _, provider := range application.AuthProvider {
+		if signInData.Type == provider.ProviderType {
+			authProviderObj = provider
+			break
+		}
+	}
+
+	if len(authProviderObj.ID) == 0 {
+		return nil, errors.New("no provider was configured with given type")
+	}
+
+	authProvider, err := auth.GetAuthProvider(authProviderObj)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return authProvider.Begin(ctx, auth.ProviderContext{
+		Tenant:     tenant,
+		User:       user,
+		Credential: selectedCredential,
+		SendMail: func(ctx context.Context, data object.SendMailData) {
+			// TODO do nothing  right now.. we need to check to fix it
+		},
+	})
+}
+
+func (is IdentityService) SignInSubmit(ctx context.Context, tenantID string, applicationID string, signInData object.SignInRequest) (string, object.User, error) {
 }
