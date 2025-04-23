@@ -84,8 +84,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.POST("/tenant/:tenant_id/template/:template_id/fill", identityRoutes.fillMessageTemplate)
 
 	v1.POST("/tenant/:tenant_id/application", identityRoutes.createApplication)
-	v1.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplication)
-	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplications)
+	v1.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplications)
+	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplication)
 	v1.PUT("/tenant/:tenant_id/application/:application_id", identityRoutes.updateApplication)
 	v1.DELETE("/tenant/:tenant_id/application/:application_id", identityRoutes.killApplication)
 
@@ -95,13 +95,13 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/resource/:resource_id", identityRoutes.killResource)
 
 	v1.POST("/tenant/:tenant_id/model", identityRoutes.createModel)
-	v1.GET("/tenant/:tenant_id/model", Pagination(), identityRoutes.findModel)
+	v1.GET("/tenant/:tenant_id/model", Pagination(), identityRoutes.findModels)
 	v1.GET("/tenant/:tenant_id/model/:model_id", identityRoutes.findModel)
 	v1.PUT("/tenant/:tenant_id/model/:model_id", identityRoutes.updateModel)
 	v1.DELETE("/tenant/:tenant_id/model/:model_id", identityRoutes.killModel)
 
 	v1.POST("/tenant/:tenant_id/adapter", identityRoutes.createAdapter)
-	v1.GET("/tenant/:tenant_id/adapter", Pagination(), identityRoutes.findAdapter)
+	v1.GET("/tenant/:tenant_id/adapter", Pagination(), identityRoutes.findAdapters)
 	v1.GET("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.findAdapter)
 	v1.PUT("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.updateAdapter)
 	v1.DELETE("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.killAdapter)
