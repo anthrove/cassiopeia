@@ -73,3 +73,9 @@ func FindApplications(ctx context.Context, db *gorm.DB, tenantID string, paginat
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
 }
+
+func FindApplicationByDomain(ctx context.Context, db *gorm.DB, domain string) (object.Application, error) {
+	var data object.Application
+	err := db.WithContext(ctx).Take(&data, "sign_in_url LIKE '%' || ? || '%' OR sign_up_url LIKE '%' || ? || '%' OR forget_url LIKE '%' || ? || '%'", domain, domain, domain).Error
+	return data, err
+}
