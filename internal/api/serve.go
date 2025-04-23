@@ -17,18 +17,11 @@
 package api
 
 import (
-	"database/sql"
-	"fmt"
 	"github.com/anthrove/identity/docs"
 	"github.com/anthrove/identity/pkg/logic"
-	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/zitadel/oidc/v3/pkg/op"
-	"html/template"
-	"net/http"
-	"time"
 )
 
 // IdentityRoutes defines the routes related to identity management.
@@ -124,122 +117,13 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killEnforcer)
 	v1.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
 
-	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
+	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
+	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
 	r.Any("/favicon.ico", func(context *gin.Context) {})
 
-	r.Any("/auth/:tenant_id/login", func(c *gin.Context) {
-		switch c.Request.Method {
-		case "GET":
-			loginHandler(c.Writer, c.Request)
-		case "POST":
-			identityRoutes.checkLoginHandler(c)
-		default:
-			c.Status(http.StatusMethodNotAllowed)
-			return
-		}
-	})
 	r.Any("/:tenant_id/*any", identityRoutes.OIDCEndpoints)
 
-}
-
-var (
-	loginTmpl, _ = template.New("login").Parse(`
-	<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset="UTF-8">
-			<title>Login</title>
-		</head>
-		<body style="display: flex; align-items: center; justify-content: center; height: 100vh;">
-			<form method="POST" style="height: 200px; width: 200px;">
-				<input type="hidden" name="id" value="{{.ID}}">
-				<div>
-					<label for="username">Username:</label>
-					<input id="username" name="username" style="width: 100%">
-				</div>
-				<div>
-					<label for="password">Password:</label>
-					<input id="password" name="password" style="width: 100%">
-				</div>
-				<p style="color:red; min-height: 1rem;">{{.Error}}</p>
-				<button type="submit">Login</button>
-			</form>
-		</body>
-	</html>`)
-)
-
-func loginHandler(w http.ResponseWriter, r *http.Request) {
-	requestID := r.URL.Query().Get("request_id")
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, fmt.Sprintf("cannot parse form:%s", err), http.StatusInternalServerError)
-		return
-	}
-	//the oidc package will pass the id of the auth request as query parameter
-	//we will use this id through the login process and therefore pass it to the  login page
-	renderLogin(w, requestID, nil)
-}
-
-func renderLogin(w http.ResponseWriter, id string, err error) {
-	var errMsg string
-	if err != nil {
-		errMsg = err.Error()
-	}
-	data := &struct {
-		ID    string
-		Error string
-	}{
-		ID:    id,
-		Error: errMsg,
-	}
-	err = loginTmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func (ir IdentityRoutes) checkLoginHandler(c *gin.Context) {
-	tenantId := c.Param("tenant_id")
-
-	authRequestID, _ := c.GetPostForm("id")
-
-	authRequest, err := ir.service.FindAuthRequest(c, tenantId, authRequestID)
-
-	username, _ := c.GetPostForm("username")
-	password, _ := c.GetPostForm("password")
-
-	_, user, err := ir.service.SignIn(c, tenantId, authRequest.ApplicationID, object.SignInRequest{
-		Username: username,
-		Password: password,
-	})
-
-	if err != nil {
-		renderLogin(c.Writer, authRequestID, err)
-		return
-	}
-
-	err = ir.service.UpdateAuthRequest(c, tenantId, authRequestID, object.UpdateAuthRequest{
-		UserID: sql.NullString{
-			String: user.ID,
-			Valid:  true,
-		},
-		Authenticated:   true,
-		AuthenticatedAt: time.Now(),
-	})
-
-	if err != nil {
-		renderLogin(c.Writer, authRequestID, err)
-		return
-	}
-
-	provider, err := GetProvider(c, ir.service, tenantId)
-	if err != nil {
-		renderLogin(c.Writer, authRequestID, err)
-	}
-
-	callbackURL := op.AuthCallbackURL(provider)
-	c.Redirect(http.StatusFound, "/"+tenantId+"/"+callbackURL(c, authRequestID))
 }
