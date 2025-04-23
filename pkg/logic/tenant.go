@@ -40,7 +40,7 @@ import (
 // Returns:
 //   - Tenant object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.CreateTenant) (object.Tenant, error) {
+func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.CreateTenant, opt ...string) (object.Tenant, error) {
 	err := validate.Struct(createTenant)
 
 	if err != nil {
@@ -56,7 +56,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		return object.Tenant{}, errors.New("password type does not match any known types")
 	}
 
-	tenant, err := repository.CreateTenant(ctx, is.db, createTenant)
+	tenant, err := repository.CreateTenant(ctx, is.db, createTenant, opt...)
 
 	if err != nil {
 		return object.Tenant{}, err

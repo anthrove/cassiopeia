@@ -17,6 +17,7 @@
 package main
 
 import (
+	"context"
 	"github.com/anthrove/identity/internal/api"
 	"github.com/anthrove/identity/pkg/logic"
 	"github.com/anthrove/identity/pkg/repository"
@@ -43,6 +44,12 @@ func main() {
 	}
 
 	service := logic.NewIdentityService(engine)
+
+	_, err = service.SetupAdminTenant(context.Background())
+
+	if err != nil {
+		log.Panic("Problem while creating admin tenant: ", err)
+	}
 
 	router := gin.Default()
 	api.SetupRoutes(router, service)
