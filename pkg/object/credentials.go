@@ -17,6 +17,7 @@
 package object
 
 import (
+	"encoding/json"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
 	"time"
@@ -31,9 +32,9 @@ type Credentials struct {
 	UpdatedAt time.Time      `json:"updated_at" format:"date-time"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" format:"date-time" gorm:"index"`
 
-	Type     string         `json:"type"`
-	Metadata map[string]any `json:"metadata"`
-	Enabled  bool           `json:"enabled"`
+	Type     string          `json:"type"`
+	Metadata json.RawMessage `json:"metadata"`
+	Enabled  bool            `json:"enabled"`
 }
 
 func (base *Credentials) BeforeCreate(db *gorm.DB) error {

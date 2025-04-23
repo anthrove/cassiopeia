@@ -18,33 +18,46 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/anthrove/identity/pkg/object"
 	"gorm.io/gorm"
 )
 
 func CreateCredential(ctx context.Context, db *gorm.DB, tenantId string, createCredentials object.CreateCredential) (object.Credentials, error) {
+	byteData, err := json.Marshal(createCredentials.Metadata)
+
+	if err != nil {
+		return object.Credentials{}, err
+	}
+
 	credentials := object.Credentials{
 		TenantID: tenantId,
 		UserID:   createCredentials.UserID,
 		Type:     createCredentials.Type,
-		Metadata: createCredentials.Metadata,
+		Metadata: byteData,
 		Enabled:  createCredentials.Enabled,
 	}
 
-	err := db.WithContext(ctx).Model(&object.Credentials{}).Create(&credentials).Error
+	err = db.WithContext(ctx).Model(&object.Credentials{}).Create(&credentials).Error
 
 	return credentials, err
 }
 
 func UpdateCredential(ctx context.Context, db *gorm.DB, tenantID string, credentialsId string, updateCredentials object.UpdateCredential) error {
+	byteData, err := json.Marshal(updateCredentials.Metadata)
+
+	if err != nil {
+		return err
+	}
+
 	credentials := object.Credentials{
 		ID:       credentialsId,
 		TenantID: tenantID,
-		Metadata: updateCredentials.Metadata,
+		Metadata: byteData,
 		Enabled:  updateCredentials.Enabled,
 	}
 
-	err := db.WithContext(ctx).Model(&object.Credentials{}).Where("id = ? AND tenant_id = ?", credentialsId, tenantID).Updates(&credentials).Error
+	err = db.WithContext(ctx).Model(&object.Credentials{}).Where("id = ? AND tenant_id = ?", credentialsId, tenantID).Updates(&credentials).Error
 
 	return err
 }

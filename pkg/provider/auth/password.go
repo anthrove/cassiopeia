@@ -128,7 +128,7 @@ func (p passwordAuth) Configure(_ context.Context, providerContext ProviderConte
 		return nil, err
 	}
 
-	if len(passwordStr) >= passwordConfig.MinPasswordLength {
+	if len(passwordStr) < passwordConfig.MinPasswordLength {
 		return nil, errors.New("password is too short")
 	}
 
@@ -152,19 +152,19 @@ func (p passwordAuth) Configure(_ context.Context, providerContext ProviderConte
 		}
 	}
 
-	if lowercase > passwordConfig.MinLowercaseLength {
+	if lowercase < passwordConfig.MinLowercaseLength {
 		return nil, errors.New("password requires multiple (" + strconv.Itoa(passwordConfig.MinLowercaseLength) + ") lowercase letters")
 	}
 
-	if uppercase > passwordConfig.MinUppercaseLetter {
+	if uppercase < passwordConfig.MinUppercaseLetter {
 		return nil, errors.New("password requires multiple (" + strconv.Itoa(passwordConfig.MinUppercaseLetter) + ") uppercase letters")
 	}
 
-	if digit > passwordConfig.MinDigitLetter {
+	if digit < passwordConfig.MinDigitLetter {
 		return nil, errors.New("password requires multiple (" + strconv.Itoa(passwordConfig.MinDigitLetter) + ") digit letters")
 	}
 
-	if special > passwordConfig.MinSpecialLetter {
+	if special < passwordConfig.MinSpecialLetter {
 		return nil, errors.New("password requires multiple (" + strconv.Itoa(passwordConfig.MinSpecialLetter) + ") special letters")
 	}
 
@@ -189,7 +189,14 @@ func (p passwordAuth) Validate(ctx context.Context, providerContext ProviderCont
 		return false, nil, err
 	}
 
-	return success, providerContext.Credential.Metadata, nil
+	var dataMap map[string]any
+	err = json.Unmarshal(providerContext.Credential.Metadata, &dataMap)
+
+	if err != nil {
+		return false, nil, err
+	}
+
+	return success, dataMap, nil
 }
 
 func (p passwordAuth) Begin(_ context.Context, _ ProviderContext) (map[string]any, error) {
@@ -197,9 +204,16 @@ func (p passwordAuth) Begin(_ context.Context, _ ProviderContext) (map[string]an
 }
 
 func (p passwordAuth) Submit(_ context.Context, providerContext ProviderContext, data map[string]any) (bool, error) {
-	hash := providerContext.Credential.Metadata["hash"].(string)
-	salt := providerContext.Credential.Metadata["salt"].(string)
-	hashType := providerContext.Credential.Metadata["type"].(string)
+	var dataMap map[string]any
+	err := json.Unmarshal(providerContext.Credential.Metadata, &dataMap)
+
+	if err != nil {
+		return false, err
+	}
+
+	hash := dataMap["hash"].(string)
+	salt := dataMap["salt"].(string)
+	hashType := dataMap["type"].(string)
 
 	hasher, err := crypto.GetPasswordHasher(hashType)
 
