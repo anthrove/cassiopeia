@@ -25,7 +25,7 @@ import (
 // Tenant represents a tenant entity in the system.
 // It contains information about the tenant such as its ID, timestamps, display name, password type, and associated groups.
 type Tenant struct {
-	ID string `json:"id" gorm:"primaryKey;type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ID string `json:"id" gorm:"primaryKey;type:char(25)" maxLength:"25" minLength:"25" example:"BsOOa4igppKxYwhAQQrD3GCRZ"`
 
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	UpdatedAt time.Time `json:"updated_at" format:"date-time"`
@@ -33,7 +33,7 @@ type Tenant struct {
 	DisplayName  string `json:"display_name" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
 	PasswordType string `json:"password_type" gorm:"type:varchar(100)" maxLength:"100" example:"bcrypt"`
 
-	SigningCertificateID *string `json:"signing_key_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	SigningCertificateID *string `json:"signing_certificate_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
 	Groups       []Group           `json:"-" swaggerignore:"true"`
 	Providers    []Provider        `json:"-" swaggerignore:"true"`
