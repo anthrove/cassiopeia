@@ -44,7 +44,8 @@ type Application struct {
 
 	RedirectURLs []string `json:"redirect_urls" gorm:"type:text[]; serializer:json"`
 
-	Tokens []Token `json:"-" swaggerignore:"true"`
+	Tokens       []Token    `json:"-" swaggerignore:"true"`
+	AuthProvider []Provider `json:"auth_provider" gorm:"many2many:auth_application_provider;"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new group record is inserted into the database.

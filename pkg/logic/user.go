@@ -20,11 +20,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/anthrove/identity/pkg/crypto"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider/auth"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
+	"math"
 	"strconv"
 )
 
@@ -79,17 +80,11 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		return object.User{}, err
 	}
 
-	passwordSalt, err := util.RandomSaltString(25)
-	if err != nil {
-		return object.User{}, err
-	}
+	tenantProviders, err := is.FindProviders(ctx, tenantID, object.Pagination{
+		Limit: math.MaxInt,
+		Page:  0,
+	})
 
-	passwordHasher, err := crypto.GetPasswordHasher(userTenant.PasswordType)
-	if err != nil {
-		return object.User{}, err
-	}
-
-	passwordHash, err := passwordHasher.HashPassword(createUser.Password, passwordSalt)
 	if err != nil {
 		return object.User{}, err
 	}
@@ -102,12 +97,56 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		DisplayName:            createUser.DisplayName,
 		Email:                  createUser.Email,
 		EmailVerificationToken: strconv.Itoa(emailVerificationToken),
-		PasswordSalt:           passwordSalt,
-		PasswordType:           userTenant.PasswordType,
-		PasswordHash:           passwordHash,
 	}
 
-	return repository.CreateUser(ctx, is.db, tenantID, user)
+	user, err = repository.CreateUser(ctx, is.db, tenantID, user)
+
+	if err != nil {
+		return object.User{}, err
+	}
+
+	var passProvider object.Provider
+	for _, provider := range tenantProviders {
+		if provider.ProviderType == "password" {
+			passProvider = provider
+		}
+	}
+
+	if len(passProvider.ID) == 0 {
+		return object.User{}, errors.New("no password provider configured in tenant")
+	}
+
+	passwordProvider, err := auth.GetAuthProvider(passProvider)
+
+	if err != nil {
+		return object.User{}, err
+	}
+
+	metadata, err := passwordProvider.Configure(ctx, auth.ProviderContext{
+		Tenant:     userTenant,
+		User:       user,
+		Credential: object.Credentials{},
+		SendMail:   nil,
+	}, map[string]any{
+		"password": createUser.Password,
+	})
+
+	if err != nil {
+		return object.User{}, err
+	}
+
+	_, err = is.CreateCredential(ctx, tenantID, object.CreateCredential{
+		UserID:   user.ID,
+		Type:     "password",
+		Metadata: metadata,
+		Enabled:  true,
+	})
+
+	if err != nil {
+		return object.User{}, err
+	}
+
+	return user, nil
 }
 
 // UpdateUser updates an existing user's information within a specified tenant.
