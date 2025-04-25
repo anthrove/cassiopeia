@@ -42,6 +42,8 @@ import (
 //   - User object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateUser(ctx context.Context, tenantID string, createUser object.CreateUser, opt ...string) (object.User, error) {
+	dbConn := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return object.User{}, errors.New("tenantID is required")
 	}
@@ -91,7 +93,7 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 
 	emailVerificationToken := util.RandomNumber(6)
 
-	user, err = repository.CreateUser(ctx, is.db, tenantID, createUser, opt...)
+	user, err = repository.CreateUser(ctx, dbConn, tenantID, createUser, opt...)
 
 	if err != nil {
 		return object.User{}, err
@@ -164,6 +166,8 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateUser(ctx context.Context, tenantID string, userID string, updateUser object.UpdateUser) error {
+	dbConn := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -181,10 +185,12 @@ func (is IdentityService) UpdateUser(ctx context.Context, tenantID string, userI
 		}
 	}
 
-	return repository.UpdateUser(ctx, is.db, tenantID, userID, updateUser)
+	return repository.UpdateUser(ctx, dbConn, tenantID, userID, updateUser)
 }
 
 func (is IdentityService) UpdateUserEmail(ctx context.Context, tenantID string, userID string, updateUserEmail object.UpdateEmail) error {
+	dbConn := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -202,7 +208,7 @@ func (is IdentityService) UpdateUserEmail(ctx context.Context, tenantID string, 
 		}
 	}
 
-	return repository.UpdateUserEmail(ctx, is.db, tenantID, userID, updateUserEmail)
+	return repository.UpdateUserEmail(ctx, dbConn, tenantID, userID, updateUserEmail)
 }
 
 // KillUser deletes an existing user within a specified tenant.
@@ -215,6 +221,8 @@ func (is IdentityService) UpdateUserEmail(ctx context.Context, tenantID string, 
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillUser(ctx context.Context, tenantID string, userID string) error {
+	dbConn := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -223,7 +231,7 @@ func (is IdentityService) KillUser(ctx context.Context, tenantID string, userID 
 		return errors.New("userID is required")
 	}
 
-	return repository.KillUser(ctx, is.db, tenantID, userID)
+	return repository.KillUser(ctx, dbConn, tenantID, userID)
 }
 
 // FindUser retrieves a specific user within a specified tenant.

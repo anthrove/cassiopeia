@@ -38,6 +38,8 @@ import (
 //   - MessageTemplate object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateMessageTemplate(ctx context.Context, tenantID string, createMessageTemplate object.CreateMessageTemplate) (object.MessageTemplate, error) {
+	dbConn := is.getDBConn(ctx)
+
 	err := validate.Struct(createMessageTemplate)
 
 	if err != nil {
@@ -48,7 +50,7 @@ func (is IdentityService) CreateMessageTemplate(ctx context.Context, tenantID st
 		}
 	}
 
-	return repository.CreateMessageTemplate(ctx, is.db, tenantID, createMessageTemplate)
+	return repository.CreateMessageTemplate(ctx, dbConn, tenantID, createMessageTemplate)
 }
 
 // UpdateMessageTemplate updates an existing messageTemplate's information in the system.
@@ -63,6 +65,8 @@ func (is IdentityService) CreateMessageTemplate(ctx context.Context, tenantID st
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateMessageTemplate(ctx context.Context, tenantID string, messageTemplateID string, updateMessageTemplate object.UpdateMessageTemplate) error {
+	dbConn := is.getDBConn(ctx)
+
 	if len(messageTemplateID) == 0 {
 		return errors.New("messageTemplateID is required")
 	}
@@ -76,7 +80,7 @@ func (is IdentityService) UpdateMessageTemplate(ctx context.Context, tenantID st
 		}
 	}
 
-	return repository.UpdateMessageTemplate(ctx, is.db, tenantID, messageTemplateID, updateMessageTemplate)
+	return repository.UpdateMessageTemplate(ctx, dbConn, tenantID, messageTemplateID, updateMessageTemplate)
 }
 
 // KillMessageTemplate deletes an existing messageTemplate from the system.
@@ -88,7 +92,9 @@ func (is IdentityService) UpdateMessageTemplate(ctx context.Context, tenantID st
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillMessageTemplate(ctx context.Context, tenantID string, messageTemplateID string) error {
-	return repository.KillMessageTemplate(ctx, is.db, tenantID, messageTemplateID)
+	dbConn := is.getDBConn(ctx)
+
+	return repository.KillMessageTemplate(ctx, dbConn, tenantID, messageTemplateID)
 }
 
 // FindMessageTemplate retrieves a specific messageTemplate from the system.

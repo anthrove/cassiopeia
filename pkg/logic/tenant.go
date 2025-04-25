@@ -41,6 +41,8 @@ import (
 //   - Tenant object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.CreateTenant, opt ...string) (object.Tenant, error) {
+	dbConn := is.getDBConn(ctx)
+
 	err := validate.Struct(createTenant)
 
 	if err != nil {
@@ -56,7 +58,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		return object.Tenant{}, errors.New("password type does not match any known types")
 	}
 
-	tenant, err := repository.CreateTenant(ctx, is.db, createTenant, opt...)
+	tenant, err := repository.CreateTenant(ctx, dbConn, createTenant, opt...)
 
 	if err != nil {
 		return object.Tenant{}, err
@@ -99,6 +101,8 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, updateTenant object.UpdateTenant) error {
+	dbConn := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -117,7 +121,7 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 		return errors.New("password type does not match any known types")
 	}
 
-	return repository.UpdateTenant(ctx, is.db, tenantID, updateTenant)
+	return repository.UpdateTenant(ctx, dbConn, tenantID, updateTenant)
 }
 
 // KillTenant deletes an existing tenant from the system.

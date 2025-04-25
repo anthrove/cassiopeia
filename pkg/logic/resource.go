@@ -42,6 +42,8 @@ import (
 //   - Resource object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateResource(ctx context.Context, tenantId string, createResource object.CreateResource, file io.Reader) (object.Resource, error) {
+	dbConn := is.getDBConn(ctx)
+
 	err := validate.Struct(createResource)
 
 	if err != nil {
@@ -96,7 +98,7 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 		resourceURL = fmt.Sprintf("%s/%s/%s", resourceObject.StorageInterface.GetEndpoint(), bucket, resourceObject.Path)
 	}
 
-	return repository.CreateResource(ctx, is.db, tenantId, createResource, resourcePath, resourceURL, hash)
+	return repository.CreateResource(ctx, dbConn, tenantId, createResource, resourcePath, resourceURL, hash)
 }
 
 // KillResource deletes an existing resource within a specified tenant.
@@ -109,6 +111,7 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillResource(ctx context.Context, tenantID string, resourceID string) error {
+	dbConn := is.getDBConn(ctx)
 
 	resource, err := is.FindResource(ctx, tenantID, resourceID)
 	if err != nil {
@@ -130,7 +133,7 @@ func (is IdentityService) KillResource(ctx context.Context, tenantID string, res
 		return err
 	}
 
-	err = repository.KillResource(ctx, is.db, tenantID, resourceID)
+	err = repository.KillResource(ctx, dbConn, tenantID, resourceID)
 	if err != nil {
 		return err
 	}

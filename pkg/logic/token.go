@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreateToken(ctx context.Context, tenantID string, createToken object.CreateToken) (object.Token, error) {
+	dbConn := is.getDBConn(ctx)
+
 	err := validate.Struct(createToken)
 
 	if err != nil {
@@ -36,15 +38,19 @@ func (is IdentityService) CreateToken(ctx context.Context, tenantID string, crea
 		}
 	}
 
-	return repository.CreateToken(ctx, is.db, tenantID, createToken)
+	return repository.CreateToken(ctx, dbConn, tenantID, createToken)
 }
 
 func (is IdentityService) KillToken(ctx context.Context, tenantID string, tokenID string) error {
-	return repository.KillToken(ctx, is.db, tenantID, tokenID)
+	dbConn := is.getDBConn(ctx)
+
+	return repository.KillToken(ctx, dbConn, tenantID, tokenID)
 }
 
 func (is IdentityService) KillTokens(ctx context.Context, tenantID string, tokenIDs []string) error {
-	return repository.KillTokens(ctx, is.db, tenantID, tokenIDs)
+	dbConn := is.getDBConn(ctx)
+
+	return repository.KillTokens(ctx, dbConn, tenantID, tokenIDs)
 }
 
 func (is IdentityService) FindToken(ctx context.Context, tenantID string, tokenID string) (object.Token, error) {

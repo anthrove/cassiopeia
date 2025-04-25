@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreatePermission(ctx context.Context, tenantID string, createPermission object.CreatePermission) (object.Permission, error) {
+	dbConn := is.getDBConn(ctx)
+
 	err := validate.Struct(createPermission)
 
 	if err != nil {
@@ -36,7 +38,7 @@ func (is IdentityService) CreatePermission(ctx context.Context, tenantID string,
 		}
 	}
 
-	permission, err := repository.CreatePermission(ctx, is.db, tenantID, createPermission)
+	permission, err := repository.CreatePermission(ctx, dbConn, tenantID, createPermission)
 
 	if err != nil {
 		return object.Permission{}, err
@@ -48,6 +50,8 @@ func (is IdentityService) CreatePermission(ctx context.Context, tenantID string,
 }
 
 func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string, permissionID string, updatePermission object.UpdatePermission) error {
+	dbConn := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -61,7 +65,7 @@ func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string,
 		}
 	}
 
-	err = repository.UpdatePermission(ctx, is.db, tenantID, permissionID, updatePermission)
+	err = repository.UpdatePermission(ctx, dbConn, tenantID, permissionID, updatePermission)
 
 	if err != nil {
 		return err
@@ -73,7 +77,9 @@ func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string,
 }
 
 func (is IdentityService) KillPermission(ctx context.Context, tenantID string, permissionID string) error {
-	return repository.KillPermission(ctx, is.db, tenantID, permissionID)
+	dbConn := is.getDBConn(ctx)
+
+	return repository.KillPermission(ctx, dbConn, tenantID, permissionID)
 }
 
 func (is IdentityService) FindPermission(ctx context.Context, tenantID string, permissionID string) (object.Permission, error) {
