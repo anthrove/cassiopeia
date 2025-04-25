@@ -41,7 +41,7 @@ import (
 // Returns:
 //   - User object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateUser(ctx context.Context, tenantID string, createUser object.CreateUser) (object.User, error) {
+func (is IdentityService) CreateUser(ctx context.Context, tenantID string, createUser object.CreateUser, opt ...string) (object.User, error) {
 	if len(tenantID) == 0 {
 		return object.User{}, errors.New("tenantID is required")
 	}
@@ -91,15 +91,17 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 
 	emailVerificationToken := util.RandomNumber(6)
 
-	user = object.User{
-		TenantID:               tenantID,
-		Username:               createUser.Username,
-		DisplayName:            createUser.DisplayName,
-		Email:                  createUser.Email,
-		EmailVerificationToken: strconv.Itoa(emailVerificationToken),
+	user, err = repository.CreateUser(ctx, is.db, tenantID, createUser, opt...)
+
+	if err != nil {
+		return object.User{}, err
 	}
 
-	user, err = repository.CreateUser(ctx, is.db, tenantID, user)
+	err = is.UpdateUserEmail(ctx, tenantID, user.ID, object.UpdateEmail{
+		Email:                  user.Email,
+		EmailVerified:          false,
+		EmailVerificationToken: strconv.Itoa(emailVerificationToken),
+	})
 
 	if err != nil {
 		return object.User{}, err
@@ -180,6 +182,27 @@ func (is IdentityService) UpdateUser(ctx context.Context, tenantID string, userI
 	}
 
 	return repository.UpdateUser(ctx, is.db, tenantID, userID, updateUser)
+}
+
+func (is IdentityService) UpdateUserEmail(ctx context.Context, tenantID string, userID string, updateUserEmail object.UpdateEmail) error {
+	if len(tenantID) == 0 {
+		return errors.New("tenantID is required")
+	}
+
+	if len(userID) == 0 {
+		return errors.New("userID is required")
+	}
+
+	err := validate.Struct(updateUserEmail)
+
+	if err != nil {
+		var validateErrs validator.ValidationErrors
+		if errors.As(err, &validateErrs) {
+			return errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
+		}
+	}
+
+	return repository.UpdateUserEmail(ctx, is.db, tenantID, userID, updateUserEmail)
 }
 
 // KillUser deletes an existing user within a specified tenant.

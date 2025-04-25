@@ -77,6 +77,12 @@ type UpdateUser struct {
 	DisplayName string `json:"display_name" validate:"required,max=100" maxLength:"100"`
 }
 
+type UpdateEmail struct {
+	Email                  string `json:"email"`
+	EmailVerified          bool   `json:"email_verified"`
+	EmailVerificationToken string `json:"email_verification_token"`
+}
+
 // UpdateUserPassword represents the data required to update an existing user's password.
 // It includes the password, which is required and has a maximum length of 100 characters.
 type UpdateUserPassword struct {

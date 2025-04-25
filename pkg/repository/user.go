@@ -33,7 +33,17 @@ import (
 // Returns:
 //   - User object if creation is successful.
 //   - Error if there is any issue during creation.
-func CreateUser(ctx context.Context, db *gorm.DB, tenantId string, user object.User) (object.User, error) {
+func CreateUser(ctx context.Context, db *gorm.DB, tenantId string, createUser object.CreateUser, opt ...string) (object.User, error) {
+	user := object.User{
+		ID:                     getIDOrEmpty(opt...),
+		TenantID:               tenantId,
+		Username:               createUser.Username,
+		DisplayName:            createUser.DisplayName,
+		Email:                  createUser.Email,
+		EmailVerified:          false,
+		EmailVerificationToken: "",
+	}
+
 	err := db.WithContext(ctx).Model(&object.User{}).Create(&user).Error
 
 	return user, err
@@ -55,6 +65,20 @@ func UpdateUser(ctx context.Context, db *gorm.DB, tenantID string, userId string
 		ID:          userId,
 		TenantID:    tenantID,
 		DisplayName: updateUser.DisplayName,
+	}
+
+	err := db.WithContext(ctx).Model(&object.User{}).Where("id = ? AND tenant_id = ?", userId, tenantID).Updates(&user).Error
+
+	return err
+}
+
+func UpdateUserEmail(ctx context.Context, db *gorm.DB, tenantID string, userId string, updateUserEmail object.UpdateEmail) error {
+	user := object.User{
+		ID:                     userId,
+		TenantID:               tenantID,
+		Email:                  updateUserEmail.Email,
+		EmailVerified:          updateUserEmail.EmailVerified,
+		EmailVerificationToken: updateUserEmail.EmailVerificationToken,
 	}
 
 	err := db.WithContext(ctx).Model(&object.User{}).Where("id = ? AND tenant_id = ?", userId, tenantID).Updates(&user).Error

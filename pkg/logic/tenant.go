@@ -108,7 +108,7 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 	if err != nil {
 		var validateErrs validator.ValidationErrors
 		if errors.As(err, &validateErrs) {
-			return errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
+			return errors.Join(fmt.Errorf("problem while validating update tenant data"), validateErrs)
 		}
 	}
 

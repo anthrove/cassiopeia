@@ -16,9 +16,49 @@
 
 package object
 
+import "encoding/json"
+
 type ImportTenant struct {
 	ID                   string  `json:"id"`
 	DisplayName          string  `json:"display_name"`
 	PasswordType         string  `json:"password_type"`
 	SigningCertificateID *string `json:"signing_certificate_id"`
+}
+
+type ImportProvider struct {
+	ID          string          `json:"id"`
+	DisplayName string          `json:"display_name"`
+	Category    string          `json:"category"`
+	Type        string          `json:"type"`
+	Parameter   json.RawMessage `json:"parameter"`
+}
+
+type ImportGroup struct {
+	ID            string  `json:"id"`
+	DisplayName   string  `json:"display_name"`
+	ParentGroupID *string `json:"parent_group_id"`
+}
+
+type ImportApplication struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"display_name"`
+
+	ClientSecret string `json:"client_secret"`
+
+	Logo string `json:"logo"`
+
+	SignInURL string `json:"sign_in_url"`
+	SignUpURL string `json:"sign_up_url"`
+	ForgetURL string `json:"forget_url"`
+	TermsURL  string `json:"terms_url"`
+
+	RedirectURLs []string `json:"redirect_urls"`
+}
+
+type ImportUser struct {
+	ID          string `json:"id"`
+	Username    string `json:"username"`
+	DisplayName string `json:"display_name"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
 }

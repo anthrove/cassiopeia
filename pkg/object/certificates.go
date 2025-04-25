@@ -71,8 +71,6 @@ type Certificate struct {
 
 	Certificate string `json:"certificate"`
 	PrivateKey  string `json:"private_key"`
-
-	Applications []Application `json:"-" swaggerignore:"true"`
 }
 
 func (base Certificate) ToSigningCert() SignCertificate {
