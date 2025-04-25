@@ -29,7 +29,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, createProvider object.CreateProvider) (object.Provider, error) {
+func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, createProvider object.CreateProvider, opt ...string) (object.Provider, error) {
 	err := validate.Struct(createProvider)
 
 	if err != nil {
@@ -50,7 +50,7 @@ func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, c
 		return object.Provider{}, err
 	}
 
-	return repository.CreateProvider(ctx, is.db, tenantID, createProvider)
+	return repository.CreateProvider(ctx, is.db, tenantID, createProvider, opt...)
 }
 
 func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, providerID string, updateProvider object.UpdateProvider) error {

@@ -38,7 +38,7 @@ import (
 // Returns:
 //   - Group object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, createGroup object.CreateGroup) (object.Group, error) {
+func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, createGroup object.CreateGroup, opt ...string) (object.Group, error) {
 	err := validate.Struct(createGroup)
 
 	if err != nil {
@@ -48,7 +48,7 @@ func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, crea
 		}
 	}
 
-	return repository.CreateGroup(ctx, is.db, tenantID, createGroup)
+	return repository.CreateGroup(ctx, is.db, tenantID, createGroup, opt...)
 }
 
 // UpdateGroup updates an existing group's information within a specified tenant.

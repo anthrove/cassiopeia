@@ -25,9 +25,8 @@ import (
 )
 
 type Application struct {
-	ID            string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	TenantID      string `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	CertificateID string `json:"certificate_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ID       string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	TenantID string `json:"tenant_id" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
 	CreatedAt time.Time `json:"createdAt" format:"date-time"`
 	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
@@ -176,8 +175,6 @@ func (base *Application) ClockSkew() time.Duration {
 // ============================================
 
 type CreateApplication struct {
-	CertificateID string `json:"certificate_id" validate:"required,len=25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-
 	DisplayName string `json:"display_name" validate:"required,max=100" example:"Frontend Application"`
 	Logo        string `json:"logo"  example:"https://domain.tld/files/logo.png"`
 
@@ -190,8 +187,6 @@ type CreateApplication struct {
 }
 
 type UpdateApplication struct {
-	CertificateID string `json:"certificate_id" validate:"required,len=25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-
 	DisplayName string `json:"display_name" validate:"required,max=100" example:"Frontend Application"`
 	Logo        string `json:"logo"  example:"https://domain.tld/files/logo.png"`
 

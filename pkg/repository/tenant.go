@@ -32,8 +32,9 @@ import (
 // Returns:
 //   - Tenant object if creation is successful.
 //   - Error if there is any issue during creation.
-func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTenant) (object.Tenant, error) {
+func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTenant, opt ...string) (object.Tenant, error) {
 	tenant := object.Tenant{
+		ID:           getIDOrEmpty(opt...),
 		DisplayName:  createTenant.DisplayName,
 		PasswordType: createTenant.PasswordType,
 	}

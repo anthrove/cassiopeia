@@ -22,8 +22,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateProvider(ctx context.Context, db *gorm.DB, tenantId string, createProvider object.CreateProvider) (object.Provider, error) {
+func CreateProvider(ctx context.Context, db *gorm.DB, tenantId string, createProvider object.CreateProvider, opt ...string) (object.Provider, error) {
 	provider := object.Provider{
+		ID:           getIDOrEmpty(opt...),
 		TenantID:     tenantId,
 		DisplayName:  createProvider.DisplayName,
 		Category:     createProvider.Category,

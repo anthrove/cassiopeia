@@ -26,7 +26,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func (is IdentityService) CreateApplication(ctx context.Context, tenantID string, createApplication object.CreateApplication) (object.Application, error) {
+func (is IdentityService) CreateApplication(ctx context.Context, tenantID string, createApplication object.CreateApplication, opt ...string) (object.Application, error) {
 	err := validate.Struct(createApplication)
 
 	if err != nil {
@@ -66,4 +66,12 @@ func (is IdentityService) FindApplication(ctx context.Context, tenantID string, 
 
 func (is IdentityService) FindApplications(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Application, error) {
 	return repository.FindApplications(ctx, is.db, tenantID, pagination)
+}
+
+func (is IdentityService) AppendAuthProviderToApplication(ctx context.Context, tenantID string, applicationID string, authProviderID string) error {
+	return repository.AppendAuthProviderToApplication(ctx, is.db, tenantID, applicationID, authProviderID)
+}
+
+func (is IdentityService) RemoveAuthProviderFromApplication(ctx context.Context, tenantID string, applicationID string, authProviderID string) error {
+	return repository.RemoveAuthProviderFromApplication(ctx, is.db, tenantID, applicationID, authProviderID)
 }
