@@ -34,6 +34,14 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 		return adminTenant, nil
 	}
 
+	tx := is.db.Begin()
+	ctx = saveDBConn(ctx, tx)
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
 	tenant, err := is.ImportTenant(ctx, object.ImportTenant{
 		ID:           "_____admin_____",
 		DisplayName:  "Admin Tenant",
@@ -41,6 +49,7 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	})
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
@@ -52,6 +61,7 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	})
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
@@ -61,6 +71,7 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	})
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
@@ -76,12 +87,14 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	})
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
 	err = is.AppendAuthProviderToApplication(ctx, tenant.ID, adminApplication.ID, passProvider.ID)
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
@@ -94,16 +107,18 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	})
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
 	err = is.AppendUserToGroup(ctx, tenant.ID, adminUser.ID, adminGroup.ID)
 
 	if err != nil {
+		tx.Rollback()
 		return object.Tenant{}, err
 	}
 
-	return tenant, err
+	return tenant, tx.Commit().Error
 }
 
 func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.ImportTenant) (object.Tenant, error) {

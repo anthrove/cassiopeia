@@ -29,9 +29,9 @@ func saveDBConn(ctx context.Context, db *gorm.DB) context.Context {
 	return ctx
 }
 
-func (is IdentityService) getDBConn(ctx context.Context) *gorm.DB {
+func (is IdentityService) getDBConn(ctx context.Context) (*gorm.DB, bool) {
 	if ctx.Value("db_conn") == nil {
-		return is.db
+		return is.db, false
 	}
 
 	dbVal, ok := ctx.Value("db_conn").(*gorm.DB)
@@ -40,5 +40,5 @@ func (is IdentityService) getDBConn(ctx context.Context) *gorm.DB {
 		panic("failed to convert db connection from context")
 	}
 
-	return dbVal
+	return dbVal, true
 }

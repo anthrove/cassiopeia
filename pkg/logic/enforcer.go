@@ -27,7 +27,7 @@ import (
 )
 
 func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, createEnforcer object.CreateEnforcer) (object.Enforcer, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createEnforcer)
 
@@ -42,7 +42,7 @@ func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, c
 }
 
 func (is IdentityService) UpdateEnforcer(ctx context.Context, tenantID string, enforcerID string, updateEnforcer object.UpdateEnforcer) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
@@ -61,17 +61,21 @@ func (is IdentityService) UpdateEnforcer(ctx context.Context, tenantID string, e
 }
 
 func (is IdentityService) KillEnforcer(ctx context.Context, tenantID string, enforcerID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillEnforcer(ctx, dbConn, tenantID, enforcerID)
 }
 
 func (is IdentityService) FindEnforcer(ctx context.Context, tenantID string, enforcerID string) (object.Enforcer, error) {
-	return repository.FindEnforcer(ctx, is.db, tenantID, enforcerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindEnforcer(ctx, dbConn, tenantID, enforcerID)
 }
 
 func (is IdentityService) FindEnforcers(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Enforcer, error) {
-	return repository.FindEnforcers(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindEnforcers(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) Enforce(ctx context.Context, tenantID string, enforcerID string, request []any) (bool, error) {

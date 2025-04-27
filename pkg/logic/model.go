@@ -27,7 +27,7 @@ import (
 )
 
 func (is IdentityService) CreateModel(ctx context.Context, tenantID string, createModel object.CreateModel) (object.Model, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createModel)
 
@@ -42,7 +42,7 @@ func (is IdentityService) CreateModel(ctx context.Context, tenantID string, crea
 }
 
 func (is IdentityService) UpdateModel(ctx context.Context, tenantID string, modelID string, updateModel object.UpdateModel) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
@@ -61,15 +61,19 @@ func (is IdentityService) UpdateModel(ctx context.Context, tenantID string, mode
 }
 
 func (is IdentityService) KillModel(ctx context.Context, tenantID string, modelID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillModel(ctx, dbConn, tenantID, modelID)
 }
 
 func (is IdentityService) FindModel(ctx context.Context, tenantID string, modelID string) (object.Model, error) {
-	return repository.FindModel(ctx, is.db, tenantID, modelID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindModel(ctx, dbConn, tenantID, modelID)
 }
 
 func (is IdentityService) FindModels(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Model, error) {
-	return repository.FindModels(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindModels(ctx, dbConn, tenantID, pagination)
 }

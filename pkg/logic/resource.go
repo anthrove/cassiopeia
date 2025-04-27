@@ -42,7 +42,7 @@ import (
 //   - Resource object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateResource(ctx context.Context, tenantId string, createResource object.CreateResource, file io.Reader) (object.Resource, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createResource)
 
@@ -111,7 +111,7 @@ func (is IdentityService) CreateResource(ctx context.Context, tenantId string, c
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillResource(ctx context.Context, tenantID string, resourceID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	resource, err := is.FindResource(ctx, tenantID, resourceID)
 	if err != nil {
@@ -152,7 +152,9 @@ func (is IdentityService) KillResource(ctx context.Context, tenantID string, res
 //   - Resource object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindResource(ctx context.Context, tenantID string, resourceID string) (object.Resource, error) {
-	return repository.FindResource(ctx, is.db, tenantID, resourceID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindResource(ctx, dbConn, tenantID, resourceID)
 }
 
 // FindResources retrieves a list of resources within a specified tenant, with pagination support.
@@ -166,7 +168,9 @@ func (is IdentityService) FindResource(ctx context.Context, tenantID string, res
 //   - Slice of Resource objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindResources(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Resource, error) {
-	return repository.FindResources(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindResources(ctx, dbConn, tenantID, pagination)
 }
 
 // FindResourceURL retrieves just the URL of resources within a specified tenant.
@@ -179,5 +183,7 @@ func (is IdentityService) FindResources(ctx context.Context, tenantID string, pa
 //   - URl of Resource objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindResourceURL(ctx context.Context, tenantID string, resourceID string) (string, error) {
-	return repository.FindResourceURL(ctx, is.db, tenantID, resourceID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindResourceURL(ctx, dbConn, tenantID, resourceID)
 }

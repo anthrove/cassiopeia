@@ -29,7 +29,7 @@ import (
 )
 
 func (is IdentityService) CreateCertificate(ctx context.Context, tenantID string, createCertificate object.CreateCertificate) (object.Certificate, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createCertificate)
 
@@ -135,7 +135,7 @@ func (is IdentityService) CreateCertificate(ctx context.Context, tenantID string
 }
 
 func (is IdentityService) UpdateCertificate(ctx context.Context, tenantID string, certificateID string, updateCertificate object.UpdateCertificate) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
@@ -154,19 +154,25 @@ func (is IdentityService) UpdateCertificate(ctx context.Context, tenantID string
 }
 
 func (is IdentityService) KillCertificate(ctx context.Context, tenantID string, certificateID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillCertificate(ctx, dbConn, tenantID, certificateID)
 }
 
 func (is IdentityService) FindCertificate(ctx context.Context, tenantID string, certificateID string) (object.Certificate, error) {
-	return repository.FindCertificate(ctx, is.db, tenantID, certificateID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCertificate(ctx, dbConn, tenantID, certificateID)
 }
 
 func (is IdentityService) FindCertificates(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Certificate, error) {
-	return repository.FindCertificates(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCertificates(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) FindAllCertificates(ctx context.Context) ([]object.Certificate, error) {
-	return repository.FindAllCertificates(ctx, is.db)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindAllCertificates(ctx, dbConn)
 }

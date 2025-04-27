@@ -27,7 +27,7 @@ import (
 )
 
 func (is IdentityService) CreateApplication(ctx context.Context, tenantID string, createApplication object.CreateApplication, opt ...string) (object.Application, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createApplication)
 
@@ -42,7 +42,7 @@ func (is IdentityService) CreateApplication(ctx context.Context, tenantID string
 }
 
 func (is IdentityService) UpdateApplication(ctx context.Context, tenantID string, applicationID string, updateApplication object.UpdateApplication) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
@@ -61,27 +61,31 @@ func (is IdentityService) UpdateApplication(ctx context.Context, tenantID string
 }
 
 func (is IdentityService) KillApplication(ctx context.Context, tenantID string, applicationID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillApplication(ctx, dbConn, tenantID, applicationID)
 }
 
 func (is IdentityService) FindApplication(ctx context.Context, tenantID string, applicationID string) (object.Application, error) {
-	return repository.FindApplication(ctx, is.db, tenantID, applicationID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindApplication(ctx, dbConn, tenantID, applicationID)
 }
 
 func (is IdentityService) FindApplications(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Application, error) {
-	return repository.FindApplications(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindApplications(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) AppendAuthProviderToApplication(ctx context.Context, tenantID string, applicationID string, authProviderID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.AppendAuthProviderToApplication(ctx, dbConn, tenantID, applicationID, authProviderID)
 }
 
 func (is IdentityService) RemoveAuthProviderFromApplication(ctx context.Context, tenantID string, applicationID string, authProviderID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.RemoveAuthProviderFromApplication(ctx, dbConn, tenantID, applicationID, authProviderID)
 }

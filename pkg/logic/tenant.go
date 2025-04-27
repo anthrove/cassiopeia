@@ -26,6 +26,7 @@ import (
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-jose/go-jose/v4"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -41,12 +42,11 @@ import (
 //   - Tenant object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.CreateTenant, opt ...string) (object.Tenant, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, nested := is.getDBConn(ctx)
 
 	err := validate.Struct(createTenant)
 
 	if err != nil {
-
 		var validateErrs validator.ValidationErrors
 		if errors.As(err, &validateErrs) {
 			return object.Tenant{}, errors.Join(fmt.Errorf("problem while validating create tenant data"), util.ConvertValidationError(validateErrs))
@@ -58,9 +58,23 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		return object.Tenant{}, errors.New("password type does not match any known types")
 	}
 
+	var tx *gorm.DB
+	if !nested {
+		tx = dbConn.Begin()
+		ctx = saveDBConn(ctx, tx)
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
+	}
+
 	tenant, err := repository.CreateTenant(ctx, dbConn, createTenant, opt...)
 
 	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
 		return object.Tenant{}, err
 	}
 
@@ -72,6 +86,9 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 	})
 
 	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
 		return object.Tenant{}, err
 	}
 
@@ -82,7 +99,17 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 	})
 
 	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
 		return object.Tenant{}, err
+	}
+
+	if !nested {
+		err = tx.Commit().Error
+		if err != nil {
+			return object.Tenant{}, err
+		}
 	}
 
 	tenant.SigningCertificateID = &certificate.IDs
@@ -101,7 +128,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, updateTenant object.UpdateTenant) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
@@ -133,7 +160,9 @@ func (is IdentityService) UpdateTenant(ctx context.Context, tenantID string, upd
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillTenant(ctx context.Context, tenantID string) error {
-	return repository.KillTenant(ctx, is.db, tenantID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillTenant(ctx, dbConn, tenantID)
 }
 
 // FindTenant retrieves a specific tenant from the system.
@@ -146,7 +175,9 @@ func (is IdentityService) KillTenant(ctx context.Context, tenantID string) error
 //   - Tenant object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindTenant(ctx context.Context, tenantID string) (object.Tenant, error) {
-	return repository.FindTenant(ctx, is.db, tenantID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindTenant(ctx, dbConn, tenantID)
 }
 
 // FindTenants retrieves a list of tenants from the system, with pagination support.
@@ -159,5 +190,7 @@ func (is IdentityService) FindTenant(ctx context.Context, tenantID string) (obje
 //   - Slice of Tenant objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindTenants(ctx context.Context, pagination object.Pagination) ([]object.Tenant, error) {
-	return repository.FindTenants(ctx, is.db, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindTenants(ctx, dbConn, pagination)
 }

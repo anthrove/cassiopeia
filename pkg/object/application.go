@@ -41,7 +41,7 @@ type Application struct {
 	ForgetURL string `json:"forget_url" gorm:"type:varchar(255)"`
 	TermsURL  string `json:"terms_url" gorm:"type:varchar(255)"`
 
-	RedirectURLs []string `json:"redirect_urls" gorm:"type:text[]; serializer:json"`
+	RedirectURLs []string `json:"redirect_urls" gorm:"serializer:json"`
 
 	Tokens       []Token    `json:"-" swaggerignore:"true"`
 	AuthProvider []Provider `json:"auth_provider" gorm:"many2many:auth_application_provider;"`

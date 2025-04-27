@@ -30,7 +30,7 @@ import (
 )
 
 func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, createProvider object.CreateProvider, opt ...string) (object.Provider, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createProvider)
 
@@ -56,7 +56,7 @@ func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, c
 }
 
 func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, providerID string, updateProvider object.UpdateProvider) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
@@ -92,17 +92,21 @@ func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, p
 }
 
 func (is IdentityService) KillProvider(ctx context.Context, tenantID string, providerID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillProvider(ctx, dbConn, tenantID, providerID)
 }
 
 func (is IdentityService) FindProvider(ctx context.Context, tenantID string, providerID string) (object.Provider, error) {
-	return repository.FindProvider(ctx, is.db, tenantID, providerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindProvider(ctx, dbConn, tenantID, providerID)
 }
 
 func (is IdentityService) FindProviders(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Provider, error) {
-	return repository.FindProviders(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindProviders(ctx, dbConn, tenantID, pagination)
 }
 
 func validateProvider(providerObj object.Provider) error {

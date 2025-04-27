@@ -38,7 +38,7 @@ import (
 //   - MessageTemplate object if creation is successful.
 //   - Error if there is any issue during validation or creation.
 func (is IdentityService) CreateMessageTemplate(ctx context.Context, tenantID string, createMessageTemplate object.CreateMessageTemplate) (object.MessageTemplate, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createMessageTemplate)
 
@@ -65,7 +65,7 @@ func (is IdentityService) CreateMessageTemplate(ctx context.Context, tenantID st
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateMessageTemplate(ctx context.Context, tenantID string, messageTemplateID string, updateMessageTemplate object.UpdateMessageTemplate) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	if len(messageTemplateID) == 0 {
 		return errors.New("messageTemplateID is required")
@@ -92,7 +92,7 @@ func (is IdentityService) UpdateMessageTemplate(ctx context.Context, tenantID st
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillMessageTemplate(ctx context.Context, tenantID string, messageTemplateID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillMessageTemplate(ctx, dbConn, tenantID, messageTemplateID)
 }
@@ -107,7 +107,9 @@ func (is IdentityService) KillMessageTemplate(ctx context.Context, tenantID stri
 //   - MessageTemplate object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindMessageTemplate(ctx context.Context, tenantID string, messageTemplateID string) (object.MessageTemplate, error) {
-	return repository.FindMessageTemplate(ctx, is.db, tenantID, messageTemplateID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindMessageTemplate(ctx, dbConn, tenantID, messageTemplateID)
 }
 
 // FindMessageTemplates retrieves a list of messageTemplates from the system, with pagination support.
@@ -120,5 +122,7 @@ func (is IdentityService) FindMessageTemplate(ctx context.Context, tenantID stri
 //   - Slice of MessageTemplate objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindMessageTemplates(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.MessageTemplate, error) {
-	return repository.FindMessageTemplates(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindMessageTemplates(ctx, dbConn, tenantID, pagination)
 }

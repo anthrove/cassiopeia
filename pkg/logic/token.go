@@ -27,7 +27,7 @@ import (
 )
 
 func (is IdentityService) CreateToken(ctx context.Context, tenantID string, createToken object.CreateToken) (object.Token, error) {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createToken)
 
@@ -42,29 +42,37 @@ func (is IdentityService) CreateToken(ctx context.Context, tenantID string, crea
 }
 
 func (is IdentityService) KillToken(ctx context.Context, tenantID string, tokenID string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillToken(ctx, dbConn, tenantID, tokenID)
 }
 
 func (is IdentityService) KillTokens(ctx context.Context, tenantID string, tokenIDs []string) error {
-	dbConn := is.getDBConn(ctx)
+	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.KillTokens(ctx, dbConn, tenantID, tokenIDs)
 }
 
 func (is IdentityService) FindToken(ctx context.Context, tenantID string, tokenID string) (object.Token, error) {
-	return repository.FindToken(ctx, is.db, tenantID, tokenID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindToken(ctx, dbConn, tenantID, tokenID)
 }
 
 func (is IdentityService) FindTokenByRefresh(ctx context.Context, tenantID string, refreshToken string) (object.Token, error) {
-	return repository.FindTokenByRefresh(ctx, is.db, tenantID, refreshToken)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindTokenByRefresh(ctx, dbConn, tenantID, refreshToken)
 }
 
 func (is IdentityService) FindTokens(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Token, error) {
-	return repository.FindTokens(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindTokens(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) FindUserTokens(ctx context.Context, tenantID string, applicationID string, userID string) ([]object.Token, error) {
-	return repository.FindUserTokens(ctx, is.db, tenantID, applicationID, userID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindUserTokens(ctx, dbConn, tenantID, applicationID, userID)
 }
