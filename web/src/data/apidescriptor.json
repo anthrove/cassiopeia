@@ -1,5 +1,9 @@
 {
     "tenant":{
         "password_types":["bcrypt", "argon2id", "pbkdf2", "scrypt"]
+    },
+    "certificate":{
+        "algorithms":["RS512"],
+        "bit_sizes":[1024,2048]
     }
 }

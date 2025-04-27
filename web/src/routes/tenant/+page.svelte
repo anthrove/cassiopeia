@@ -7,10 +7,10 @@
     const OBJECT_TYPE = "Tenant";
     const TABLE_COLUMNS = ["Tennant", "Password Type"];
 
-    import apidescriptor from '../../data/apidescriptor.json'
+    import apiDescriptor from '../../data/apidescriptor.json'
     const build_createForm_descriptor = {
         display_name: String,
-        password_type: apidescriptor.tenant.password_types,
+        password_type: apiDescriptor.tenant.password_types,
     }
 
     import { readAll as readAllCertificates } from "$lib/logic/certificate.svelte";
@@ -33,7 +33,7 @@
                 label: "Password type",
                 required: true,
 
-                options: apidescriptor.tenant.password_types,
+                options: apiDescriptor.tenant.password_types,
             },
             signing_certificate_id: {
                 type: "select:single",
