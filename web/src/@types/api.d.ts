@@ -76,6 +76,9 @@ type Group = {
     string
   ]
 }
+
+type Group__create = Pick<Group,'displayName'|'parent_group_id'>
+type Group__update = Pick<Group,'displayName'|'parent_group_id'>
 // --- Users ---
 
 type User = {
