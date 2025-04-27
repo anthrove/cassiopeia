@@ -24,6 +24,8 @@
         build_createForm_descriptor,
         build_editForm_descriptor,
 
+        searchKey = "display_name",
+
         ...otherProps
     } = $props();
 
@@ -221,7 +223,7 @@
         </div>
     </Modal>
 
-    <SearchableTable rows={items}>
+    <SearchableTable rows={items} {searchKey}>
         {#snippet header()}
             {#each TABLE_COLUMNS as label, index}
                 <th class="text-start py-4 {index ? '' : 'px-4'}">{label}</th>

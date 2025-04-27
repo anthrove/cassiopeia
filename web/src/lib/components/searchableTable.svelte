@@ -5,13 +5,13 @@
         [key: string]: any;
     };
 
-    let { rows, columns=[], row, header,empty } = $props();
+    let { rows, columns=[], row, header,empty,searchKey='display_name' } = $props();
 
     let search = $state("");
 
     let filteredItems = $derived(
         rows?.filter((item:SearchableObject) =>
-            item.display_name?.toLowerCase().includes(search.toLowerCase()),
+            !item[searchKey]||item[searchKey]?.toLowerCase().includes(search.toLowerCase()),
         ),
     );
 
