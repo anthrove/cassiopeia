@@ -26,7 +26,7 @@ type Tenant = {
 }
 
 type Tenant__create = Pick<Tenant, 'display_name' | 'password_type'>
-type Tenant__update = Pick<Tenant, 'display_name' | 'password_type' | 'signing_certificate_id'>
+type Tenant__update = Pick<Tenant, 'id'|'display_name' | 'password_type' | 'signing_certificate_id'>
 
 // --- Certificates ---
 
@@ -44,6 +44,8 @@ type Certificate = {
   updated_at: string
 }
 
+type Certificate__create = Pick<Certificate,'algorithm'|'bit_size'|'display_name'|'expired_at'>
+type Certificate__update = Pick<Certificate,'id'|'display_name'>
 // --- Applications ---
 
 type Application = {
@@ -78,7 +80,7 @@ type Group = {
 }
 
 type Group__create = Pick<Group,'displayName'|'parent_group_id'>
-type Group__update = Pick<Group,'displayName'|'parent_group_id'>
+type Group__update = Pick<Group,'id'|'displayName'|'parent_group_id'>
 // --- Users ---
 
 type User = {

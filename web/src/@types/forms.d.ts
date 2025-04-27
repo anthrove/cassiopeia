@@ -27,10 +27,12 @@ type ExplicitFormFieldDescriptor = Partial<CommonFieldDescriptorOptions>&({
 } | {
     type: "boolean"
 }| {
+    type: "date"
+} | {
     type: "select:single"
     options: any[],
     label: string
     labeler?: LabelerFunction
 })
 
-type FormFieldDescriptor = ExplicitFormFieldDescriptor | StringConstructor | NumberConstructor | BooleanConstructor| string[]
+type FormFieldDescriptor = ExplicitFormFieldDescriptor | StringConstructor | NumberConstructor | BooleanConstructor| string[] | DateConstructor

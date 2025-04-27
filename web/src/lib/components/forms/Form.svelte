@@ -70,12 +70,21 @@
                     label: key,
                     readonly:false
                 };
-            } else {
+            } else if (fieldDescriptor === Date) {
+                formState[key] = formState[key] || new Date().toISOString()
+                explicitDescriptor = {
+                    type: "date",
+                    required: true,
+                    label: key,
+                    readonly:false
+                };
+            }else {
                 explicitDescriptor = <ExplicitFormFieldDescriptor>fieldDescriptor;
                 formState[key] =
                     formState[key] ||
                     explicitDescriptor.default ||
                     {
+                        date: new Date().toISOString(),
                         boolean: false,
                         number: 0,
                         string: "",
@@ -92,14 +101,15 @@
     })
 </script>
 
+<pre>{JSON.stringify(formState,null,4)}</pre>
 <form onsubmit={onFormSubmit}>
     {#each descriptors as descriptor, descriptorIndex}
-        {#if descriptor.type == "string"}
+        {#if ['string','date'].includes(descriptor.type)}
             <Input
                 readonly={descriptor.readonly}
                 required={descriptor.required}
                 label={descriptor.label}
-                type="text"
+                type={{string:'text',date:'datetime-local'}[descriptor.type]}
                 bind:value={formState[keylist[descriptorIndex]]}
                 class="mb-4"
             />
