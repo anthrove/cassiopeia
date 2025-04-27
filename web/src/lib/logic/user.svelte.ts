@@ -24,3 +24,17 @@ export async function create(descriptor:User__create) {
     console.log(application.data);
     
 }
+
+export async function update(definition: User__update){
+    const response = await api(`v1/tenant/${get(context)}/user/${definition.id}`,{
+        method: 'PUT',
+        body: definition
+    })
+    console.log(response);
+}
+
+export async function kill(id:string) {
+    await api(`v1/tenant/${get(context)}/user/${id}`,{
+        method:'DELETE'
+    })
+}

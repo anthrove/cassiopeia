@@ -18,7 +18,7 @@
             return "";
         }
         if ($context) {
-            return `${PREFIX}${href}?tenant=${$context}`;
+            return `${PREFIX}${href}?tenant=${$context}`.replaceAll('?','&').replace('&','?');
         }
         return href;
     });
@@ -30,11 +30,17 @@
     this={isButton ? "button" : "a"}
     {type}
     onclick={() => {
+        if(disabled){ 
+            console.log("button disabled");
+            
+            return
+        }
         onclick();
     }}
     role={isButton ? "button" : "link"}
     href={computedHref}
     {target}
+    {disabled}
     class="{classList}{disabled
         ? ' cursor-not-allowed opacity-50'
         : ' cursor-pointer'} text-start">{@render children?.()}</svelte:element

@@ -30,7 +30,7 @@
     let doRender = $state(false)
     // hydrate state descriptors
     function hydrate(descriptor:FormDescriptor){
-        //formState = {}
+        formState = {...formState}
         keylist = Object.keys(descriptor);
         for (const [key, fieldDescriptor] of Object.entries(descriptor)) {
             let explicitDescriptor: ExplicitFormFieldDescriptor;
@@ -73,7 +73,7 @@
             } else {
                 explicitDescriptor = <ExplicitFormFieldDescriptor>fieldDescriptor;
                 formState[key] =
-                    formState[key]
+                    formState[key] ||
                     explicitDescriptor.default ||
                     {
                         boolean: false,

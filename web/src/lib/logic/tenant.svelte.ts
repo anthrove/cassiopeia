@@ -6,7 +6,7 @@ const api = useApiFetch()
 
 // Creates a new Tennant
 export async function create(definition:Tenant__create) {
-    const response = await api('v1/tenant/',{
+    const response = await api('v1/tenant',{
         method: 'POST',
         body: definition
     })

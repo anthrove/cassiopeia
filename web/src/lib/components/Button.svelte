@@ -8,7 +8,8 @@
         href = "",
         class:classList = "",
         variant = 'primary' as ButtonVariant,
-        type = 'button'
+        type = 'button',
+        disabled = false
     } = $props();
 
     const VARIANTS = <{[key in ButtonVariant]:string}>{
@@ -22,6 +23,7 @@
     {href}
     {type}
     {onclick}
+    {disabled}
     class={`${classList} ${VARIANTS[variant]} p-1 px-2 cursor-pointer`}
 >
     {@render children?.()}

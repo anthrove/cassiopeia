@@ -10,14 +10,6 @@ interface RequestOptions extends RequestInit {
     body?: any; // Allow any type, e.g., object, string, FormData, etc.
 }
 
-type APIResponse<T> = {
-    data:T,
-    error:null
-} | {
-    data: null,
-    error: string
-}
-
 export function useApiFetch(event?: import('@sveltejs/kit').RequestEvent) {
     return async <T>(endpoint: string, options: RequestOptions = {}): Promise<APIResponse<T>> => {
         let token: string | undefined;

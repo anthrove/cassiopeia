@@ -1,3 +1,21 @@
+// --- Meta-Types ---
+type APIResponse<T> = {
+    data:T,
+    error:null
+} | {
+    data: null,
+    error: string
+}
+
+interface CRUDAPI<Base=any,Create=any,Update=any>{
+  create(descriptor:Create):Promise<null>
+  readAll(): Promise<Base[]>
+  read(): Promise<Base>
+  update(descriptor:Update):Promise<null>
+  kill(id:string):Promise<null>
+}
+
+// --- Tenant ---
 type Tenant = {
   id: string
   display_name: string
@@ -77,3 +95,5 @@ type User = {
 }
 
 type User__create = Pick<User,'display_name' | 'email' | 'username'> & {password: string}
+
+type User__update = Pick<User, 'id' | 'display_name'>

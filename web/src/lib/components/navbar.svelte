@@ -126,7 +126,6 @@
                             class="hover:bg-zinc-50 border-zinc-200 border-b-[0.5px] bg-white text-black"
                         >
                             <Link
-                                href={$context==tenant.id?"/tenant":""}
                                 onclick={() => setCurentTenant(tenant.id)}
                                 class="{$context == tenant.id?'text-primary-500 hover:text-primary-300':'hover:text-zinc-600'} py-2 px-4 inline-block cursor-pointer w-full"
                                 >{tenant.display_name}</Link
