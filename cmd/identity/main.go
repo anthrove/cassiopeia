@@ -22,6 +22,8 @@ import (
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/gin-gonic/gin"
 	"log"
+	"github.com/gin-contrib/cors"
+    "time"
 )
 
 //	@title			Identity API
@@ -47,6 +49,16 @@ func main() {
 	service := logic.NewIdentityService(engine)
 
 	router := gin.Default()
+
+	router.Use(cors.New(cors.Config{
+        AllowOrigins:     []string{"*"}, // Wildcard for development only
+        AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+        AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+        ExposeHeaders:    []string{"Content-Length"},
+        AllowCredentials: true,
+        MaxAge:           12 * time.Hour,
+    }))
+
 	api.SetupRoutes(router, service)
 	err = router.Run(":8080")
 

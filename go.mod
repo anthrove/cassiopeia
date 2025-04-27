@@ -7,7 +7,7 @@ require (
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/casbin/casbin/v2 v2.104.0
 	github.com/casbin/gorm-adapter/v3 v3.32.0
-	github.com/gin-contrib/static v1.1.5
+	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-gonic/gin v1.10.0
 	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/go-playground/validator/v10 v10.26.0
