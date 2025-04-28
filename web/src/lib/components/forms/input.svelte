@@ -16,7 +16,7 @@
 <label class="flex flex-col {classList}">
     {#if label}
         <div class="relative flex items-center mb-1">
-            <span class="px-2 z-10 ml-8 bg-white dark:bg-zinc-800"
+            <span class="px-2 z-10 ml-8 dark:bg-zinc-800 bg-white "
                 >{label}{#if required}<span class="text-rose-600">*</span
                     >{/if}</span
             >
