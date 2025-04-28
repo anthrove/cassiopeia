@@ -19,6 +19,8 @@ package email
 import (
 	"errors"
 	"github.com/anthrove/identity/pkg/object"
+	"maps"
+	"slices"
 )
 
 type Provider interface {
@@ -27,10 +29,29 @@ type Provider interface {
 	SendMail(toAddress, subject string, body string) error
 }
 
+var providerMap = map[string]func(provider object.Provider) (Provider, error){
+	"smtp": newSMTPProvider,
+}
+
 func GetEMailProvider(provider object.Provider) (Provider, error) {
-	switch provider.ProviderType {
-	case "smtp":
-		return newSMTPProvider(provider)
+	newFunc, exists := providerMap[provider.ProviderType]
+
+	if !exists {
+		return nil, errors.New("unknown email provider: " + provider.ProviderType)
 	}
-	return nil, errors.New("unknown email provider: " + provider.ProviderType)
+
+	return newFunc(provider)
+}
+
+func ConfigurationFields(providerType string) []object.ProviderConfigurationField {
+	switch providerType {
+	case "smtp":
+		return smtpProvider{}.GetConfigurationFields()
+	}
+
+	return nil
+}
+
+func GetEMailTypes() []string {
+	return slices.Collect(maps.Keys(providerMap))
 }

@@ -20,6 +20,8 @@ import (
 	"context"
 	"errors"
 	"github.com/anthrove/identity/pkg/object"
+	"maps"
+	"slices"
 )
 
 type ProviderContext struct {
@@ -40,10 +42,29 @@ type Provider interface {
 	Submit(ctx context.Context, providerContext ProviderContext, data map[string]any) (bool, error)
 }
 
+var providerMap = map[string]func(provider object.Provider) (Provider, error){
+	"password": newPasswordAuth,
+}
+
 func GetAuthProvider(provider object.Provider) (Provider, error) {
-	switch provider.ProviderType {
-	case "password":
-		return newPasswordAuth(provider), nil
+	newFunc, exists := providerMap[provider.ProviderType]
+
+	if !exists {
+		return nil, errors.New("unknown auth provider: " + provider.ProviderType)
 	}
-	return nil, errors.New("unknown auth provider: " + provider.ProviderType)
+
+	return newFunc(provider)
+}
+
+func ConfigurationFields(providerType string) []object.ProviderConfigurationField {
+	switch providerType {
+	case "password":
+		return passwordAuth{}.GetConfigurationFields()
+	}
+
+	return nil
+}
+
+func GetAuthTypes() []string {
+	return slices.Collect(maps.Keys(providerMap))
 }
