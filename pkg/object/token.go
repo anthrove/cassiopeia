@@ -29,7 +29,7 @@ type Token struct {
 	ApplicationID string         `json:"application_id" maxLength:"25" minLength:"25" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	UserID        sql.NullString `json:"user_id" maxLength:"25" gorm:"type:char(25)" `
 
-	CreatedAt time.Time `json:"createdAt" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	ExpiredAt time.Time `json:"expired_at" format:"date-time"`
 
 	RefreshTokenID string `json:"refresh_token"`
