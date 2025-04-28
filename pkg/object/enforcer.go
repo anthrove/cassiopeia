@@ -25,7 +25,7 @@ type Enforcer struct {
 	ID       string `json:"id"`
 	TenantID string `json:"tenant_id"`
 
-	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
 	Description string `json:"description"`
 
 	ModelID   string  `json:"model_id"`
@@ -48,7 +48,7 @@ func (base *Enforcer) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateEnforcer struct {
-	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
 	Description string `json:"description"`
 
 	ModelID   string `json:"model_id"`
@@ -56,7 +56,7 @@ type CreateEnforcer struct {
 }
 
 type UpdateEnforcer struct {
-	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
 	Description string `json:"description"`
 
 	ModelID   string `json:"model_id"`

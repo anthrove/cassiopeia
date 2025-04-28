@@ -25,7 +25,7 @@ import (
 func CreateEnforcer(ctx context.Context, db *gorm.DB, tenantId string, createEnforcer object.CreateEnforcer) (object.Enforcer, error) {
 	enforcer := object.Enforcer{
 		TenantID:    tenantId,
-		Name:        createEnforcer.Name,
+		DisplayName: createEnforcer.DisplayName,
 		Description: createEnforcer.Description,
 		ModelID:     createEnforcer.ModelID,
 		AdapterID:   createEnforcer.AdapterID,
@@ -39,7 +39,7 @@ func CreateEnforcer(ctx context.Context, db *gorm.DB, tenantId string, createEnf
 func UpdateEnforcer(ctx context.Context, db *gorm.DB, tenantID string, enforcerId string, updateEnforcer object.UpdateEnforcer) error {
 	enforcer := object.Enforcer{
 		TenantID:    tenantID,
-		Name:        updateEnforcer.Name,
+		DisplayName: updateEnforcer.DisplayName,
 		Description: updateEnforcer.Description,
 		ModelID:     updateEnforcer.ModelID,
 		AdapterID:   updateEnforcer.AdapterID,

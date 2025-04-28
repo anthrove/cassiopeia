@@ -25,7 +25,7 @@ import (
 func CreateAdapter(ctx context.Context, db *gorm.DB, tenantId string, createAdapter object.CreateAdapter) (object.Adapter, error) {
 	adapter := object.Adapter{
 		TenantID:     tenantId,
-		Name:         createAdapter.Name,
+		DisplayName:  createAdapter.DisplayName,
 		TableName:    createAdapter.TableName,
 		ExternalDB:   createAdapter.ExternalDB,
 		Driver:       createAdapter.Driver,
@@ -44,7 +44,7 @@ func CreateAdapter(ctx context.Context, db *gorm.DB, tenantId string, createAdap
 func UpdateAdapter(ctx context.Context, db *gorm.DB, tenantID string, adapterId string, updateAdapter object.UpdateAdapter) error {
 	adapter := object.Adapter{
 		TenantID:     tenantID,
-		Name:         updateAdapter.Name,
+		DisplayName:  updateAdapter.DisplayName,
 		TableName:    updateAdapter.TableName,
 		ExternalDB:   updateAdapter.ExternalDB,
 		Driver:       updateAdapter.Driver,
