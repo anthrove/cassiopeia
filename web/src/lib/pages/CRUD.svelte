@@ -64,20 +64,21 @@
             createForm_descriptor = build_createForm_descriptor
         }
 
-        if(isFunction(build_editForm_descriptor)){
-            editForm_descriptor = await build_editForm_descriptor()
-        }else{
-            editForm_descriptor = build_editForm_descriptor
+        if (!Object.keys(current).length) {
+            closeEditModal();
         }
         setTimeout(()=>{
             _current = $state.snapshot(current);
         },0)
-        if (!Object.keys(current).length) {
-            closeEditModal();
-        }
     }
 
     context.subscribe(reloadData);
+    onMount(()=>{
+        reloadData()
+        if($selected){
+            openEditModal($selected)
+        }
+    })
 
     let _current = $state<_ItemType>(<ItemType>{});
     let createModal_open = $state(false);
@@ -97,11 +98,22 @@
     }
 
     import { create as createContext } from "$lib/stores/urlcontext.svelte";
+    import { onMount } from "svelte";
     let selected = createContext("selected");
 
-    function openEditModal(id: string) {
+    async function openEditModal(id: string) {
         selected.set(id);
-        _current = $state.snapshot(current || {});
+
+        if(isFunction(build_editForm_descriptor)){
+            editForm_descriptor = {}
+            editForm_descriptor = await build_editForm_descriptor(id)
+        }else{
+            editForm_descriptor = build_editForm_descriptor
+        }
+
+        setTimeout(()=>{
+            _current = $state.snapshot(current || {});
+        },0)
     }
     function closeEditModal() {
         selected.set("");
@@ -145,12 +157,6 @@
     <Modal open={!!$selected} onclose={closeEditModal}>
         <div class="prose">
             <h2>Edit {OBJECT_TYPE}</h2>
-            {#if false}
-            <div class="flex gap-4">
-                <pre>{JSON.stringify(current,null,4)}</pre>
-                <pre>{JSON.stringify(_current,null,4)}</pre>
-            </div>
-            {/if}
             {#if Object.keys(editForm_descriptor).length > 0}
                 <Form
                     onsubmit={update}

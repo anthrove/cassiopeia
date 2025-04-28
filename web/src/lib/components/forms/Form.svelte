@@ -101,7 +101,6 @@
     })
 </script>
 
-<pre>{JSON.stringify(formState,null,4)}</pre>
 <form onsubmit={onFormSubmit}>
     {#each descriptors as descriptor, descriptorIndex}
         {#if ['string','date'].includes(descriptor.type)}
