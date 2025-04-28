@@ -102,3 +102,29 @@ type User = {
 type User__create = Pick<User,'display_name' | 'email' | 'username'> & {password: string}
 
 type User__update = Pick<User, 'id' | 'display_name'>
+
+// --- Enforcers ---
+
+type Enforcer = {
+  id: string,
+  adapter_id: string,
+  description: string,
+  model_id: string,
+  name: string,
+  tenant_id: string
+}
+
+type Enforcer__create = {
+  adapter_id: string,
+  description: string,
+  model_id: string,
+  name: string,
+}
+
+type Enforcer__update = {
+  id: string,
+  adapter_id: string,
+  description: string,
+  model_id: string,
+  name: string,
+}
