@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider"
 	"github.com/anthrove/identity/pkg/provider/auth"
 	"github.com/anthrove/identity/pkg/provider/email"
 	"github.com/anthrove/identity/pkg/provider/storage"
@@ -107,6 +108,18 @@ func (is IdentityService) FindProviders(ctx context.Context, tenantID string, pa
 	dbConn, _ := is.getDBConn(ctx)
 
 	return repository.FindProviders(ctx, dbConn, tenantID, pagination)
+}
+
+func (is IdentityService) FindProviderCategories(ctx context.Context, tenantID string) ([]string, error) {
+	return []string{"email", "storage", "auth"}, nil
+}
+
+func (is IdentityService) FindProviderTypes(ctx context.Context, tenantID string, category string) []string {
+	return provider.Types(category)
+}
+
+func (is IdentityService) FindProviderConfiguration(ctx context.Context, tenantID string, category string, providerType string) []object.ProviderConfigurationField {
+	return provider.ConfigurationFields(category, providerType)
 }
 
 func validateProvider(providerObj object.Provider) error {

@@ -62,11 +62,11 @@ type UpdateProvider struct {
 }
 
 type ProviderConfigurationField struct {
-	FieldKey  string
-	FieldType string
+	FieldKey  string `json:"field_key"`
+	FieldType string `json:"field_type"`
 }
 
 type ProviderConfigurationFieldValue struct {
-	FieldKey   string
-	FieldValue string
+	FieldKey   string `json:"field_key"`
+	FieldValue string `json:"field_value"`
 }
