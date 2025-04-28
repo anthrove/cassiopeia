@@ -15,7 +15,7 @@
 
 {#if open}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <div role="dialog" tabindex="0" class="absolute overflow-y-auto h-screen flex items-start inset-0 bg-black/40 z-20 text-start" onclick={closeSelf}>
+    <div role="dialog" tabindex="0" class="fixed overflow-y-auto h-screen flex items-start inset-0 bg-black/40 z-20 text-start" onclick={closeSelf}>
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <div class="mt-16 p-4 flex-1" onclick={closeSelf} role="alertdialog" tabindex="0">
             <div class="container mx-auto p-4 bg-white rounded shadow block relative">
