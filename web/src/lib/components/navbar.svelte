@@ -113,7 +113,6 @@
         <div class="ml-auto">
             <li class="relative group h-full flex items-center">
                 <Link
-                    disabled={!$context}
                     href="/tenant"
                     class="cursor-pointer h-full flex items-center px-4 italic"
                     >{tenants.find(t=>t.id == $context)?.display_name || "No tenant"}</Link

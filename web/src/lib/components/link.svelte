@@ -20,7 +20,7 @@
         if ($context) {
             return `${PREFIX}${href}?tenant=${$context}`.replaceAll('?','&').replace('&','?');
         }
-        return href;
+        return `${PREFIX}${href}`.replaceAll('?','&').replace('&','?');
     });
 
     let isButton = $derived(disabled || !href);
