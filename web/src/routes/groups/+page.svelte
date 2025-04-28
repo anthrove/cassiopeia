@@ -19,7 +19,7 @@
     const build_editForm_descriptor = {
         id: {
             type: "string",
-            label: "User ID",
+            label: "Group ID",
             readonly: true,
         },
         display_name: String,
