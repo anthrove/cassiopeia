@@ -6,8 +6,8 @@ import { get } from "svelte/store";
 
 const api = useApiFetch()
 
-export async function readAll(): Promise<Certificate[]> {
-    const certificates = await api<Certificate[]>(`v1/tenant/${get(context)}/certificate`)
+export async function readAll(id:string=''): Promise<Certificate[]> {
+    const certificates = await api<Certificate[]>(`v1/tenant/${id||get(context)}/certificate`)
     return certificates.data!
 }
 

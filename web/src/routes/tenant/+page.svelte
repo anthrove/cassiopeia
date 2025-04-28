@@ -14,8 +14,9 @@
     }
 
     import { readAll as readAllCertificates } from "$lib/logic/certificate.svelte";
-    async function build_editForm_descriptor(){
-        const certificates = await readAllCertificates();
+    async function build_editForm_descriptor(tenantId:string){
+        
+        const certificates = await readAllCertificates(tenantId);
 
         return <FormDescriptor>{
             id: {
