@@ -76,7 +76,7 @@ func GenerateCertificate(privateKey any, publicKey any, expireAt time.Time, sign
 		// TODO you have to generate a different serial number each execution
 		SerialNumber: big.NewInt(123123),
 		Subject: pkix.Name{
-			CommonName:   "New Name",
+			CommonName:   "New DisplayName",
 			Organization: []string{"New Org."},
 		},
 		BasicConstraintsValid: true,
