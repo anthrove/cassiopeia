@@ -40,7 +40,7 @@
         </thead>
         <tbody>
             {#each filteredItems as item,i}
-                <tr class="{i%2?'bg-zinc-100':''} border-b-[0.5px] border-zinc-300">
+                <tr class="{i%2?'bg-zinc-100 dark:bg-zinc-900/50':''} border-b-[0.5px] border-zinc-300 dark:border-zinc-700">
                     {@render row?.(item)}
                     {#if !row}
                         {#each columnsDerived as column}

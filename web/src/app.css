@@ -17,3 +17,9 @@
 }
 
 @custom-variant hover (&:hover);
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.prose{
+    @apply prose dark:prose-invert
+}
