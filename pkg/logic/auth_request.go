@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreateAuthRequest(ctx context.Context, tenantID string, createAuthRequest object.CreateAuthRequest) (object.AuthRequest, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createAuthRequest)
 
 	if err != nil {
@@ -36,10 +38,12 @@ func (is IdentityService) CreateAuthRequest(ctx context.Context, tenantID string
 		}
 	}
 
-	return repository.CreateAuthRequest(ctx, is.db, tenantID, createAuthRequest)
+	return repository.CreateAuthRequest(ctx, dbConn, tenantID, createAuthRequest)
 }
 
 func (is IdentityService) UpdateAuthRequest(ctx context.Context, tenantID string, authRequestID string, updateAuthRequest object.UpdateAuthRequest) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -53,17 +57,23 @@ func (is IdentityService) UpdateAuthRequest(ctx context.Context, tenantID string
 		}
 	}
 
-	return repository.UpdateAuthRequest(ctx, is.db, tenantID, authRequestID, updateAuthRequest)
+	return repository.UpdateAuthRequest(ctx, dbConn, tenantID, authRequestID, updateAuthRequest)
 }
 
 func (is IdentityService) KillAuthRequest(ctx context.Context, tenantID string, authRequestID string) error {
-	return repository.KillAuthRequest(ctx, is.db, tenantID, authRequestID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillAuthRequest(ctx, dbConn, tenantID, authRequestID)
 }
 
 func (is IdentityService) FindAuthRequest(ctx context.Context, tenantID string, authRequestID string) (object.AuthRequest, error) {
-	return repository.FindAuthRequest(ctx, is.db, tenantID, authRequestID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindAuthRequest(ctx, dbConn, tenantID, authRequestID)
 }
 
 func (is IdentityService) FindAuthRequests(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.AuthRequest, error) {
-	return repository.FindAuthRequests(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindAuthRequests(ctx, dbConn, tenantID, pagination)
 }

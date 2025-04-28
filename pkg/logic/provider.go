@@ -30,6 +30,8 @@ import (
 )
 
 func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, createProvider object.CreateProvider, opt ...string) (object.Provider, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createProvider)
 
 	if err != nil {
@@ -50,10 +52,12 @@ func (is IdentityService) CreateProvider(ctx context.Context, tenantID string, c
 		return object.Provider{}, err
 	}
 
-	return repository.CreateProvider(ctx, is.db, tenantID, createProvider, opt...)
+	return repository.CreateProvider(ctx, dbConn, tenantID, createProvider, opt...)
 }
 
 func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, providerID string, updateProvider object.UpdateProvider) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -67,7 +71,7 @@ func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, p
 		}
 	}
 
-	oldProviderObj, err := repository.FindProvider(ctx, is.db, tenantID, providerID)
+	oldProviderObj, err := repository.FindProvider(ctx, dbConn, tenantID, providerID)
 
 	if err != nil {
 		return err
@@ -88,15 +92,21 @@ func (is IdentityService) UpdateProvider(ctx context.Context, tenantID string, p
 }
 
 func (is IdentityService) KillProvider(ctx context.Context, tenantID string, providerID string) error {
-	return repository.KillProvider(ctx, is.db, tenantID, providerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillProvider(ctx, dbConn, tenantID, providerID)
 }
 
 func (is IdentityService) FindProvider(ctx context.Context, tenantID string, providerID string) (object.Provider, error) {
-	return repository.FindProvider(ctx, is.db, tenantID, providerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindProvider(ctx, dbConn, tenantID, providerID)
 }
 
 func (is IdentityService) FindProviders(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Provider, error) {
-	return repository.FindProviders(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindProviders(ctx, dbConn, tenantID, pagination)
 }
 
 func validateProvider(providerObj object.Provider) error {

@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, createEnforcer object.CreateEnforcer) (object.Enforcer, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createEnforcer)
 
 	if err != nil {
@@ -36,10 +38,12 @@ func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, c
 		}
 	}
 
-	return repository.CreateEnforcer(ctx, is.db, tenantID, createEnforcer)
+	return repository.CreateEnforcer(ctx, dbConn, tenantID, createEnforcer)
 }
 
 func (is IdentityService) UpdateEnforcer(ctx context.Context, tenantID string, enforcerID string, updateEnforcer object.UpdateEnforcer) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -53,19 +57,25 @@ func (is IdentityService) UpdateEnforcer(ctx context.Context, tenantID string, e
 		}
 	}
 
-	return repository.UpdateEnforcer(ctx, is.db, tenantID, enforcerID, updateEnforcer)
+	return repository.UpdateEnforcer(ctx, dbConn, tenantID, enforcerID, updateEnforcer)
 }
 
 func (is IdentityService) KillEnforcer(ctx context.Context, tenantID string, enforcerID string) error {
-	return repository.KillEnforcer(ctx, is.db, tenantID, enforcerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillEnforcer(ctx, dbConn, tenantID, enforcerID)
 }
 
 func (is IdentityService) FindEnforcer(ctx context.Context, tenantID string, enforcerID string) (object.Enforcer, error) {
-	return repository.FindEnforcer(ctx, is.db, tenantID, enforcerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindEnforcer(ctx, dbConn, tenantID, enforcerID)
 }
 
 func (is IdentityService) FindEnforcers(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Enforcer, error) {
-	return repository.FindEnforcers(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindEnforcers(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) Enforce(ctx context.Context, tenantID string, enforcerID string, request []any) (bool, error) {

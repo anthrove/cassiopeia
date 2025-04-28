@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreateCredential(ctx context.Context, tenantID string, createCredential object.CreateCredential) (object.Credentials, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createCredential)
 
 	if err != nil {
@@ -36,10 +38,12 @@ func (is IdentityService) CreateCredential(ctx context.Context, tenantID string,
 		}
 	}
 
-	return repository.CreateCredential(ctx, is.db, tenantID, createCredential)
+	return repository.CreateCredential(ctx, dbConn, tenantID, createCredential)
 }
 
 func (is IdentityService) UpdateCredential(ctx context.Context, tenantID string, credentialID string, updateCredential object.UpdateCredential) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -53,21 +57,29 @@ func (is IdentityService) UpdateCredential(ctx context.Context, tenantID string,
 		}
 	}
 
-	return repository.UpdateCredential(ctx, is.db, tenantID, credentialID, updateCredential)
+	return repository.UpdateCredential(ctx, dbConn, tenantID, credentialID, updateCredential)
 }
 
 func (is IdentityService) KillCredential(ctx context.Context, tenantID string, credentialID string) error {
-	return repository.KillCredential(ctx, is.db, tenantID, credentialID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillCredential(ctx, dbConn, tenantID, credentialID)
 }
 
 func (is IdentityService) FindCredential(ctx context.Context, tenantID string, credentialID string) (object.Credentials, error) {
-	return repository.FindCredential(ctx, is.db, tenantID, credentialID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCredential(ctx, dbConn, tenantID, credentialID)
 }
 
 func (is IdentityService) FindCredentials(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Credentials, error) {
-	return repository.FindCredentials(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCredentials(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) FindCredentialsByUser(ctx context.Context, tenantID string, userID string) ([]object.Credentials, error) {
-	return repository.FindCredentialsByUser(ctx, is.db, tenantID, userID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCredentialsByUser(ctx, dbConn, tenantID, userID)
 }

@@ -3,9 +3,10 @@
     <module name="identity" />
     <working_directory value="$PROJECT_DIR$" />
     <envs>
-      <env name="DB_DATASOURCE" value="gorm.db" />
-      <env name="DB_DRIVER" value="sqlite" />
+      <env name="pDB_DATASOURCE" value="postgres://anthrove:anthrove@192.168.1.15:5432/anthrove" />
       <env name="DB_DEBUG" value="true" />
+      <env name="DB_DRIVER" value="sqlite" />
+      <env name="DB_DATASOURCE" value="gorm.db" />
     </envs>
     <EXTENSION ID="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />

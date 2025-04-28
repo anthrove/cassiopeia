@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreatePermission(ctx context.Context, tenantID string, createPermission object.CreatePermission) (object.Permission, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createPermission)
 
 	if err != nil {
@@ -36,7 +38,7 @@ func (is IdentityService) CreatePermission(ctx context.Context, tenantID string,
 		}
 	}
 
-	permission, err := repository.CreatePermission(ctx, is.db, tenantID, createPermission)
+	permission, err := repository.CreatePermission(ctx, dbConn, tenantID, createPermission)
 
 	if err != nil {
 		return object.Permission{}, err
@@ -48,6 +50,8 @@ func (is IdentityService) CreatePermission(ctx context.Context, tenantID string,
 }
 
 func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string, permissionID string, updatePermission object.UpdatePermission) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -61,7 +65,7 @@ func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string,
 		}
 	}
 
-	err = repository.UpdatePermission(ctx, is.db, tenantID, permissionID, updatePermission)
+	err = repository.UpdatePermission(ctx, dbConn, tenantID, permissionID, updatePermission)
 
 	if err != nil {
 		return err
@@ -73,17 +77,25 @@ func (is IdentityService) UpdatePermission(ctx context.Context, tenantID string,
 }
 
 func (is IdentityService) KillPermission(ctx context.Context, tenantID string, permissionID string) error {
-	return repository.KillPermission(ctx, is.db, tenantID, permissionID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillPermission(ctx, dbConn, tenantID, permissionID)
 }
 
 func (is IdentityService) FindPermission(ctx context.Context, tenantID string, permissionID string) (object.Permission, error) {
-	return repository.FindPermission(ctx, is.db, tenantID, permissionID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindPermission(ctx, dbConn, tenantID, permissionID)
 }
 
 func (is IdentityService) FindPermissions(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Permission, error) {
-	return repository.FindPermissions(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindPermissions(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) FindPermissionsByEnforcer(ctx context.Context, tenantID string, enforcerID string) ([]object.Permission, error) {
-	return repository.FindPermissionsByEnforcer(ctx, is.db, tenantID, enforcerID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindPermissionsByEnforcer(ctx, dbConn, tenantID, enforcerID)
 }

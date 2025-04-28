@@ -27,6 +27,8 @@ import (
 )
 
 func (is IdentityService) CreateAdapter(ctx context.Context, tenantID string, createAdapter object.CreateAdapter) (object.Adapter, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createAdapter)
 
 	if err != nil {
@@ -36,10 +38,12 @@ func (is IdentityService) CreateAdapter(ctx context.Context, tenantID string, cr
 		}
 	}
 
-	return repository.CreateAdapter(ctx, is.db, tenantID, createAdapter)
+	return repository.CreateAdapter(ctx, dbConn, tenantID, createAdapter)
 }
 
 func (is IdentityService) UpdateAdapter(ctx context.Context, tenantID string, adapterID string, updateAdapter object.UpdateAdapter) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -53,17 +57,23 @@ func (is IdentityService) UpdateAdapter(ctx context.Context, tenantID string, ad
 		}
 	}
 
-	return repository.UpdateAdapter(ctx, is.db, tenantID, adapterID, updateAdapter)
+	return repository.UpdateAdapter(ctx, dbConn, tenantID, adapterID, updateAdapter)
 }
 
 func (is IdentityService) KillAdapter(ctx context.Context, tenantID string, adapterID string) error {
-	return repository.KillAdapter(ctx, is.db, tenantID, adapterID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillAdapter(ctx, dbConn, tenantID, adapterID)
 }
 
 func (is IdentityService) FindAdapter(ctx context.Context, tenantID string, adapterID string) (object.Adapter, error) {
-	return repository.FindAdapter(ctx, is.db, tenantID, adapterID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindAdapter(ctx, dbConn, tenantID, adapterID)
 }
 
 func (is IdentityService) FindAdapters(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Adapter, error) {
-	return repository.FindAdapters(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindAdapters(ctx, dbConn, tenantID, pagination)
 }
