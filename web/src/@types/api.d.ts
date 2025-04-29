@@ -1,18 +1,18 @@
 // --- Meta-Types ---
 type APIResponse<T> = {
-    data:T,
-    error:null
+  data: T,
+  error: null
 } | {
-    data: null,
-    error: string
+  data: null,
+  error: string
 }
 
-interface CRUDAPI<Base=any,Create=any,Update=any>{
-  create(descriptor:Create):Promise<null>
+interface CRUDAPI<Base = any, Create = any, Update = any> {
+  create(descriptor: Create): Promise<Base>
   readAll(): Promise<Base[]>
-  read(): Promise<Base>
-  update(descriptor:Update):Promise<null>
-  kill(id:string):Promise<null>
+  read(id:string): Promise<Base>
+  update(descriptor: Update): Promise<void>
+  kill(id: string): Promise<void>
 }
 
 // --- Tenant ---
@@ -26,7 +26,7 @@ type Tenant = {
 }
 
 type Tenant__create = Pick<Tenant, 'display_name' | 'password_type'>
-type Tenant__update = Pick<Tenant, 'id'|'display_name' | 'password_type' | 'signing_certificate_id'>
+type Tenant__update = Pick<Tenant, 'id' | 'display_name' | 'password_type' | 'signing_certificate_id'>
 
 // --- Certificates ---
 
@@ -44,8 +44,8 @@ type Certificate = {
   updated_at: string
 }
 
-type Certificate__create = Pick<Certificate,'algorithm'|'bit_size'|'display_name'|'expired_at'>
-type Certificate__update = Pick<Certificate,'id'|'display_name'>
+type Certificate__create = Pick<Certificate, 'algorithm' | 'bit_size' | 'display_name' | 'expired_at'>
+type Certificate__update = Pick<Certificate, 'id' | 'display_name'>
 // --- Applications ---
 
 type Application = {
@@ -79,8 +79,8 @@ type Group = {
   ]
 }
 
-type Group__create = Pick<Group,'displayName'|'parent_group_id'>
-type Group__update = Pick<Group,'id'|'displayName'|'parent_group_id'>
+type Group__create = Pick<Group, 'displayName' | 'parent_group_id'>
+type Group__update = Pick<Group, 'id' | 'displayName' | 'parent_group_id'>
 // --- Users ---
 
 type User = {
@@ -99,7 +99,7 @@ type User = {
   username: string
 }
 
-type User__create = Pick<User,'display_name' | 'email' | 'username'> & {password: string}
+type User__create = Pick<User, 'display_name' | 'email' | 'username'> & { password: string }
 
 type User__update = Pick<User, 'id' | 'display_name'>
 
@@ -110,7 +110,7 @@ type Enforcer = {
   adapter_id: string,
   description: string,
   model_id: string,
-  name: string,
+  display_name: string,
   tenant_id: string
 }
 
@@ -118,7 +118,7 @@ type Enforcer__create = {
   adapter_id: string,
   description: string,
   model_id: string,
-  name: string,
+  display_name: string,
 }
 
 type Enforcer__update = {
@@ -126,5 +126,60 @@ type Enforcer__update = {
   adapter_id: string,
   description: string,
   model_id: string,
-  name: string,
+  display_name: string,
+}
+
+// --- Adapters ---
+
+type Adapter = {
+  id: string,
+  database_name: string,
+  driver: string,
+  external_db: boolean,
+  host: string,
+  display_name: string,
+  password: string,
+  port: string,
+  table_name: string,
+  tenant_id: string,
+  username: string
+}
+
+type Adapter__create = {
+  database_name: string,
+  driver: string,
+  external_db: boolean,
+  host: string,
+  display_name: string,
+  password: password,
+  port: number,
+  table_name: string,
+  username: string
+}
+
+type Adapter__update = {
+  id: string
+}
+
+// --- Models ---
+
+type Model = {
+  id: string,
+  description: string,
+  model: string,
+  display_name: string,
+  tenant_id: string
+}
+
+type Model__create = {
+  description: string,
+  model: string,
+  display_name: string,
+}
+
+type Model__update = {
+  id: string,
+  description: string,
+  model: string,
+  display_name: string,
 }
