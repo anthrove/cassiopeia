@@ -8,7 +8,8 @@ type CommonFieldDescriptorOptions = {
     default: any
     label: string
     required: boolean,
-    readonly: boolean
+    readonly: boolean,
+    conditional? = (formState:any)=>boolean
 }
 
 // Describes a single Form field with optional additional configuration
