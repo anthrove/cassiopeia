@@ -20,17 +20,17 @@
         state: formState = $bindable({}),
         descriptor = {} as FormDescriptor,
         onsubmit = () => {},
-        submit = <Snippet|string>'Submit'
+        submit = <Snippet | string>"Submit",
     } = $props();
 
     let descriptors: ExplicitFormFieldDescriptor[] = $state([]);
     //let formState: { [key: string]: any } = $state({});
-    let keylist = $state<string[]>([])
+    let keylist = $state<string[]>([]);
 
-    let doRender = $state(false)
+    let doRender = $state(false);
     // hydrate state descriptors
-    function hydrate(descriptor:FormDescriptor){
-        formState = {...formState}
+    function hydrate(descriptor: FormDescriptor) {
+        formState = { ...formState };
         keylist = Object.keys(descriptor);
         for (const [key, fieldDescriptor] of Object.entries(descriptor)) {
             let explicitDescriptor: ExplicitFormFieldDescriptor;
@@ -40,7 +40,7 @@
                     type: "string",
                     required: true,
                     label: key,
-                    readonly:false
+                    readonly: false,
                 };
             } else if (fieldDescriptor === Number) {
                 formState[key] = formState[key] || 0;
@@ -48,38 +48,40 @@
                     type: "number",
                     required: true,
                     label: key,
-                    readonly:false
+                    readonly: false,
                 };
             } else if (fieldDescriptor === Boolean) {
-                formState[key] = !!formState[key]
+                formState[key] = !!formState[key];
                 explicitDescriptor = {
                     type: "boolean",
                     required: true,
                     label: key,
-                    readonly:false
+                    readonly: false,
                 };
             } else if (Array.isArray(fieldDescriptor)) {
                 formState[key] = formState[key] || fieldDescriptor[0];
                 explicitDescriptor = {
                     type: "select:single",
-    
+
                     options: fieldDescriptor,
                     default: fieldDescriptor[0],
-    
+
                     required: true,
                     label: key,
-                    readonly:false
+                    readonly: false,
                 };
             } else if (fieldDescriptor === Date) {
-                formState[key] = formState[key] || new Date().toISOString()
+                formState[key] = formState[key] || new Date().toISOString();
                 explicitDescriptor = {
                     type: "date",
                     required: true,
                     label: key,
-                    readonly:false
+                    readonly: false,
                 };
-            }else {
-                explicitDescriptor = <ExplicitFormFieldDescriptor>fieldDescriptor;
+            } else {
+                explicitDescriptor = <ExplicitFormFieldDescriptor>(
+                    fieldDescriptor
+                );
                 formState[key] =
                     formState[key] ||
                     explicitDescriptor.default ||
@@ -96,41 +98,48 @@
         }
     }
 
-    hydrate(descriptor)
-    $effect(()=>{
-    })
+    hydrate(descriptor);
+    $effect(() => {});
 </script>
 
 <form onsubmit={onFormSubmit}>
     {#each descriptors as descriptor, descriptorIndex}
-        {#if ['string','date'].includes(descriptor.type)}
-            <Input
-                readonly={descriptor.readonly}
-                required={descriptor.required}
-                label={descriptor.label}
-                type={{string:'text',date:'datetime-local'}[descriptor.type]}
-                bind:value={formState[keylist[descriptorIndex]]}
-                class="mb-4"
-            />
-        {:else if descriptor.type == "select:single"}
-            <Dropdown
-                readonly={descriptor.readonly}
-                required={descriptor.required}
-                label={descriptor.label}
-                options={descriptor.options}
-                bind:value={formState[keylist[descriptorIndex]]}
-                labeler={descriptor.labeler}
-                class="mb-4"
-            />
-        {:else}
-            <span class="text-rose-600 mb-4"
-                >Unsuported input type: {descriptor.type}</span
-            >
+        {#if !descriptor.conditional || descriptor.conditional(formState)}
+            {#if ["string", "date", "number", "boolean"].includes(descriptor.type)}
+                <Input
+                    readonly={descriptor.readonly}
+                    required={descriptor.required}
+                    label={descriptor.label}
+                    type={{
+                        'select:single':descriptor.default,
+                        string: "text",
+                        date: "datetime-local",
+                        number: "number",
+                        boolean: "checkbox",
+                    }[descriptor.type]}
+                    bind:value={formState[keylist[descriptorIndex]]}
+                    class="mb-4"
+                />
+            {:else if descriptor.type == "select:single"}
+                <Dropdown
+                    readonly={descriptor.readonly}
+                    required={descriptor.required}
+                    label={descriptor.label}
+                    options={descriptor.options}
+                    bind:value={formState[keylist[descriptorIndex]]}
+                    labeler={descriptor.labeler}
+                    class="mb-4"
+                />
+            {:else}
+                <span class="text-rose-600 mb-4"
+                    >Unsuported input type: {descriptor.type}</span
+                >
+            {/if}
         {/if}
     {/each}
 
     {#if submit}
-        {#if typeof submit === 'string'}
+        {#if typeof submit === "string"}
             <Button type="submit">{submit}</Button>
         {:else}
             {@render submit()}
