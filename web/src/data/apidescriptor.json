@@ -5,5 +5,11 @@
     "certificate":{
         "algorithms":["RS512"],
         "bit_sizes":[1024,2048]
+    },
+    "adapters":{
+        "databases":["mysql"]
+    },
+    "models":{
+        "default":"<defaultModel>"
     }
 }
