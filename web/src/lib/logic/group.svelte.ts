@@ -8,22 +8,11 @@ const api = useApiFetch()
 
 export async function readAll(): Promise<Group[]> {
     const groups = await api<Group[]>(`v1/tenant/${get(context)}/group`)
-    return groups.data!.map(
-        g=>{
-            // TODO: See issue https://github.com/anthrove/identity/issues/29
-            //@ts-expect-error temporary overwite until API is fixed
-            g.display_name = g.displayName
-            return g
-        }
-    )
+    return groups.data!
 }
 
 export async function read(id:string): Promise<Group> {
     const groups = await api<Group>(`v1/tenant/${get(context)}/group/${id}`)
-    // TODO: See issue https://github.com/anthrove/identity/issues/29
-    //@ts-expect-error temporary overwite until API is fixed
-    groups.data!.display_name = groups.data.displayName
-
     return groups.data!
 }
 

@@ -37,10 +37,10 @@
     {TABLE_COLUMNS}
     {build_createForm_descriptor}
     {build_editForm_descriptor}
-    searchKey='displayName'
+    searchKey='display_name'
 >
     {#snippet name(item: Group)}
-        {item.displayName}
+        {item.display_name}
     {/snippet}
     {#snippet parent_group_id(item: Group)}
         {JSON.stringify(item.parent_group_id)}

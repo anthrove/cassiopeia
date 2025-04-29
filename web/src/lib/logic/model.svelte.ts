@@ -19,10 +19,7 @@ export async function read(id:string): Promise<Model> {
 export async function create(descriptor:Model__create):Promise<Model> {
     const application = await api<Model>(`v1/tenant/${get(context)}/model`,{
         method:'POST',
-        body: {
-            ...descriptor,
-            name:descriptor.display_name
-        }
+        body: descriptor
     })
     console.log(application.data);
     return application.data!

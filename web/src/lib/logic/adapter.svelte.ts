@@ -19,10 +19,7 @@ export async function read(id:string): Promise<Adapter> {
 export async function create(descriptor:Adapter__create): Promise<Adapter> {
     const application = await api<Adapter>(`v1/tenant/${get(context)}/adapter`,{
         method:'POST',
-        body: {
-            ...descriptor,
-            name: descriptor.display_name
-        }
+        body: descriptor
     })
     console.log(application.data);
     return application.data!

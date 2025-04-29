@@ -68,19 +68,16 @@ type Application__create = Pick<Application, 'display_name' | 'certificate_id' |
 
 // --- Groups ---
 type Group = {
-  createdAt: string,
-  displayName: string,
   id: string,
+  display_name: string,
   parent_group_id: string,
   tenant_id: string,
-  updatedAt: string,
-  users: [
-    string
-  ]
+  created_at: string,
+  updated_at: string,
 }
 
-type Group__create = Pick<Group, 'displayName' | 'parent_group_id'>
-type Group__update = Pick<Group, 'id' | 'displayName' | 'parent_group_id'>
+type Group__create = Pick<Group, 'display_name' | 'parent_group_id'>
+type Group__update = Pick<Group, 'id' | 'display_name' | 'parent_group_id'>
 // --- Users ---
 
 type User = {

@@ -31,10 +31,7 @@ export async function read(id:string): Promise<Enforcer> {
 export async function create(descriptor:Enforcer__create) {
     const application = await api<Enforcer>(`v1/tenant/${get(context)}/enforcer`,{
         method:'POST',
-        body: {
-            ...descriptor,
-            name: descriptor.display_name,
-        }
+        body: descriptor
     })
     console.log(application.data);
     
@@ -43,10 +40,7 @@ export async function create(descriptor:Enforcer__create) {
 export async function update(descriptor: Enforcer__update){
     const response = await api(`v1/tenant/${get(context)}/enforcer/${descriptor.id}`,{
         method: 'PUT',
-        body: {
-            ...descriptor,
-            name: descriptor.display_name,
-        }
+        body: descriptor,
     })
     console.log(response);
 }
