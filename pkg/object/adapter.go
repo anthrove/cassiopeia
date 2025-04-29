@@ -25,9 +25,9 @@ type Adapter struct {
 	ID       string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	TenantID string `json:"tenant_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
-	Name       string `json:"name"`
-	TableName  string `json:"table_name"`
-	ExternalDB bool   `json:"external_db"`
+	DisplayName string `json:"display_name"`
+	TableName   string `json:"table_name"`
+	ExternalDB  bool   `json:"external_db"`
 
 	Driver string `json:"driver"`
 
@@ -52,9 +52,9 @@ func (base *Adapter) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateAdapter struct {
-	Name       string `json:"name" validate:"required"`
-	TableName  string `json:"table_name" validate:"required"`
-	ExternalDB bool   `json:"external_db"`
+	DisplayName string `json:"display_name" validate:"required"`
+	TableName   string `json:"table_name" validate:"required"`
+	ExternalDB  bool   `json:"external_db"`
 
 	Driver string `json:"driver"  validate:"required_if=ExternalDB true"  example:"mysql"`
 
@@ -66,9 +66,9 @@ type CreateAdapter struct {
 }
 
 type UpdateAdapter struct {
-	Name       string `json:"name" validate:"required"`
-	TableName  string `json:"table_name" validate:"required"`
-	ExternalDB bool   `json:"external_db"`
+	DisplayName string `json:"display_name" validate:"required"`
+	TableName   string `json:"table_name" validate:"required"`
+	ExternalDB  bool   `json:"external_db"`
 
 	Driver string `json:"driver"  validate:"required_if=ExternalDB true"  example:"mysql"`
 

@@ -26,7 +26,9 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func (is IdentityService) CreateApplication(ctx context.Context, tenantID string, createApplication object.CreateApplication) (object.Application, error) {
+func (is IdentityService) CreateApplication(ctx context.Context, tenantID string, createApplication object.CreateApplication, opt ...string) (object.Application, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createApplication)
 
 	if err != nil {
@@ -36,10 +38,12 @@ func (is IdentityService) CreateApplication(ctx context.Context, tenantID string
 		}
 	}
 
-	return repository.CreateApplication(ctx, is.db, tenantID, createApplication)
+	return repository.CreateApplication(ctx, dbConn, tenantID, createApplication)
 }
 
 func (is IdentityService) UpdateApplication(ctx context.Context, tenantID string, applicationID string, updateApplication object.UpdateApplication) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -53,19 +57,37 @@ func (is IdentityService) UpdateApplication(ctx context.Context, tenantID string
 		}
 	}
 
-	return repository.UpdateApplication(ctx, is.db, tenantID, applicationID, updateApplication)
+	return repository.UpdateApplication(ctx, dbConn, tenantID, applicationID, updateApplication)
 }
 
 func (is IdentityService) KillApplication(ctx context.Context, tenantID string, applicationID string) error {
-	return repository.KillApplication(ctx, is.db, tenantID, applicationID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillApplication(ctx, dbConn, tenantID, applicationID)
 }
 
 func (is IdentityService) FindApplication(ctx context.Context, tenantID string, applicationID string) (object.Application, error) {
-	return repository.FindApplication(ctx, is.db, tenantID, applicationID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindApplication(ctx, dbConn, tenantID, applicationID)
 }
 
 func (is IdentityService) FindApplications(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Application, error) {
-	return repository.FindApplications(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindApplications(ctx, dbConn, tenantID, pagination)
+}
+
+func (is IdentityService) AppendAuthProviderToApplication(ctx context.Context, tenantID string, applicationID string, authProviderID string) error {
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.AppendAuthProviderToApplication(ctx, dbConn, tenantID, applicationID, authProviderID)
+}
+
+func (is IdentityService) RemoveAuthProviderFromApplication(ctx context.Context, tenantID string, applicationID string, authProviderID string) error {
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.RemoveAuthProviderFromApplication(ctx, dbConn, tenantID, applicationID, authProviderID)
 }
 
 func (is IdentityService) FindApplicationByDomain(ctx context.Context, domain string) (object.Application, error) {

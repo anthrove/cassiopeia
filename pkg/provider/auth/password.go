@@ -42,10 +42,10 @@ type passwordAuth struct {
 	provider object.Provider
 }
 
-func newPasswordAuth(provider object.Provider) Provider {
+func newPasswordAuth(provider object.Provider) (Provider, error) {
 	return &passwordAuth{
 		provider: provider,
-	}
+	}, nil
 }
 
 func (p passwordAuth) GetConfigurationFields() []object.ProviderConfigurationField {

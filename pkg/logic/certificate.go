@@ -29,6 +29,8 @@ import (
 )
 
 func (is IdentityService) CreateCertificate(ctx context.Context, tenantID string, createCertificate object.CreateCertificate) (object.Certificate, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createCertificate)
 
 	if err != nil {
@@ -129,10 +131,12 @@ func (is IdentityService) CreateCertificate(ctx context.Context, tenantID string
 		return object.Certificate{}, errors.New("given algorithm is not supported")
 	}
 
-	return repository.CreateCertificate(ctx, is.db, tenantID, certificate)
+	return repository.CreateCertificate(ctx, dbConn, tenantID, certificate)
 }
 
 func (is IdentityService) UpdateCertificate(ctx context.Context, tenantID string, certificateID string, updateCertificate object.UpdateCertificate) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -146,21 +150,29 @@ func (is IdentityService) UpdateCertificate(ctx context.Context, tenantID string
 		}
 	}
 
-	return repository.UpdateCertificate(ctx, is.db, tenantID, certificateID, updateCertificate)
+	return repository.UpdateCertificate(ctx, dbConn, tenantID, certificateID, updateCertificate)
 }
 
 func (is IdentityService) KillCertificate(ctx context.Context, tenantID string, certificateID string) error {
-	return repository.KillCertificate(ctx, is.db, tenantID, certificateID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillCertificate(ctx, dbConn, tenantID, certificateID)
 }
 
 func (is IdentityService) FindCertificate(ctx context.Context, tenantID string, certificateID string) (object.Certificate, error) {
-	return repository.FindCertificate(ctx, is.db, tenantID, certificateID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCertificate(ctx, dbConn, tenantID, certificateID)
 }
 
 func (is IdentityService) FindCertificates(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Certificate, error) {
-	return repository.FindCertificates(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindCertificates(ctx, dbConn, tenantID, pagination)
 }
 
 func (is IdentityService) FindAllCertificates(ctx context.Context) ([]object.Certificate, error) {
-	return repository.FindAllCertificates(ctx, is.db)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindAllCertificates(ctx, dbConn)
 }
