@@ -16,9 +16,10 @@ type CommonFieldDescriptorOptions = {
 
 type ExplicitFormFieldDescriptor = Partial<CommonFieldDescriptorOptions>&({
     type: "string"
-    multiline?: boolean
     min?: number
     max?:number
+}|{
+    type: "textarea"
 }|{
     type: "number"
     min?: number
@@ -27,6 +28,8 @@ type ExplicitFormFieldDescriptor = Partial<CommonFieldDescriptorOptions>&({
 
 } | {
     type: "boolean"
+}|{
+    type: "password"
 }| {
     type: "date"
 } | {

@@ -180,3 +180,26 @@ type Model__update = {
   model: string,
   display_name: string,
 }
+
+// --- Providers ---
+
+type Provider = {
+  id: string,
+  display_name: string,
+  category: string,
+  provider_type: string,
+  parameter:{[key:string]:any}
+}
+
+type Provider__create = {
+  display_name: string,
+  category: string,
+  provider_type: string,
+  parameter:{[key:string]:any}
+}
+
+type Provider_update = {
+  id: string,
+  display_name: string,
+  parameter:{[key:string]:any}
+}
