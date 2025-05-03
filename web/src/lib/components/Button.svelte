@@ -3,7 +3,7 @@
 
     type ButtonVariant = 'primary' | 'secondary' | 'danger'
     let {
-        children,
+        children = null,
         onclick = (e:PointerEvent) => {},
         href = "",
         class:classList = "",

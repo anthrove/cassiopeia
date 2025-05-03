@@ -3,6 +3,7 @@
     import Button from "../Button.svelte";
     import Dropdown from "./Dropdown.svelte";
     import Input from "./input.svelte";
+    import Textarea from "./Textarea.svelte";
 
     // This component converts a form description into a rendered form that is two-way bindable
     function onFormSubmit(event: SubmitEvent) {
@@ -21,6 +22,7 @@
         descriptor = {} as FormDescriptor,
         onsubmit = () => {},
         submit = <Snippet | string>"Submit",
+        class: classList = "",
     } = $props();
 
     let descriptors: ExplicitFormFieldDescriptor[] = $state([]);
@@ -90,6 +92,8 @@
                         boolean: false,
                         number: 0,
                         string: "",
+                        textarea:'',
+                        password:'',
                         //@ts-expect-error This path is only hit for select:single in which case this value exitsts.
                         "select:single": explicitDescriptor?.options?.at(0),
                     }[explicitDescriptor.type];
@@ -102,20 +106,22 @@
     $effect(() => {});
 </script>
 
-<form onsubmit={onFormSubmit}>
+<form onsubmit={onFormSubmit} class={classList}>
     {#each descriptors as descriptor, descriptorIndex}
         {#if !descriptor.conditional || descriptor.conditional(formState)}
-            {#if ["string", "date", "number", "boolean"].includes(descriptor.type)}
+            {#if ["string", "date", "number", "boolean","password"].includes(descriptor.type)}
                 <Input
                     readonly={descriptor.readonly}
                     required={descriptor.required}
                     label={descriptor.label}
                     type={{
-                        'select:single':descriptor.default,
+                        "select:single": descriptor.default,
                         string: "text",
                         date: "datetime-local",
                         number: "number",
                         boolean: "checkbox",
+                        textarea:'string',
+                        password:'password'
                     }[descriptor.type]}
                     bind:value={formState[keylist[descriptorIndex]]}
                     class="mb-4"
@@ -130,9 +136,17 @@
                     labeler={descriptor.labeler}
                     class="mb-4"
                 />
+            {:else if descriptor.type == "textarea"}
+                <Textarea
+                    bind:value={formState[keylist[descriptorIndex]]}
+                    readonly={descriptor.readonly}
+                    required={descriptor.required}
+                    label={descriptor.label}
+                    class="mb-4"
+                />
             {:else}
                 <span class="text-rose-600 mb-4"
-                    >Unsuported input type: {descriptor.type}</span
+                    >Unsuported form input type: {descriptor.type}</span
                 >
             {/if}
         {/if}

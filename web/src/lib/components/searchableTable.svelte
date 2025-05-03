@@ -1,17 +1,25 @@
 <script lang="ts">
-
     type SearchableObject = {
         display_name: string;
         [key: string]: any;
     };
 
-    let { rows, columns=[], row, header,empty,searchKey='display_name' } = $props();
+    let {
+        rows,
+        columns = [],
+        row = null,
+        header = null,
+        empty = null,
+        searchKey = "display_name",
+    } = $props();
 
     let search = $state("");
 
     let filteredItems = $derived(
-        rows?.filter((item:SearchableObject) =>
-            !item[searchKey]||item[searchKey]?.toLowerCase().includes(search.toLowerCase()),
+        rows?.filter(
+            (item: SearchableObject) =>
+                !item[searchKey] ||
+                item[searchKey]?.toLowerCase().includes(search.toLowerCase()),
         ),
     );
 
@@ -22,9 +30,9 @@
 
 <div class="">
     {#if rows?.length}
-    <div class="flex">
-        <Input bind:value={search} placeholder="Search table"/>
-    </div>
+        <div class="flex">
+            <Input bind:value={search} placeholder="Search table" />
+        </div>
     {/if}
     <table class="w-full table-auto">
         <thead class="border-b-[0.5px] border-zinc-300">
@@ -39,8 +47,12 @@
             </tr>
         </thead>
         <tbody>
-            {#each filteredItems as item,i}
-                <tr class="{i%2?'bg-zinc-100 dark:bg-zinc-900/50':''} border-b-[0.5px] border-zinc-300 dark:border-zinc-700">
+            {#each filteredItems as item, i}
+                <tr
+                    class="{i % 2
+                        ? 'bg-zinc-100 dark:bg-zinc-900/50'
+                        : ''} border-b-[0.5px] border-zinc-300 dark:border-zinc-700"
+                >
                     {@render row?.(item)}
                     {#if !row}
                         {#each columnsDerived as column}
