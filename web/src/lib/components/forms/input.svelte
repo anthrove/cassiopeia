@@ -25,7 +25,7 @@
             ></div>
         </div>
     {/if}
-    {#if ["text", "number"].includes(inputType)}
+    {#if ["text", "number","password"].includes(inputType)}
         <input
             {readonly}
             type={inputType}
@@ -70,7 +70,7 @@
         />
     {:else}
         <div class="text-lg text-rose-600 italic">
-            Input type not yet implemented :(
+            &lt;Input&gt; type not yet implemented :(
         </div>
     {/if}
 </label>
