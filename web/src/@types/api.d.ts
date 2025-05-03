@@ -10,7 +10,7 @@ type APIResponse<T> = {
 interface CRUDAPI<Base = any, Create = any, Update = any> {
   create(descriptor: Create): Promise<Base>
   readAll(): Promise<Base[]>
-  read(id:string): Promise<Base>
+  read(id: string): Promise<Base>
   update(descriptor: Update): Promise<void>
   kill(id: string): Promise<void>
 }
@@ -188,18 +188,18 @@ type Provider = {
   display_name: string,
   category: string,
   provider_type: string,
-  parameter:{[key:string]:any}
+  parameter: { [key: string]: any }
 }
 
 type Provider__create = {
   display_name: string,
   category: string,
   provider_type: string,
-  parameter:{[key:string]:any}
+  parameter: { [key: string]: any }
 }
 
 type Provider_update = {
   id: string,
   display_name: string,
-  parameter:{[key:string]:any}
+  parameter: { [key: string]: any }
 }
