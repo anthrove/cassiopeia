@@ -96,6 +96,7 @@
             parameter: configuration,
         });
         createModal_open = false;
+        reloadData()
     }
 
     async function onEditSubmit(configuration: any) {
