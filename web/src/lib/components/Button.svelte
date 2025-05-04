@@ -15,7 +15,7 @@
     const VARIANTS = <{[key in ButtonVariant]:string}>{
         'primary':'bg-primary-500 text-white hover:bg-transparent border-[1px] border-primary-500 hover:text-primary-500',
         'danger':'bg-rose-600 text-white hover:font-bold hover:bg-transparent border-[1px] border-rose-600 hover:text-rose-600',
-        'secondary':'border-[1px] border-zinc-500 text-black hover:bg-zinc-500 hover:text-white'
+        'secondary':'border-[1px] border-zinc-500 text-black hover:bg-zinc-500 hover:text-white dark:text-white'
     }
 </script>
 

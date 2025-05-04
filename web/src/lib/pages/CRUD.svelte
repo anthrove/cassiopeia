@@ -30,6 +30,7 @@
     } = $props();
 
     const {
+        read: readItem,
         readAll: readAllItems,
         create: createItem,
         update: updateItem,
@@ -64,7 +65,7 @@
             createForm_descriptor = build_createForm_descriptor
         }
 
-        if (!Object.keys(current).length) {
+        if (!Object.keys(current||{}).length) {
             closeEditModal();
         }
         setTimeout(()=>{
@@ -101,8 +102,12 @@
     import { onMount } from "svelte";
     let selected = createContext("selected");
 
+    let current = $state<ItemType>(<any>null)
     async function openEditModal(id: string) {
         selected.set(id);
+
+        current = await readItem(id);
+        _current = $state.snapshot(current || {})
 
         if(isFunction(build_editForm_descriptor)){
             editForm_descriptor = {}
@@ -110,17 +115,10 @@
         }else{
             editForm_descriptor = build_editForm_descriptor
         }
-
-        setTimeout(()=>{
-            _current = $state.snapshot(current || {});
-        },0)
     }
     function closeEditModal() {
         selected.set("");
     }
-    let current = $derived<_ItemType>(
-        items.find((u: ItemType) => u.id == $selected) || {},
-    );
 
     let hasChanges = $derived(
         JSON.stringify(current) != JSON.stringify(_current),
@@ -132,7 +130,6 @@
     }
 
     async function confirmDelete() {
-        //@ts-expect-error adding the empty object to the type for fallback reasons. that case never hits this branch.
         await deleteItem(current.id);
 
         confirmDeleteModal_open = false;

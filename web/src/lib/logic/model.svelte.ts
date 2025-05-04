@@ -28,7 +28,10 @@ export async function create(descriptor:Model__create):Promise<Model> {
 export async function update(definition: Model__update){
     const response = await api(`v1/tenant/${get(context)}/model/${definition.id}`,{
         method: 'PUT',
-        body: definition
+        body: {
+            name: definition.display_name,
+            ...definition
+        }
     })
     console.log(response);
 }

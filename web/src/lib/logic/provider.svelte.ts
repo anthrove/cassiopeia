@@ -40,3 +40,9 @@ export async function update(definition: Provider_update){
     })
     console.log(response);
 }
+
+export async function kill(id:string) {
+    await api(`v1/tenant/${get(context)}/provider/${id}`,{
+        method:'DELETE'
+    })
+}

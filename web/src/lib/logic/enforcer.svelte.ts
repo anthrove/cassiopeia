@@ -18,13 +18,12 @@ export async function readAll(): Promise<Enforcer[]> {
 }
 
 export async function read(id:string): Promise<Enforcer> {
-    const certificates = await api<Enforcer>(`v1/tenant/${get(context)}/enforcer/${id}`)
-    console.log(certificates);
+    const enforcer = await api<Enforcer>(`v1/tenant/${get(context)}/enforcer/${id}`)
     
     return {
         //@ts-expect-error polyfil broken api name
-        display_name: certificates.data?.name,
-        ...certificates.data!,
+        display_name: enforcer.data?.name,
+        ...enforcer.data!,
     }
 }
 
@@ -40,7 +39,10 @@ export async function create(descriptor:Enforcer__create) {
 export async function update(descriptor: Enforcer__update){
     const response = await api(`v1/tenant/${get(context)}/enforcer/${descriptor.id}`,{
         method: 'PUT',
-        body: descriptor,
+        body: {
+            name: descriptor.display_name,
+            ...descriptor
+        },
     })
     console.log(response);
 }
