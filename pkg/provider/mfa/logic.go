@@ -17,6 +17,7 @@
 package mfa
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/pquerna/otp"
@@ -25,9 +26,9 @@ import (
 type Provider interface {
 	GetConfigurationFields() []object.ProviderConfigurationField
 	ValidateConfigurationFields() error
-	Create(username string) (object.MFAProviderData, error)
-	Validate(secret string, data map[string]any) (bool, error)
-	ValidateMFAMethode(secret string, data map[string]any) (bool, error)
+	GenerateUserConfig(username string) (object.MFAProviderData, error)
+	InitDataFlow(mfaConfig json.RawMessage) error
+	ValidateDatFlow(mfaConfig json.RawMessage, data map[string]any) (bool, error)
 }
 
 func GetMFAProvider(provider object.Provider) (Provider, error) {

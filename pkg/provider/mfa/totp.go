@@ -80,8 +80,9 @@ func (t totpProvider) Create(username string) (object.MFAProviderData, error) {
 
 }
 
-func (t totpProvider) Validate(secret string, data map[string]any) (bool, error) {
+func (t totpProvider) Validate(mfaConfig json.RawMessage, data map[string]any) (bool, error) {
 	var parameters totpBodyData
+	var totpProperties totpProperties
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -93,13 +94,17 @@ func (t totpProvider) Validate(secret string, data map[string]any) (bool, error)
 		return false, err
 	}
 
+	err = json.Unmarshal(mfaConfig, &totpProperties)
+	if err != nil {
+		return false, err
+	}
+
 	if len(parameters.OTP) == 0 {
 		return false, errors.New("missing otp")
 	}
 
 	// Validate OTP
-	return totp.Validate(parameters.OTP, secret), nil
-
+	return totp.Validate(parameters.OTP, totpProperties.Secret), nil
 }
 
 func (t totpProvider) GetConfigurationFields() []object.ProviderConfigurationField {
@@ -110,8 +115,4 @@ func (t totpProvider) GetConfigurationFields() []object.ProviderConfigurationFie
 func (t totpProvider) ValidateConfigurationFields() error {
 	// There is no configuration that needs to be validated
 	return nil
-}
-
-func (t totpProvider) ValidateMFAMethode(secret string, data map[string]any) (bool, error) {
-	return t.Validate(secret, data)
 }
