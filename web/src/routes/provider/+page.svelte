@@ -8,7 +8,8 @@
         readConfig,
         readAll as readAllProviders,
         create as createProvider,
-        update as updateProvider
+        update as updateProvider,
+        kill as deleteProvider,
     } from "$lib/logic/provider.svelte";
     import Form from "$lib/components/forms/Form.svelte";
     import Button from "$lib/components/Button.svelte";
@@ -98,9 +99,9 @@
     }
 
     async function onEditSubmit(configuration: any) {
-        let parameter = <any>{}
-        for(const key of Object.keys(providerConfig)){
-            parameter[key] = configuration[key]
+        let parameter = <any>{};
+        for (const key of Object.keys(providerConfig)) {
+            parameter[key] = configuration[key];
         }
         const provider = await updateProvider({
             id: $selected,
@@ -108,7 +109,7 @@
             parameter,
         });
         editModal_open = false;
-        reloadData()
+        reloadData();
     }
 
     let editModal_open = $state(false);
@@ -117,27 +118,43 @@
         if (!provider) {
             return;
         }
-        selected.set(provider.id)
+        selected.set(provider.id);
         createModal_state.category = provider.category;
         await selectType(provider.provider_type);
         editModal_open = true;
     }
 
-    function closeEditModal(){
-        selected.set('')
-        editModal_open = false
+    function closeEditModal() {
+        selected.set("");
+        editModal_open = false;
     }
 
-    function flatProvider(id:string){
-        const provider = providers.find(p=>p.id == id)
-        if(!provider){return null}
+    function flatProvider(id: string) {
+        const provider = providers.find((p) => p.id == id);
+        if (!provider) {
+            return null;
+        }
         return {
             ...provider.parameter,
             ...provider,
-        }
+        };
     }
 
     const TABLE_COLUMNS = ["Display Name", "Category"];
+
+
+    let confirmDeleteModal_open = $state(false);
+    function askDelete() {
+        confirmDeleteModal_open = true;
+    }
+
+    async function confirmDelete() {
+        await deleteProvider($selected);
+        reloadData();
+
+        confirmDeleteModal_open = false
+        editModal_open = false
+    }
 </script>
 
 <Modal bind:open={createModal_open}>
@@ -190,9 +207,69 @@
                 descriptor={providerConfig}
                 state={flatProvider($selected)}
                 onsubmit={onEditSubmit}
-                submit="Update provider"
-            ></Form>
+            >
+                {#snippet submit()}
+                    <div class="flex gap-4 items-center">
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            class="flex gap-2 items-center"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                ><path
+                                    fill="currentColor"
+                                    d="M21 7v14H3V3h14zm-9 11q1.25 0 2.125-.875T15 15t-.875-2.125T12 12t-2.125.875T9 15t.875 2.125T12 18m-6-8h9V6H6z"
+                                /></svg
+                            >
+                            <span> Save changes</span>
+                        </Button>
+                        <Button
+                            onclick={askDelete}
+                            variant="danger"
+                            class="flex gap-2 items-center"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                ><path
+                                    fill="currentColor"
+                                    d="M5 21V6H4V4h5V3h6v1h5v2h-1v15zm2-2h10V6H7zm2-2h2V8H9zm4 0h2V8h-2zM7 6v13z"
+                                /></svg
+                            >
+                            <span> Delete Provider</span>
+                        </Button>
+                    </div>
+                {/snippet}
+            </Form>
         {/key}
+    </div>
+</Modal>
+
+<Modal bind:open={confirmDeleteModal_open}>
+    <div class="prose">
+        <h2 class="text-rose-600">
+            Delete Provider?
+        </h2>
+        <p>
+            This action cannot be undone. Are you sure you want to do this?
+        </p>
+        <div class="flex items-center gap-4 flex-wrap">
+            <Button variant="danger" onclick={confirmDelete}
+                >Confirm permanent deletion</Button
+            >
+            <Button
+                variant="secondary"
+                onclick={() => {
+                    confirmDeleteModal_open = false;
+                }}>Cancel</Button
+            >
+        </div>
     </div>
 </Modal>
 
