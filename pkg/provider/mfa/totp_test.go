@@ -39,7 +39,7 @@ func TestToTpProviderFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	data, err := provider.Create("testuser")
+	data, err := provider.GenerateUserConfig("testuser")
 
 	if err != nil {
 		t.Fatal(err)
@@ -59,7 +59,7 @@ func TestToTpProviderFlow(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	success, err := provider.Validate(data.Properties, map[string]any{
+	success, err := provider.ValidateDatFlow(data.Properties, map[string]any{
 		"otp": code,
 	})
 

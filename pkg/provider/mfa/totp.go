@@ -49,7 +49,7 @@ func newTOTPProvider(provider object.Provider, period uint, digits otp.Digits, h
 	}, nil
 }
 
-func (t totpProvider) Create(username string) (object.MFAProviderData, error) {
+func (t totpProvider) GenerateUserConfig(username string) (object.MFAProviderData, error) {
 	if len(username) == 0 {
 		return object.MFAProviderData{}, errors.New("username is required")
 	}
@@ -77,10 +77,14 @@ func (t totpProvider) Create(username string) (object.MFAProviderData, error) {
 	return object.MFAProviderData{
 		Properties: propertiesJson,
 	}, nil
-
 }
 
-func (t totpProvider) Validate(mfaConfig json.RawMessage, data map[string]any) (bool, error) {
+func (t totpProvider) InitDataFlow(_ json.RawMessage) (map[string]any, error) {
+	// No init is required with totp
+	return nil, nil
+}
+
+func (t totpProvider) ValidateDatFlow(mfaConfig json.RawMessage, data map[string]any) (bool, error) {
 	var parameters totpBodyData
 	var totpProperties totpProperties
 

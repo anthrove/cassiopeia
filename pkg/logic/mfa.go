@@ -67,7 +67,7 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 		return object.MFA{}, err
 	}
 
-	mfaData, err := mfaProvider.Create(userID)
+	mfaData, err := mfaProvider.GenerateUserConfig(userID)
 	if err != nil {
 		return object.MFA{}, err
 	}
@@ -87,7 +87,7 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 	createMFA.RecoveryCodes = recoveryCodes
 	createMFA.Properties = mfaData.Properties
 
-	createdMFA, err := repository.CreateMFA(ctx, is.db, tenantID, createMFA)
+	createdMFA, err := repository.CreateMFA(ctx, is.db, tenantID, userID, createMFA)
 	if err != nil {
 		return object.MFA{}, err
 	}
@@ -100,14 +100,14 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 // If validation passes, it calls the repository to update the MFA in the database.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - tenantID: unique identifier of the tenant to which the MFA belongs.
 //   - mfaID: unique identifier of the MFA to be updated.
 //   - updateMFA: object containing the updated details of the MFA.
 //
 // Returns:
 //   - Error if there is any issue during validation or updating.
-func (is IdentityService) UpdateMFA(ctx context.Context, userID string, mfaID string, updateMFA object.UpdateMFA) error {
+func (is IdentityService) UpdateMFA(ctx context.Context, tenantID string, userID string, mfaID string, updateMFA object.UpdateMFA) error {
 	if len(mfaID) == 0 {
 		return errors.New("mfaID is required")
 	}
@@ -121,7 +121,7 @@ func (is IdentityService) UpdateMFA(ctx context.Context, userID string, mfaID st
 		}
 	}
 
-	return repository.UpdateMFA(ctx, is.db, mfaID, userID, updateMFA)
+	return repository.UpdateMFA(ctx, is.db, tenantID, userID, mfaID, updateMFA)
 }
 
 // KillMFA deletes an existing MFA within a specified tenant.
@@ -133,7 +133,7 @@ func (is IdentityService) UpdateMFA(ctx context.Context, userID string, mfaID st
 //
 // Returns:
 //   - Error if there is any issue during deletion.
-func (is IdentityService) KillMFA(ctx context.Context, tenantID string, mfaID string) error {
+func (is IdentityService) KillMFA(ctx context.Context, tenantID string, userID string, mfaID string) error {
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -142,7 +142,7 @@ func (is IdentityService) KillMFA(ctx context.Context, tenantID string, mfaID st
 		return errors.New("mfaID is required")
 	}
 
-	return repository.KillMFA(ctx, is.db, tenantID, mfaID)
+	return repository.KillMFA(ctx, is.db, tenantID, userID, mfaID)
 }
 
 // FindMFA retrieves a specific MFA within a specified tenant.
@@ -155,7 +155,7 @@ func (is IdentityService) KillMFA(ctx context.Context, tenantID string, mfaID st
 // Returns:
 //   - MFA object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func (is IdentityService) FindMFA(ctx context.Context, userID string, mfaID string) (object.MFA, error) {
+func (is IdentityService) FindMFA(ctx context.Context, tenantID string, userID string, mfaID string) (object.MFA, error) {
 	if len(userID) == 0 {
 		return object.MFA{}, errors.New("userID is required")
 	}
@@ -164,7 +164,7 @@ func (is IdentityService) FindMFA(ctx context.Context, userID string, mfaID stri
 		return object.MFA{}, errors.New("mfaID is required")
 	}
 
-	return repository.FindMFA(ctx, is.db, mfaID, userID)
+	return repository.FindMFA(ctx, is.db, tenantID, userID, mfaID)
 }
 
 // FindMFAs retrieves a list of MFAs within a specified tenant, with pagination support.
@@ -177,12 +177,12 @@ func (is IdentityService) FindMFA(ctx context.Context, userID string, mfaID stri
 // Returns:
 //   - Slice of MFA objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func (is IdentityService) FindMFAs(ctx context.Context, userID string, pagination object.Pagination) ([]object.MFA, error) {
+func (is IdentityService) FindMFAs(ctx context.Context, tenantID string, userID string, pagination object.Pagination) ([]object.MFA, error) {
 	if len(userID) == 0 {
 		return nil, errors.New("userID is required")
 	}
 
-	return repository.FindMFAs(ctx, is.db, userID, pagination)
+	return repository.FindMFAs(ctx, is.db, tenantID, userID, pagination)
 }
 
 // VerifieMFA updates the verification status of an existing MFA within a specified tenant in the database.
@@ -195,7 +195,7 @@ func (is IdentityService) FindMFAs(ctx context.Context, userID string, paginatio
 //
 // Returns:
 //   - Error if there is any issue during updating.
-func (is IdentityService) VerifieMFA(ctx context.Context, tenantID string, mfaID string, userID string, verified bool) error {
+func (is IdentityService) VerifyMFA(ctx context.Context, tenantID string, mfaID string, userID string, body map[string]any) error {
 	if len(mfaID) == 0 {
 		return errors.New("mfaID is required")
 	}
@@ -204,13 +204,15 @@ func (is IdentityService) VerifieMFA(ctx context.Context, tenantID string, mfaID
 		return errors.New("userID is required")
 	}
 
+	mfaObj, err := is.FindMFA(ctx, tenantID, userID, mfaID)
+
 	// TODO: Implement the ValidateMFAMethode to validate if the MFA works
 
-	return repository.VerifieMFA(ctx, is.db, mfaID, userID, verified)
+	return repository.VerifieMFA(ctx, is.db, tenantID, userID, mfaID, true)
 }
 
-func (is IdentityService) UseRecoveryCode(ctx context.Context, mfaID string, userID string, recoveryCode string) (bool, error) {
-	userMFA, err := is.FindMFA(ctx, userID, mfaID)
+func (is IdentityService) UseRecoveryCode(ctx context.Context, tenantID string, userID string, mfaID string, recoveryCode string) (bool, error) {
+	userMFA, err := is.FindMFA(ctx, tenantID, userID, mfaID)
 	if err != nil {
 		return false, err
 	}
@@ -226,7 +228,7 @@ func (is IdentityService) UseRecoveryCode(ctx context.Context, mfaID string, use
 	userMFA.RecoveryCodes[recoveryCodeIndex] = userMFA.RecoveryCodes[len(userMFA.RecoveryCodes)-1]
 	userMFA.RecoveryCodes = userMFA.RecoveryCodes[:len(userMFA.RecoveryCodes)-1]
 
-	err = repository.UpdateMFARecoveryCodes(ctx, is.db, mfaID, userID, userMFA.RecoveryCodes)
+	err = repository.UpdateMFARecoveryCodes(ctx, is.db, tenantID, userID, mfaID, userMFA.RecoveryCodes)
 	if err != nil {
 		return false, err
 	}

@@ -27,7 +27,7 @@ type Provider interface {
 	GetConfigurationFields() []object.ProviderConfigurationField
 	ValidateConfigurationFields() error
 	GenerateUserConfig(username string) (object.MFAProviderData, error)
-	InitDataFlow(mfaConfig json.RawMessage) error
+	InitDataFlow(mfaConfig json.RawMessage) (map[string]any, error)
 	ValidateDatFlow(mfaConfig json.RawMessage, data map[string]any) (bool, error)
 }
 

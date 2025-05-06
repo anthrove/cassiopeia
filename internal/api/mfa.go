@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2025 Anthrove
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package api
 
 import (
@@ -57,6 +73,7 @@ func (ir IdentityRoutes) createMFA(c *gin.Context) {
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/tenant/{tenant_id}/user/{user_id}/mfa/{mfa_id} [put]
 func (ir IdentityRoutes) updateMFA(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 	mfaID := c.Param("mfa_id")
 
@@ -70,7 +87,7 @@ func (ir IdentityRoutes) updateMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateMFA(c, userID, mfaID, body)
+	err = ir.service.UpdateMFA(c, tenantID, userID, mfaID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -95,10 +112,11 @@ func (ir IdentityRoutes) updateMFA(c *gin.Context) {
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/tenant/{tenant_id}/user/{user_id}/mfa/{mfa_id} [delete]
 func (ir IdentityRoutes) killMFA(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 	mfaID := c.Param("mfa_id")
 
-	err := ir.service.KillMFA(c, userID, mfaID)
+	err := ir.service.KillMFA(c, tenantID, userID, mfaID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -120,10 +138,11 @@ func (ir IdentityRoutes) killMFA(c *gin.Context) {
 // @Failure	400			{object}	HttpResponse{data=nil}			"Bad Request"
 // @Router		/tenant/{tenant_id}/user/{user_id}/mfa/{mfa_id} [get]
 func (ir IdentityRoutes) findMFA(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 	mfaID := c.Param("mfa_id")
 
-	mfa, err := ir.service.FindMFA(c, userID, mfaID)
+	mfa, err := ir.service.FindMFA(c, tenantID, userID, mfaID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
 			Error: err.Error(),
@@ -148,6 +167,7 @@ func (ir IdentityRoutes) findMFA(c *gin.Context) {
 // @Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
 // @Router		/tenant/{tenant_id}/user/{user_id}/mfa [get]
 func (ir IdentityRoutes) findMFAs(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 
 	pagination, ok := c.Get("pagination")
@@ -164,7 +184,7 @@ func (ir IdentityRoutes) findMFAs(c *gin.Context) {
 		return
 	}
 
-	mfas, err := ir.service.FindMFAs(c, userID, paginationObj)
+	mfas, err := ir.service.FindMFAs(c, tenantID, userID, paginationObj)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{
@@ -184,15 +204,16 @@ func (ir IdentityRoutes) findMFAs(c *gin.Context) {
 // @Param		tenant_id	path	string				true	"Tenant ID"
 // @Param		user_id		path	string				true	"User ID"
 // @Param		mfa_id		path	string				true	"MFA ID"
-// @Param		MFA			body	object.UpdateMFA	true	"Update MFA Data"
+// @Param		MFA			body	map[string]any  	true	"Verify MFA Body"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/tenant/{tenant_id}/user/{user_id}/mfa/{mfa_id} [put]
-func (ir IdentityRoutes) validateMFA(c *gin.Context) {
+// @Router		/tenant/{tenant_id}/user/{user_id}/mfa/{mfa_id}/verify [post]
+func (ir IdentityRoutes) verifyMFA(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
 	userID := c.Param("user_id")
 	mfaID := c.Param("mfa_id")
 
-	var body object.UpdateMFA
+	var body map[string]any
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -202,7 +223,7 @@ func (ir IdentityRoutes) validateMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateMFA(c, userID, mfaID, body)
+	err = ir.service.VerifyMFA(c, tenantID, userID, mfaID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{

@@ -32,7 +32,7 @@ import (
 // Returns:
 //   - MFA object if creation is successful.
 //   - Error if there is any issue during creation.
-func CreateMFA(ctx context.Context, db *gorm.DB, userID string, createMFA object.CreateMFA) (object.MFA, error) {
+func CreateMFA(ctx context.Context, db *gorm.DB, tenantID string, userID string, createMFA object.CreateMFA) (object.MFA, error) {
 	mfa := object.MFA{
 		UserID:        userID,
 		DisplayName:   createMFA.DisplayName,
@@ -59,7 +59,7 @@ func CreateMFA(ctx context.Context, db *gorm.DB, userID string, createMFA object
 //
 // Returns:
 //   - Error if there is any issue during updating.
-func UpdateMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string, updateMFA object.UpdateMFA) error {
+func UpdateMFA(ctx context.Context, db *gorm.DB, tenantID string, userID string, mfaID string, updateMFA object.UpdateMFA) error {
 	mfa := object.MFA{
 		ID:          mfaID,
 		DisplayName: updateMFA.DisplayName,
@@ -81,7 +81,7 @@ func UpdateMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string, up
 //
 // Returns:
 //   - Error if there is any issue during deletion.
-func KillMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string) error {
+func KillMFA(ctx context.Context, db *gorm.DB, tenantID string, userID string, mfaID string) error {
 	return db.WithContext(ctx).Delete(&object.MFA{}, "id = ? AND user_id = ?", mfaID, userID).Error
 }
 
@@ -96,7 +96,7 @@ func KillMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string) erro
 // Returns:
 //   - MFA object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func FindMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string) (object.MFA, error) {
+func FindMFA(ctx context.Context, db *gorm.DB, tenantID string, userID string, mfaID string) (object.MFA, error) {
 	var mfa object.MFA
 	err := db.WithContext(ctx).Take(&mfa, "id = ? AND user_id = ?", mfaID, userID).Error
 	return mfa, err
@@ -113,7 +113,7 @@ func FindMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string) (obj
 // Returns:
 //   - Slice of MFA objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
-func FindMFAs(ctx context.Context, db *gorm.DB, userID string, pagination object.Pagination) ([]object.MFA, error) {
+func FindMFAs(ctx context.Context, db *gorm.DB, tenantID string, userID string, pagination object.Pagination) ([]object.MFA, error) {
 	var data []object.MFA
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("user_id = ?", userID).Find(&data).Error
 	return data, err
@@ -130,7 +130,7 @@ func FindMFAs(ctx context.Context, db *gorm.DB, userID string, pagination object
 //
 // Returns:
 //   - Error if there is any issue during updating.
-func VerifieMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string, verified bool) error {
+func VerifieMFA(ctx context.Context, db *gorm.DB, tenantID string, userID string, mfaID string, verified bool) error {
 	mfa := object.MFA{
 		ID:       mfaID,
 		Verified: verified,
@@ -152,7 +152,7 @@ func VerifieMFA(ctx context.Context, db *gorm.DB, mfaID string, userID string, v
 //
 // Returns:
 //   - Error if there is any issue during updating.
-func UpdateMFARecoveryCodes(ctx context.Context, db *gorm.DB, mfaID string, userID string, recoveryCodes []string) error {
+func UpdateMFARecoveryCodes(ctx context.Context, db *gorm.DB, tenantID string, userID string, mfaID string, recoveryCodes []string) error {
 	mfa := object.MFA{
 		ID:            mfaID,
 		RecoveryCodes: recoveryCodes,
