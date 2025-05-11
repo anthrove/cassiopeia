@@ -36,6 +36,7 @@ func GetMFAProvider(provider object.Provider) (Provider, error) {
 	case "totp":
 		// AlgorithmSHA1 should be used for compatibility with Google Authenticator, See https://github.com/pquerna/otp/issues/55 for additional details.
 		return newTOTPProvider(provider, 30, otp.DigitsSix, otp.AlgorithmSHA1)
+
 	}
 	return nil, errors.New("unknown mfa provider: " + provider.ProviderType)
 }

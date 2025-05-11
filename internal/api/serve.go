@@ -131,6 +131,13 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
+	// GET /profile - get profile information
+	// POST /profile/mfa - create / setup new mfa method
+	// POST /profile/mfa/:mfa_id/verify - Verify mfa method
+	// PUT /profile/mfa/:mfa_id - update mfa
+	// GET /profile/mfa - Get all mfa methods
+	// DELETE /profile/mfa/:mfa_id - Delete an existing mfa method
+
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
 	r.Any("/favicon.ico", func(context *gin.Context) {})

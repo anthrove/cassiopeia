@@ -24,10 +24,13 @@ import (
 )
 
 type MFA struct {
-	ID            string          `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	UserID        string          `json:"user_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
-	CreatedAt     time.Time       `json:"createdAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
-	UpdatedAt     time.Time       `json:"updatedAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+	ID         string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	UserID     string `json:"user_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ProviderID string `json:"provider_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+
+	CreatedAt time.Time `json:"createdAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+	UpdatedAt time.Time `json:"updatedAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+
 	DisplayName   string          `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Authenticator App"`
 	Type          string          `json:"type" validate:"required,max=100" maxLength:"100" example:"totp"`
 	Priority      int             `json:"priority" validate:"required" example:"1"`
