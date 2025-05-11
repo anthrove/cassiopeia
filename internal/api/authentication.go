@@ -26,15 +26,48 @@ import (
 //	@Tags		Authentication API
 //	@Accept		json
 //	@Produce	json
-//
+//	@Param		tenant_id		path	string	true	"Tenant ID"
+//	@Param		application_id	path	string	true	"Application ID"
+//	@Param		username		query	string	true	"Username"
+//	@Param		type			query	string	true	"Type"
+//	@Success	200
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login/begin [get]
+func (ir IdentityRoutes) signInBegin(c *gin.Context) {
+	tenantID := c.Param("tenant_id")
+	applicationID := c.Param("application_id")
+
+	username := c.Query("username")
+	credentialType := c.Query("type")
+
+	data, err := ir.service.SignInStart(c, tenantID, applicationID, object.SignInRequest{
+		Username: username,
+		Type:     credentialType,
+	})
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: data,
+	})
+}
+
+//	@Summary	Login
+//	@Tags		Authentication API
+//	@Accept		json
+//	@Produce	json
 //	@Param		tenant_id		path	string					true	"Tenant ID"
 //	@Param		application_id	path	string					true	"Application ID"
-//
 //	@Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
-//	@Success	204
+//	@Success	200
 //	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [put]
-func (ir IdentityRoutes) signIn(c *gin.Context) {
+//	@Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [post]
+func (ir IdentityRoutes) signInSubmit(c *gin.Context) {
 	tenantID := c.Param("tenant_id")
 	applicationID := c.Param("application_id")
 
@@ -48,7 +81,7 @@ func (ir IdentityRoutes) signIn(c *gin.Context) {
 		return
 	}
 
-	session, user, err := ir.service.SignIn(c, tenantID, applicationID, body)
+	session, user, err := ir.service.SignInSubmit(c, tenantID, applicationID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -61,12 +94,4 @@ func (ir IdentityRoutes) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, HttpResponse{
 		Data: user,
 	})
-}
-
-func SignUp(c *gin.Context) {
-
-}
-
-func SignOut(c *gin.Context) {
-
 }

@@ -38,7 +38,9 @@ import (
 // Returns:
 //   - Group object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, createGroup object.CreateGroup) (object.Group, error) {
+func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, createGroup object.CreateGroup, opt ...string) (object.Group, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	err := validate.Struct(createGroup)
 
 	if err != nil {
@@ -48,7 +50,7 @@ func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, crea
 		}
 	}
 
-	return repository.CreateGroup(ctx, is.db, tenantID, createGroup)
+	return repository.CreateGroup(ctx, dbConn, tenantID, createGroup, opt...)
 }
 
 // UpdateGroup updates an existing group's information within a specified tenant.
@@ -64,6 +66,8 @@ func (is IdentityService) CreateGroup(ctx context.Context, tenantID string, crea
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateGroup(ctx context.Context, tenantID string, groupID string, updateGroup object.UpdateGroup) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -77,7 +81,7 @@ func (is IdentityService) UpdateGroup(ctx context.Context, tenantID string, grou
 		}
 	}
 
-	return repository.UpdateGroup(ctx, is.db, tenantID, groupID, updateGroup)
+	return repository.UpdateGroup(ctx, dbConn, tenantID, groupID, updateGroup)
 }
 
 // KillGroup deletes an existing group within a specified tenant.
@@ -90,7 +94,9 @@ func (is IdentityService) UpdateGroup(ctx context.Context, tenantID string, grou
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillGroup(ctx context.Context, tenantID string, groupID string) error {
-	return repository.KillGroup(ctx, is.db, tenantID, groupID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.KillGroup(ctx, dbConn, tenantID, groupID)
 }
 
 // FindGroup retrieves a specific group within a specified tenant.
@@ -104,7 +110,9 @@ func (is IdentityService) KillGroup(ctx context.Context, tenantID string, groupI
 //   - Group object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindGroup(ctx context.Context, tenantID string, groupID string) (object.Group, error) {
-	return repository.FindGroup(ctx, is.db, tenantID, groupID)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindGroup(ctx, dbConn, tenantID, groupID)
 }
 
 // FindGroups retrieves a list of groups within a specified tenant, with pagination support.
@@ -118,5 +126,31 @@ func (is IdentityService) FindGroup(ctx context.Context, tenantID string, groupI
 //   - Slice of Group objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindGroups(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.Group, error) {
-	return repository.FindGroups(ctx, is.db, tenantID, pagination)
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindGroups(ctx, dbConn, tenantID, pagination)
+}
+
+func (is IdentityService) FindGroupsByParentID(ctx context.Context, tenantID string, parentGroupID string) ([]object.Group, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindGroupsByParentID(ctx, dbConn, tenantID, parentGroupID)
+}
+
+func (is IdentityService) AppendUserToGroup(ctx context.Context, tenantID string, userID string, groupID string) error {
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.AppendUserToGroup(ctx, dbConn, tenantID, userID, groupID)
+}
+
+func (is IdentityService) RemoveUserFromGroup(ctx context.Context, tenantID string, userID string, groupID string) error {
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.RemoveUserFromGroup(ctx, dbConn, tenantID, userID, groupID)
+}
+
+func (is IdentityService) FindUsersInGroup(ctx context.Context, tenantID string, groupID string) ([]object.User, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
+	return repository.FindUsersInGroup(ctx, dbConn, tenantID, groupID)
 }

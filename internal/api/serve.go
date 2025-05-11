@@ -42,8 +42,6 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	identityRoutes := &IdentityRoutes{service}
 
-	r.GET("/.well-known/jwks", identityRoutes.getJWKs)
-
 	v1 := r.Group("/api/v1")
 	v1.POST("/tenant", identityRoutes.createTenant)
 	v1.GET("/tenant", Pagination(), identityRoutes.findTenants)
@@ -73,6 +71,9 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.POST("/tenant/:tenant_id/provider", identityRoutes.createProvider)
 	v1.GET("/tenant/:tenant_id/provider", Pagination(), identityRoutes.findProviders)
+	v1.GET("/tenant/:tenant_id/provider/category", Pagination(), identityRoutes.findProviderCategories)
+	v1.GET("/tenant/:tenant_id/provider/category/:category", Pagination(), identityRoutes.findProviderCategoryTypes)
+	v1.GET("/tenant/:tenant_id/provider/category/:category/:type", Pagination(), identityRoutes.findProviderCategoryTypeConfiguration)
 	v1.GET("/tenant/:tenant_id/provider/:provider_id", identityRoutes.findProvider)
 	v1.PUT("/tenant/:tenant_id/provider/:provider_id", identityRoutes.updateProvider)
 	v1.DELETE("/tenant/:tenant_id/provider/:provider_id", identityRoutes.killProvider)
@@ -92,8 +93,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.POST("/tenant/:tenant_id/template/:template_id/fill", identityRoutes.fillMessageTemplate)
 
 	v1.POST("/tenant/:tenant_id/application", identityRoutes.createApplication)
-	v1.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplication)
-	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplications)
+	v1.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplications)
+	v1.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplication)
 	v1.PUT("/tenant/:tenant_id/application/:application_id", identityRoutes.updateApplication)
 	v1.DELETE("/tenant/:tenant_id/application/:application_id", identityRoutes.killApplication)
 
@@ -102,7 +103,38 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.GET("/tenant/:tenant_id/resource/:resource_id", identityRoutes.findResource)
 	v1.DELETE("/tenant/:tenant_id/resource/:resource_id", identityRoutes.killResource)
 
-	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signIn)
+	v1.POST("/tenant/:tenant_id/model", identityRoutes.createModel)
+	v1.GET("/tenant/:tenant_id/model", Pagination(), identityRoutes.findModels)
+	v1.GET("/tenant/:tenant_id/model/:model_id", identityRoutes.findModel)
+	v1.PUT("/tenant/:tenant_id/model/:model_id", identityRoutes.updateModel)
+	v1.DELETE("/tenant/:tenant_id/model/:model_id", identityRoutes.killModel)
+
+	v1.POST("/tenant/:tenant_id/adapter", identityRoutes.createAdapter)
+	v1.GET("/tenant/:tenant_id/adapter", Pagination(), identityRoutes.findAdapters)
+	v1.GET("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.findAdapter)
+	v1.PUT("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.updateAdapter)
+	v1.DELETE("/tenant/:tenant_id/adapter/:adapter_id", identityRoutes.killAdapter)
+
+	v1.POST("/tenant/:tenant_id/permission", identityRoutes.createPermission)
+	v1.GET("/tenant/:tenant_id/permission", Pagination(), identityRoutes.findPermissions)
+	v1.GET("/tenant/:tenant_id/permission/:permission_id", identityRoutes.findPermission)
+	v1.PUT("/tenant/:tenant_id/permission/:permission_id", identityRoutes.updatePermission)
+	v1.DELETE("/tenant/:tenant_id/permission/:permission_id", identityRoutes.killPermission)
+
+	v1.POST("/tenant/:tenant_id/enforcer", identityRoutes.createEnforcer)
+	v1.GET("/tenant/:tenant_id/enforcer", Pagination(), identityRoutes.findEnforcers)
+	v1.GET("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.findEnforcer)
+	v1.PUT("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.updateEnforcer)
+	v1.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killEnforcer)
+	v1.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
+
+	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
+	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
+
+	r.Any("/favicon.ico", func(context *gin.Context) {})
+
+	r.Any("/:tenant_id/*any", identityRoutes.OIDCEndpoints)
+
 }

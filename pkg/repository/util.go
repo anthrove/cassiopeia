@@ -14,31 +14,12 @@
  * limitations under the License.
  */
 
-package logic
+package repository
 
-import (
-	"context"
-	"github.com/anthrove/identity/pkg/repository"
-	"github.com/go-jose/go-jose/v4"
-)
-
-func (is IdentityService) GetJWKs(ctx context.Context) (jose.JSONWebKeySet, error) {
-	certs, err := repository.FindAllCertificates(ctx, is.db)
-
-	if err != nil {
-		return jose.JSONWebKeySet{}, err
+func getIDOrEmpty(ops ...string) string {
+	if len(ops) == 0 {
+		return ""
 	}
 
-	jwks := jose.JSONWebKeySet{}
-	for _, cert := range certs {
-		jwk, err := cert.ToJWK()
-
-		if err != nil {
-			return jose.JSONWebKeySet{}, err
-		}
-
-		jwks.Keys = append(jwks.Keys, jwk)
-	}
-
-	return jwks, nil
+	return ops[0]
 }

@@ -25,7 +25,7 @@ import (
 // Tenant represents a tenant entity in the system.
 // It contains information about the tenant such as its ID, timestamps, display name, password type, and associated groups.
 type Tenant struct {
-	ID string `json:"id" gorm:"primaryKey;type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ID string `json:"id" gorm:"primaryKey;type:char(25)" maxLength:"25" minLength:"25" example:"BsOOa4igppKxYwhAQQrD3GCRZ"`
 
 	CreatedAt time.Time `json:"created_at" format:"date-time"`
 	UpdatedAt time.Time `json:"updated_at" format:"date-time"`
@@ -33,12 +33,15 @@ type Tenant struct {
 	DisplayName  string `json:"display_name" gorm:"type:varchar(100)" maxLength:"100" example:"Tenant Title"`
 	PasswordType string `json:"password_type" gorm:"type:varchar(100)" maxLength:"100" example:"bcrypt"`
 
+	SigningCertificateID *string `json:"signing_certificate_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+
 	Groups       []Group           `json:"-" swaggerignore:"true"`
 	Providers    []Provider        `json:"-" swaggerignore:"true"`
 	Templates    []MessageTemplate `json:"-" swaggerignore:"true"`
 	Users        []User            `json:"-" swaggerignore:"true"`
 	Application  []Application     `json:"-" swaggerignore:"true"`
 	Certificates []Certificate     `json:"-" swaggerignore:"true"`
+	Tokens       []Token           `json:"-" swaggerignore:"true"`
 }
 
 // BeforeCreate is a GORM hook that is called before a new tenant record is inserted into the database.
@@ -72,6 +75,7 @@ type CreateTenant struct {
 // UpdateTenant represents the data required to update an existing tenant.
 // It includes the display name and password type, both of which are required and have a maximum length of 100 characters.
 type UpdateTenant struct {
-	DisplayName  string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	PasswordType string `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	DisplayName          string `json:"display_name" validate:"required,max=100" maxLength:"100"`
+	PasswordType         string `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	SigningCertificateID string `json:"signing_certificate_id" validate:"required,max=25" maxLength:"25"`
 }

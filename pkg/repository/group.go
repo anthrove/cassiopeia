@@ -25,7 +25,7 @@ import (
 // CreateGroup creates a new group within a specified tenant in the database.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
 //   - tenantId: unique identifier of the tenant to which the group belongs.
 //   - createGroup: object containing the details of the group to be created.
@@ -33,8 +33,9 @@ import (
 // Returns:
 //   - Group object if creation is successful.
 //   - Error if there is any issue during creation.
-func CreateGroup(ctx context.Context, db *gorm.DB, tenantId string, createGroup object.CreateGroup) (object.Group, error) {
+func CreateGroup(ctx context.Context, db *gorm.DB, tenantId string, createGroup object.CreateGroup, opt ...string) (object.Group, error) {
 	group := object.Group{
+		ID:            getIDOrEmpty(opt...),
 		TenantID:      tenantId,
 		DisplayName:   createGroup.DisplayName,
 		ParentGroupID: createGroup.ParentGroupID,
@@ -48,7 +49,7 @@ func CreateGroup(ctx context.Context, db *gorm.DB, tenantId string, createGroup 
 // UpdateGroup updates an existing group's information within a specified tenant in the database.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
 //   - tenantID: unique identifier of the tenant to which the group belongs.
 //   - groupId: unique identifier of the group to be updated.
@@ -71,7 +72,7 @@ func UpdateGroup(ctx context.Context, db *gorm.DB, tenantID string, groupId stri
 // KillGroup deletes an existing group within a specified tenant from the database.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
 //   - tenantID: unique identifier of the tenant to which the group belongs.
 //   - groupID: unique identifier of the group to be deleted.
@@ -85,7 +86,7 @@ func KillGroup(ctx context.Context, db *gorm.DB, tenantID string, groupID string
 // FindGroup retrieves a specific group within a specified tenant from the database.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
 //   - tenantID: unique identifier of the tenant to which the group belongs.
 //   - groupID: unique identifier of the group to be retrieved.
@@ -102,7 +103,7 @@ func FindGroup(ctx context.Context, db *gorm.DB, tenantID string, groupID string
 // FindGroups retrieves a list of groups within a specified tenant from the database, with pagination support.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - db: a gorm.DB instance representing the database connection.
 //   - tenantID: unique identifier of the tenant to which the groups belong.
 //   - pagination: object containing pagination details (limit and page).
@@ -114,4 +115,40 @@ func FindGroups(ctx context.Context, db *gorm.DB, tenantID string, pagination ob
 	var data []object.Group
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
+}
+
+func FindGroupsByParentID(ctx context.Context, db *gorm.DB, tenantID string, parentGroupID string) ([]object.Group, error) {
+	var data []object.Group
+	err := db.WithContext(ctx).Where("tenant_id = ? AND parent_group_id = ?", tenantID, parentGroupID).Find(&data).Error
+	return data, err
+}
+
+func AppendUserToGroup(ctx context.Context, db *gorm.DB, tenantID string, userID string, groupID string) error {
+	return db.WithContext(ctx).Model(&object.Group{
+		ID:       groupID,
+		TenantID: tenantID,
+	}).Association("Users").Append(&object.User{
+		ID:       userID,
+		TenantID: tenantID,
+	})
+}
+
+func RemoveUserFromGroup(ctx context.Context, db *gorm.DB, tenantID string, userID string, groupID string) error {
+	return db.WithContext(ctx).Model(&object.Group{
+		ID:       groupID,
+		TenantID: tenantID,
+	}).Association("Users").Delete(&object.User{
+		ID:       userID,
+		TenantID: tenantID,
+	})
+}
+
+func FindUsersInGroup(ctx context.Context, db *gorm.DB, tenantID string, groupID string) ([]object.User, error) {
+	var users []object.User
+	err := db.WithContext(ctx).Model(&object.Group{
+		ID:       groupID,
+		TenantID: tenantID,
+	}).Association("Users").Find(&users)
+
+	return users, err
 }

@@ -55,6 +55,10 @@ func GetEngine() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	if dbConfig.Debug {
+		db = db.Debug()
+	}
+
 	return db, nil
 }
 
@@ -75,6 +79,13 @@ func Migrate(engine *gorm.DB) error {
 		&object.MessageTemplate{},
 		&object.Resource{},
 		&object.Application{},
+		&object.AuthRequest{},
+		&object.Token{},
+		&object.Resource{},
+		&object.Model{},
+		&object.Enforcer{},
+		&object.Permission{},
+		&object.Credentials{},
 		&object.MFA{},
 	)
 }

@@ -27,9 +27,7 @@ import (
 // @Tags		Application API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id		path		string									true	"Tenant ID"
-//
 // @Param		"Application"	body		object.CreateApplication				true	"Create Application Data"
 // @Success	200				{object}	HttpResponse{data=object.Application{}}	"Application"
 // @Failure	400				{object}	HttpResponse{data=nil}					"Bad Request"
@@ -65,10 +63,8 @@ func (ir IdentityRoutes) createApplication(c *gin.Context) {
 // @Tags		Application API
 // @Accept		json
 // @Produce	json
-//
 // @Param		tenant_id		path	string						true	"Tenant ID"
 // @Param		application_id	path	string						true	"Application ID"
-//
 // @Param		"Application"	body	object.UpdateApplication	true	"Create Application Data"
 // @Success	204
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
@@ -157,10 +153,8 @@ func (ir IdentityRoutes) findApplication(c *gin.Context) {
 // @Tags		Application API
 // @Accept		json
 // @Produce	json
-//
 // @Param		page		query		string										false	"Page"
 // @Param		page_limit	query		string										false	"Page Limit"
-//
 // @Param		tenant_id	path		string										true	"Tenant ID"
 // @Success	200			{object}	HttpResponse{data=[]object.Application{}}	"Application"
 // @Failure	400			{object}	HttpResponse{data=nil}						"Bad Request"

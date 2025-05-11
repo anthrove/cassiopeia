@@ -24,14 +24,14 @@ import (
 
 func CreateApplication(ctx context.Context, db *gorm.DB, tenantId string, createApplication object.CreateApplication) (object.Application, error) {
 	application := object.Application{
-		TenantID:      tenantId,
-		CertificateID: createApplication.CertificateID,
-		DisplayName:   createApplication.DisplayName,
-		Logo:          createApplication.Logo,
-		SignInURL:     createApplication.SignInURL,
-		SignUpURL:     createApplication.SignUpURL,
-		ForgetURL:     createApplication.ForgetURL,
-		TermsURL:      createApplication.TermsURL,
+		TenantID:     tenantId,
+		DisplayName:  createApplication.DisplayName,
+		Logo:         createApplication.Logo,
+		SignInURL:    createApplication.SignInURL,
+		SignUpURL:    createApplication.SignUpURL,
+		ForgetURL:    createApplication.ForgetURL,
+		TermsURL:     createApplication.TermsURL,
+		RedirectURLs: createApplication.RedirectURLs,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Application{}).Create(&application).Error
@@ -41,14 +41,14 @@ func CreateApplication(ctx context.Context, db *gorm.DB, tenantId string, create
 
 func UpdateApplication(ctx context.Context, db *gorm.DB, tenantID string, applicationID string, updateApplication object.UpdateApplication) error {
 	application := object.Application{
-		TenantID:      tenantID,
-		CertificateID: updateApplication.CertificateID,
-		DisplayName:   updateApplication.DisplayName,
-		Logo:          updateApplication.Logo,
-		SignInURL:     updateApplication.SignInURL,
-		SignUpURL:     updateApplication.SignUpURL,
-		ForgetURL:     updateApplication.ForgetURL,
-		TermsURL:      updateApplication.TermsURL,
+		TenantID:     tenantID,
+		DisplayName:  updateApplication.DisplayName,
+		Logo:         updateApplication.Logo,
+		SignInURL:    updateApplication.SignInURL,
+		SignUpURL:    updateApplication.SignUpURL,
+		ForgetURL:    updateApplication.ForgetURL,
+		TermsURL:     updateApplication.TermsURL,
+		RedirectURLs: updateApplication.RedirectURLs,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Application{}).Where("id = ? AND tenant_id = ?", applicationID, tenantID).Updates(&application).Error
@@ -60,9 +60,9 @@ func KillApplication(ctx context.Context, db *gorm.DB, tenantID string, applicat
 	return db.WithContext(ctx).Delete(&object.Application{}, "id = ? AND tenant_id = ?", applicationID, tenantID).Error
 }
 
-func FindApplication(ctx context.Context, db *gorm.DB, tenantID string, groupID string) (object.Application, error) {
+func FindApplication(ctx context.Context, db *gorm.DB, tenantID string, applicationID string) (object.Application, error) {
 	var group object.Application
-	err := db.WithContext(ctx).Take(&group, "id = ? AND tenant_id = ?", groupID, tenantID).Error
+	err := db.WithContext(ctx).Preload("AuthProvider").Take(&group, "id = ? AND tenant_id = ?", applicationID, tenantID).Error
 	return group, err
 }
 
@@ -70,4 +70,24 @@ func FindApplications(ctx context.Context, db *gorm.DB, tenantID string, paginat
 	var data []object.Application
 	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
+}
+
+func AppendAuthProviderToApplication(ctx context.Context, db *gorm.DB, tenantID string, applicationID string, providerID string) error {
+	return db.WithContext(ctx).Model(&object.Application{
+		ID:       applicationID,
+		TenantID: tenantID,
+	}).Association("AuthProvider").Append(&object.Provider{
+		ID:       providerID,
+		TenantID: tenantID,
+	})
+}
+
+func RemoveAuthProviderFromApplication(ctx context.Context, db *gorm.DB, tenantID string, applicationID string, providerID string) error {
+	return db.WithContext(ctx).Model(&object.Application{
+		ID:       applicationID,
+		TenantID: tenantID,
+	}).Association("AuthProvider").Delete(&object.Provider{
+		ID:       providerID,
+		TenantID: tenantID,
+	})
 }

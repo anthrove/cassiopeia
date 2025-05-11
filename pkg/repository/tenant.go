@@ -32,8 +32,9 @@ import (
 // Returns:
 //   - Tenant object if creation is successful.
 //   - Error if there is any issue during creation.
-func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTenant) (object.Tenant, error) {
+func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTenant, opt ...string) (object.Tenant, error) {
 	tenant := object.Tenant{
+		ID:           getIDOrEmpty(opt...),
 		DisplayName:  createTenant.DisplayName,
 		PasswordType: createTenant.PasswordType,
 	}
@@ -55,8 +56,9 @@ func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTe
 //   - Error if there is any issue during updating.
 func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenant object.UpdateTenant) error {
 	tenant := object.Tenant{
-		DisplayName:  updateTenant.DisplayName,
-		PasswordType: updateTenant.PasswordType,
+		DisplayName:          updateTenant.DisplayName,
+		PasswordType:         updateTenant.PasswordType,
+		SigningCertificateID: &updateTenant.SigningCertificateID,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Tenant{

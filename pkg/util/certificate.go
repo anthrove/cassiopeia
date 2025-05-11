@@ -24,6 +24,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"errors"
 	"log"
 	"math/big"
 	"time"
@@ -75,7 +76,7 @@ func GenerateCertificate(privateKey any, publicKey any, expireAt time.Time, sign
 		// TODO you have to generate a different serial number each execution
 		SerialNumber: big.NewInt(123123),
 		Subject: pkix.Name{
-			CommonName:   "New Name",
+			CommonName:   "New DisplayName",
 			Organization: []string{"New Org."},
 		},
 		BasicConstraintsValid: true,
@@ -93,4 +94,23 @@ func GenerateCertificate(privateKey any, publicKey any, expireAt time.Time, sign
 		Bytes: cert,
 	})
 	return certPem, nil
+}
+
+func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
+	if len(pub) == 0 {
+		return nil, errors.New("empty public key")
+	}
+	block, _ := pem.Decode(pub)
+	if block == nil {
+		return nil, errors.New("public key error")
+	}
+	ifc, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	key, ok := ifc.(*rsa.PublicKey)
+	if !ok {
+		return nil, err
+	}
+	return key, nil
 }

@@ -36,7 +36,6 @@ import (
 //	@Tags		MessageTemplate API
 //	@Accept		json
 //	@Produce	json
-//
 //	@Param		tenant_id			path		string										true	"Tenant ID"
 //	@Param		"MessageTemplate"	body		object.CreateMessageTemplate				true	"Create MessageTemplate Data"
 //	@Success	200					{object}	HttpResponse{data=object.MessageTemplate{}}	"MessageTemplate"
@@ -117,10 +116,8 @@ func (ir IdentityRoutes) updateMessageTemplate(c *gin.Context) {
 //	@Tags		MessageTemplate API
 //	@Accept		json
 //	@Produce	json
-//
 //	@Param		tenant_id	path	string	true	"Tenant ID"
 //	@Param		template_id	path	string	true	"MessageTemplate ID"
-//
 //	@Success	204
 //	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 //	@Router		/api/v1/tenant/{tenant_id}/template/{template_id} [delete]

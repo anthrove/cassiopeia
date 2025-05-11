@@ -14,28 +14,31 @@
  * limitations under the License.
  */
 
-package api
+package logic
 
 import (
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"context"
+	"gorm.io/gorm"
 )
 
-// @Summary	Get all configured JWKs
-// @Tags		OIDC API
-// @Accept		json
-// @Produce	json
-// @Success	200	{object}	jose.JSONWebKeySet		"JWKs"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/.well-known/jwks [get]
-func (ir IdentityRoutes) getJWKs(c *gin.Context) {
-	jwks, err := ir.service.GetJWKs(c)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, HttpResponse{
-			Error: err.Error(),
-		})
-		return
+func saveDBConn(ctx context.Context, db *gorm.DB) context.Context {
+	if ctx.Value("db_conn") == nil {
+		return context.WithValue(ctx, "db_conn", db)
 	}
 
-	c.JSON(http.StatusOK, jwks)
+	return ctx
+}
+
+func (is IdentityService) getDBConn(ctx context.Context) (*gorm.DB, bool) {
+	if ctx.Value("db_conn") == nil {
+		return is.db, false
+	}
+
+	dbVal, ok := ctx.Value("db_conn").(*gorm.DB)
+
+	if !ok {
+		panic("failed to convert db connection from context")
+	}
+
+	return dbVal, true
 }

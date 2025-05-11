@@ -20,11 +20,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/anthrove/identity/pkg/crypto"
 	"github.com/anthrove/identity/pkg/object"
+	"github.com/anthrove/identity/pkg/provider/auth"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
 	"github.com/go-playground/validator/v10"
+	"gorm.io/gorm"
+	"math"
 	"strconv"
 )
 
@@ -40,7 +42,9 @@ import (
 // Returns:
 //   - User object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateUser(ctx context.Context, tenantID string, createUser object.CreateUser) (object.User, error) {
+func (is IdentityService) CreateUser(ctx context.Context, tenantID string, createUser object.CreateUser, opt ...string) (object.User, error) {
+	dbConn, nested := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return object.User{}, errors.New("tenantID is required")
 	}
@@ -79,35 +83,107 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 		return object.User{}, err
 	}
 
-	passwordSalt, err := util.RandomSaltString(25)
-	if err != nil {
-		return object.User{}, err
-	}
+	tenantProviders, err := is.FindProviders(ctx, tenantID, object.Pagination{
+		Limit: math.MaxInt,
+		Page:  0,
+	})
 
-	passwordHasher, err := crypto.GetPasswordHasher(userTenant.PasswordType)
-	if err != nil {
-		return object.User{}, err
-	}
-
-	passwordHash, err := passwordHasher.HashPassword(createUser.Password, passwordSalt)
 	if err != nil {
 		return object.User{}, err
 	}
 
 	emailVerificationToken := util.RandomNumber(6)
 
-	user = object.User{
-		TenantID:               tenantID,
-		Username:               createUser.Username,
-		DisplayName:            createUser.DisplayName,
-		Email:                  createUser.Email,
-		EmailVerificationToken: strconv.Itoa(emailVerificationToken),
-		PasswordSalt:           passwordSalt,
-		PasswordType:           userTenant.PasswordType,
-		PasswordHash:           passwordHash,
+	var tx *gorm.DB
+	if !nested {
+		tx = dbConn.Begin()
+		ctx = saveDBConn(ctx, tx)
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			}
+		}()
 	}
 
-	return repository.CreateUser(ctx, is.db, tenantID, user)
+	user, err = repository.CreateUser(ctx, dbConn, tenantID, createUser, opt...)
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.User{}, err
+	}
+
+	err = is.UpdateUserEmail(ctx, tenantID, user.ID, object.UpdateEmail{
+		Email:                  user.Email,
+		EmailVerified:          false,
+		EmailVerificationToken: strconv.Itoa(emailVerificationToken),
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.User{}, err
+	}
+
+	var passProvider object.Provider
+	for _, provider := range tenantProviders {
+		if provider.ProviderType == "password" {
+			passProvider = provider
+		}
+	}
+
+	if len(passProvider.ID) == 0 {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.User{}, errors.New("no password provider configured in tenant")
+	}
+
+	passwordProvider, err := auth.GetAuthProvider(passProvider)
+
+	if err != nil {
+		return object.User{}, err
+	}
+
+	metadata, err := passwordProvider.Configure(ctx, auth.ProviderContext{
+		Tenant:     userTenant,
+		User:       user,
+		Credential: object.Credentials{},
+		SendMail:   nil,
+	}, map[string]any{
+		"password": createUser.Password,
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.User{}, err
+	}
+
+	_, err = is.CreateCredential(ctx, tenantID, object.CreateCredential{
+		UserID:   user.ID,
+		Type:     "password",
+		Metadata: metadata,
+		Enabled:  true,
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.User{}, err
+	}
+
+	if !nested {
+		err = tx.Commit().Error
+		if err != nil {
+			return object.User{}, err
+		}
+	}
+	return user, nil
 }
 
 // UpdateUser updates an existing user's information within a specified tenant.
@@ -123,6 +199,8 @@ func (is IdentityService) CreateUser(ctx context.Context, tenantID string, creat
 // Returns:
 //   - Error if there is any issue during validation or updating.
 func (is IdentityService) UpdateUser(ctx context.Context, tenantID string, userID string, updateUser object.UpdateUser) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -140,7 +218,30 @@ func (is IdentityService) UpdateUser(ctx context.Context, tenantID string, userI
 		}
 	}
 
-	return repository.UpdateUser(ctx, is.db, tenantID, userID, updateUser)
+	return repository.UpdateUser(ctx, dbConn, tenantID, userID, updateUser)
+}
+
+func (is IdentityService) UpdateUserEmail(ctx context.Context, tenantID string, userID string, updateUserEmail object.UpdateEmail) error {
+	dbConn, _ := is.getDBConn(ctx)
+
+	if len(tenantID) == 0 {
+		return errors.New("tenantID is required")
+	}
+
+	if len(userID) == 0 {
+		return errors.New("userID is required")
+	}
+
+	err := validate.Struct(updateUserEmail)
+
+	if err != nil {
+		var validateErrs validator.ValidationErrors
+		if errors.As(err, &validateErrs) {
+			return errors.Join(fmt.Errorf("problem while validating create tenant data"), validateErrs)
+		}
+	}
+
+	return repository.UpdateUserEmail(ctx, dbConn, tenantID, userID, updateUserEmail)
 }
 
 // KillUser deletes an existing user within a specified tenant.
@@ -153,6 +254,8 @@ func (is IdentityService) UpdateUser(ctx context.Context, tenantID string, userI
 // Returns:
 //   - Error if there is any issue during deletion.
 func (is IdentityService) KillUser(ctx context.Context, tenantID string, userID string) error {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return errors.New("tenantID is required")
 	}
@@ -161,7 +264,7 @@ func (is IdentityService) KillUser(ctx context.Context, tenantID string, userID 
 		return errors.New("userID is required")
 	}
 
-	return repository.KillUser(ctx, is.db, tenantID, userID)
+	return repository.KillUser(ctx, dbConn, tenantID, userID)
 }
 
 // FindUser retrieves a specific user within a specified tenant.
@@ -175,6 +278,8 @@ func (is IdentityService) KillUser(ctx context.Context, tenantID string, userID 
 //   - User object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindUser(ctx context.Context, tenantID string, userID string) (object.User, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return object.User{}, errors.New("tenantID is required")
 	}
@@ -183,7 +288,7 @@ func (is IdentityService) FindUser(ctx context.Context, tenantID string, userID 
 		return object.User{}, errors.New("userID is required")
 	}
 
-	return repository.FindUser(ctx, is.db, tenantID, userID)
+	return repository.FindUser(ctx, dbConn, tenantID, userID)
 }
 
 // FindUsers retrieves a list of users within a specified tenant, with pagination support.
@@ -197,11 +302,13 @@ func (is IdentityService) FindUser(ctx context.Context, tenantID string, userID 
 //   - Slice of User objects if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindUsers(ctx context.Context, tenantID string, pagination object.Pagination) ([]object.User, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return nil, errors.New("tenantID is required")
 	}
 
-	return repository.FindUsers(ctx, is.db, tenantID, pagination)
+	return repository.FindUsers(ctx, dbConn, tenantID, pagination)
 }
 
 // FindUserByUsername retrieves a user within a specified tenant based on their username.
@@ -215,6 +322,8 @@ func (is IdentityService) FindUsers(ctx context.Context, tenantID string, pagina
 //   - User object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindUserByUsername(ctx context.Context, tenantID string, userName string) (object.User, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return object.User{}, errors.New("tenantID is required")
 	}
@@ -223,7 +332,7 @@ func (is IdentityService) FindUserByUsername(ctx context.Context, tenantID strin
 		return object.User{}, errors.New("userName is required")
 	}
 
-	return repository.FindUserByUsername(ctx, is.db, tenantID, userName)
+	return repository.FindUserByUsername(ctx, dbConn, tenantID, userName)
 }
 
 // FindUsersByEmail retrieves a user within a specified tenant based on their email.
@@ -237,6 +346,8 @@ func (is IdentityService) FindUserByUsername(ctx context.Context, tenantID strin
 //   - User object if retrieval is successful.
 //   - Error if there is any issue during retrieval.
 func (is IdentityService) FindUsersByEmail(ctx context.Context, tenantID string, email string) ([]object.User, error) {
+	dbConn, _ := is.getDBConn(ctx)
+
 	if len(tenantID) == 0 {
 		return nil, errors.New("tenantID is required")
 	}
@@ -245,5 +356,5 @@ func (is IdentityService) FindUsersByEmail(ctx context.Context, tenantID string,
 		return nil, errors.New("email is required")
 	}
 
-	return repository.FindUsersByEmail(ctx, is.db, tenantID, email)
+	return repository.FindUsersByEmail(ctx, dbConn, tenantID, email)
 }

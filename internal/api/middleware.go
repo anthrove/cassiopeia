@@ -84,5 +84,6 @@ func (ir IdentityRoutes) Authorization() gin.HandlerFunc {
 			return
 		}
 
+		c.Set("session", session)
 	}
 }

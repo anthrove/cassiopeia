@@ -21,7 +21,9 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/qor/oss"
 	"io"
+	"maps"
 	"os"
+	"slices"
 )
 
 type Provider interface {
@@ -36,13 +38,33 @@ type Provider interface {
 	GetURL(path string) (string, error)
 }
 
-func GetStorageProvider(provider object.Provider) (Provider, error) {
-	switch provider.ProviderType {
-	case "local":
-		return newLocalProvider(provider)
-	case "s3":
-		return newS3Provider(provider)
-	}
-	return nil, errors.New("unknown storage provider: " + provider.ProviderType)
+var providerMap = map[string]func(provider object.Provider) (Provider, error){
+	"local": newLocalProvider,
+	"s3":    newS3Provider,
+}
 
+func GetStorageProvider(provider object.Provider) (Provider, error) {
+	newFunc, exists := providerMap[provider.ProviderType]
+
+	if !exists {
+		return nil, errors.New("unknown storage provider: " + provider.ProviderType)
+	}
+
+	return newFunc(provider)
+}
+
+func ConfigurationFields(providerType string) []object.ProviderConfigurationField {
+	switch providerType {
+	case "local":
+		return localProvider{}.GetConfigurationFields()
+	case "s3":
+		return s3Provider{}.GetConfigurationFields()
+
+	}
+
+	return nil
+}
+
+func GetStorageTypes() []string {
+	return slices.Collect(maps.Keys(providerMap))
 }

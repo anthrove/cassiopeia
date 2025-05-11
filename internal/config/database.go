@@ -21,4 +21,5 @@ package config
 type Database struct {
 	Driver     string `env:"DB_DRIVER,notEmpty"`
 	DataSource string `env:"DB_DATASOURCE,notEmpty"`
+	Debug      bool   `env:"DB_DEBUG" default:"false"`
 }

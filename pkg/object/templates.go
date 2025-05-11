@@ -26,8 +26,8 @@ type MessageTemplate struct {
 	ID       string `json:"id" gorm:"primaryKey;type:char(25)" `
 	TenantID string `json:"tenant_id"`
 
-	CreatedAt time.Time `json:"createdAt" format:"date-time"`
-	UpdatedAt time.Time `json:"updatedAt" format:"date-time"`
+	CreatedAt time.Time `json:"created_at" format:"date-time"`
+	UpdatedAt time.Time `json:"updated_at" format:"date-time"`
 
 	DisplayName  string `json:"display_name" validate:"required,max=100" maxLength:"100"`
 	TemplateType string `json:"template_type" validate:"required"`
