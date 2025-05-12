@@ -35,7 +35,7 @@ type MFA struct {
 	Type          string          `json:"type" validate:"required,max=100" maxLength:"100" example:"totp"`
 	Priority      int             `json:"priority" validate:"required" example:"1"`
 	Verified      bool            `json:"verified" example:"true"`
-	RecoveryCodes []string        `json:"recovery_codes" validate:"required" gorm:"type:text[]; serializer:json" example:"[\"code1\", \"code2\"]"`
+	RecoveryCodes []string        `json:"-" swaggerignore:"true" gorm:"type:text[]; serializer:json"`
 	Properties    json.RawMessage `json:"properties" validate:"required"`
 }
 
@@ -57,7 +57,7 @@ type CreateMFA struct {
 	DisplayName   string          `json:"display_name" validate:"required,max=100" maxLength:"100" example:"Authenticator App"`
 	Type          string          `json:"type" validate:"required,max=100" maxLength:"100" example:"totp"`
 	Priority      int             `json:"priority" validate:"required" example:"1"`
-	RecoveryCodes []string        `json:"recovery_codes" validate:"required" gorm:"type:text[]; serializer:json" example:"[\"code1\", \"code2\"]"`
+	RecoveryCodes []string        `json:"-" swaggerignore:"true"`
 	Properties    json.RawMessage `json:"-" swaggerignore:"true"`
 }
 

@@ -20,7 +20,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/anthrove/identity/pkg/object"
-	"github.com/pquerna/otp"
+	"maps"
+	"slices"
 )
 
 type Provider interface {
@@ -31,12 +32,29 @@ type Provider interface {
 	ValidateDatFlow(mfaConfig json.RawMessage, data map[string]any) (bool, error)
 }
 
-func GetMFAProvider(provider object.Provider) (Provider, error) {
-	switch provider.ProviderType {
-	case "totp":
-		// AlgorithmSHA1 should be used for compatibility with Google Authenticator, See https://github.com/pquerna/otp/issues/55 for additional details.
-		return newTOTPProvider(provider, 30, otp.DigitsSix, otp.AlgorithmSHA1)
+var providerMap = map[string]func(provider object.Provider) (Provider, error){
+	"totp": newTOTPProvider,
+}
 
+func GetMFAProvider(provider object.Provider) (Provider, error) {
+	newFunc, exists := providerMap[provider.ProviderType]
+
+	if !exists {
+		return nil, errors.New("unknown mfa provider: " + provider.ProviderType)
 	}
-	return nil, errors.New("unknown mfa provider: " + provider.ProviderType)
+
+	return newFunc(provider)
+}
+
+func ConfigurationFields(providerType string) []object.ProviderConfigurationField {
+	switch providerType {
+	case "totp":
+		return totpProvider{}.GetConfigurationFields()
+	}
+
+	return nil
+}
+
+func GetMfaTypes() []string {
+	return slices.Collect(maps.Keys(providerMap))
 }

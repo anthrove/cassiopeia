@@ -40,12 +40,12 @@ type totpProvider struct {
 	hashAlgorithm otp.Algorithm
 }
 
-func newTOTPProvider(provider object.Provider, period uint, digits otp.Digits, hashAlgorithm otp.Algorithm) (Provider, error) {
+func newTOTPProvider(provider object.Provider) (Provider, error) {
 	return totpProvider{
 		provider:      provider,
-		hashAlgorithm: hashAlgorithm,
-		period:        period,
-		digits:        digits,
+		hashAlgorithm: otp.AlgorithmSHA1,
+		period:        30,
+		digits:        otp.DigitsSix,
 	}, nil
 }
 

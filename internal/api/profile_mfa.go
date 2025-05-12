@@ -17,6 +17,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -32,10 +33,35 @@ import (
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/profile/mfa [post]
 func (ir IdentityRoutes) ProfileCreateMFA(c *gin.Context) {
-	tenantID := c.Param("tenant_id")
-	providerID := c.Param("provider_id")
+	sessionData, exists := c.Get("session")
 
-	var body object.SendMailData
+	if !exists {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+		return
+	}
+
+	sessionObj, ok := sessionData.(map[string]any)
+
+	if !ok {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
+		return
+	}
+
+	userData, exists := sessionObj["user"]
+
+	if !exists {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
+		return
+	}
+
+	user, ok := userData.(object.User)
+
+	if !ok {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+		return
+	}
+
+	var body object.CreateMFA
 	err := c.ShouldBind(&body)
 
 	if err != nil {
@@ -45,7 +71,7 @@ func (ir IdentityRoutes) ProfileCreateMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.SendMail(c, tenantID, providerID, body)
+	mfa, err := ir.service.CreateMFA(c, user.TenantID, user.TenantID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -53,5 +79,7 @@ func (ir IdentityRoutes) ProfileCreateMFA(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusCreated, HttpResponse{
+		Data: mfa,
+	})
 }
