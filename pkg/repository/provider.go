@@ -53,9 +53,9 @@ func KillProvider(ctx context.Context, db *gorm.DB, tenantID string, providerID 
 	return db.WithContext(ctx).Delete(&object.Provider{}, "id = ? AND tenant_id = ?", providerID, tenantID).Error
 }
 
-func FindProvider(ctx context.Context, db *gorm.DB, tenantID string, groupID string) (object.Provider, error) {
+func FindProvider(ctx context.Context, db *gorm.DB, tenantID string, providerID string) (object.Provider, error) {
 	var group object.Provider
-	err := db.WithContext(ctx).Take(&group, "id = ? AND tenant_id = ?", groupID, tenantID).Error
+	err := db.WithContext(ctx).Take(&group, "id = ? AND tenant_id = ?", providerID, tenantID).Error
 	return group, err
 }
 

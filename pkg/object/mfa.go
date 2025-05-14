@@ -23,6 +23,21 @@ import (
 	"time"
 )
 
+type MFACreationResponse struct {
+	ID         string `json:"id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	UserID     string `json:"user_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+	ProviderID string `json:"provider_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
+
+	CreatedAt time.Time `json:"createdAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+	UpdatedAt time.Time `json:"updatedAt" format:"date-time" example:"2025-01-01T00:00:00Z"`
+
+	DisplayName string          `json:"display_name" maxLength:"100" example:"Authenticator App"`
+	Type        string          `json:"type" maxLength:"100" example:"totp"`
+	Priority    int             `json:"priority" example:"1"`
+	Verified    bool            `json:"verified" example:"true"`
+	Properties  json.RawMessage `json:"properties"`
+}
+
 type MFA struct {
 	ID         string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	UserID     string `json:"user_id" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
@@ -36,7 +51,7 @@ type MFA struct {
 	Priority      int             `json:"priority" validate:"required" example:"1"`
 	Verified      bool            `json:"verified" example:"true"`
 	RecoveryCodes []string        `json:"-" swaggerignore:"true" gorm:"type:text[]; serializer:json"`
-	Properties    json.RawMessage `json:"properties" validate:"required"`
+	Properties    json.RawMessage `json:"-" validate:"required"`
 }
 
 func (base *MFA) BeforeCreate(db *gorm.DB) error {

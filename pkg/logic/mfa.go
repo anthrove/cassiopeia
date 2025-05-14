@@ -36,19 +36,19 @@ import (
 // Returns:
 //   - MFA object if creation is successful.
 //   - Error if there is any issue during validation or creation.
-func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID string, createMFA object.CreateMFA) (object.MFA, error) {
+func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID string, createMFA object.CreateMFA) (object.MFACreationResponse, error) {
 	err := validate.Struct(createMFA)
 
 	if err != nil {
 		var validateErrs validator.ValidationErrors
 		if errors.As(err, &validateErrs) {
-			return object.MFA{}, errors.Join(fmt.Errorf("problem while validating create MFA data"), util.ConvertValidationError(validateErrs))
+			return object.MFACreationResponse{}, errors.Join(fmt.Errorf("problem while validating create MFA data"), util.ConvertValidationError(validateErrs))
 		}
 	}
 
 	provider, err := is.FindProvider(ctx, tenantID, createMFA.ProviderID)
 	if err != nil {
-		return object.MFA{}, err
+		return object.MFACreationResponse{}, err
 	}
 
 	// I dont see that we needs this for this provider, but i keep it here for now
@@ -60,12 +60,12 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 
 	mfaProvider, err := mfa.GetMFAProvider(provider)
 	if err != nil {
-		return object.MFA{}, err
+		return object.MFACreationResponse{}, err
 	}
 
 	mfaData, err := mfaProvider.GenerateUserConfig(userID)
 	if err != nil {
-		return object.MFA{}, err
+		return object.MFACreationResponse{}, err
 	}
 
 	var recoveryCodes []string
@@ -74,7 +74,7 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 	for range 6 {
 		phrase, err := util.RandomPassPhrase(3, "-")
 		if err != nil {
-			return object.MFA{}, err
+			return object.MFACreationResponse{}, err
 		}
 		recoveryCodes = append(recoveryCodes, phrase)
 
@@ -85,10 +85,21 @@ func (is IdentityService) CreateMFA(ctx context.Context, tenantID string, userID
 
 	createdMFA, err := repository.CreateMFA(ctx, is.db, tenantID, userID, createMFA)
 	if err != nil {
-		return object.MFA{}, err
+		return object.MFACreationResponse{}, err
 	}
 
-	return createdMFA, nil
+	return object.MFACreationResponse{
+		ID:          createdMFA.ID,
+		UserID:      createdMFA.UserID,
+		ProviderID:  createdMFA.ProviderID,
+		CreatedAt:   createdMFA.CreatedAt,
+		UpdatedAt:   createdMFA.UpdatedAt,
+		DisplayName: createdMFA.DisplayName,
+		Type:        createdMFA.Type,
+		Priority:    createdMFA.Priority,
+		Verified:    createdMFA.Verified,
+		Properties:  createdMFA.Properties,
+	}, nil
 }
 
 // UpdateMFA updates an existing MFA's information within a specified tenant.
@@ -174,7 +185,7 @@ func (is IdentityService) FindMFAs(ctx context.Context, tenantID string, userID 
 //
 // Returns:
 //   - Error if there is any issue during updating.
-func (is IdentityService) VerifyMFA(ctx context.Context, tenantID string, mfaID string, userID string, body map[string]any) error {
+func (is IdentityService) VerifyMFA(ctx context.Context, tenantID string, userID string, mfaID string, body map[string]any) error {
 	if len(mfaID) == 0 {
 		return errors.New("mfaID is required")
 	}

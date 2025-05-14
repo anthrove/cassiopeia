@@ -35,6 +35,7 @@ import (
 func CreateMFA(ctx context.Context, db *gorm.DB, tenantID string, userID string, createMFA object.CreateMFA) (object.MFA, error) {
 	mfa := object.MFA{
 		UserID:        userID,
+		ProviderID:    createMFA.ProviderID,
 		DisplayName:   createMFA.DisplayName,
 		Type:          createMFA.Type,
 		Priority:      createMFA.Priority,

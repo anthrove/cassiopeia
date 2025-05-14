@@ -27,37 +27,35 @@ import (
 // @Tags		Profile API
 // @Accept		json
 // @Produce	json
-// @Param		tenant_id	path	string	true	"Tenant ID"
-// @Param		provider_id	path	string	true	"Provider ID"
-// @Success	204
+// @Failure	200	{object}	HttpResponse{data=object.MFA{}}	"Profile"
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/profile/mfa [post]
-func (ir IdentityRoutes) ProfileCreateMFA(c *gin.Context) {
+func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
 	sessionData, exists := c.Get("session")
 
 	if !exists {
-		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
 		return
 	}
 
 	sessionObj, ok := sessionData.(map[string]any)
 
 	if !ok {
-		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
+		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
 		return
 	}
 
 	userData, exists := sessionObj["user"]
 
 	if !exists {
-		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
+		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
 		return
 	}
 
 	user, ok := userData.(object.User)
 
 	if !ok {
-		_ = c.AbortWithError(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
 		return
 	}
 
@@ -82,4 +80,245 @@ func (ir IdentityRoutes) ProfileCreateMFA(c *gin.Context) {
 	c.JSON(http.StatusCreated, HttpResponse{
 		Data: mfa,
 	})
+}
+
+// @Summary	Verify MFA from a profile
+// @Tags		Profile API
+// @Accept		json
+// @Produce	json
+// @Failure	200	{object}	HttpResponse{data=nil}	"Profile"
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/profile/mfa/{mfa_id}/verify [post]
+func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
+	mfaID := c.Param("mfa_id")
+	sessionData, exists := c.Get("session")
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+		return
+	}
+
+	sessionObj, ok := sessionData.(map[string]any)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
+		return
+	}
+
+	userData, exists := sessionObj["user"]
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
+		return
+	}
+
+	user, ok := userData.(object.User)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+		return
+	}
+
+	var body map[string]any
+	err := c.ShouldBind(&body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	err = ir.service.VerifyMFA(c, user.TenantID, user.TenantID, mfaID, body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, HttpResponse{
+		Data: nil,
+	})
+}
+
+// @Summary	Update MFA from a profile
+// @Tags		Profile API
+// @Accept		json
+// @Produce	json
+// @Failure	200	{object}	HttpResponse{data=nil}	"Profile"
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/profile/mfa/{mfa_id} [post]
+func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
+	mfaID := c.Param("mfa_id")
+	sessionData, exists := c.Get("session")
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+		return
+	}
+
+	sessionObj, ok := sessionData.(map[string]any)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
+		return
+	}
+
+	userData, exists := sessionObj["user"]
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
+		return
+	}
+
+	user, ok := userData.(object.User)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+		return
+	}
+
+	var body object.UpdateMFA
+	err := c.ShouldBind(&body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	err = ir.service.UpdateMFA(c, user.TenantID, user.TenantID, mfaID, body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, HttpResponse{
+		Data: nil,
+	})
+}
+
+// @Summary	List all MFA from a profile
+// @Tags		Profile API
+// @Accept		json
+// @Produce	json
+//
+//	@Param		page		query		string									false	"Page"
+//	@Param		page_limit	query		string									false	"Page Limit"
+//
+// @Failure	200	{object}	HttpResponse{data=[]object.MFA{}}	"Get all Profiles"
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/profile/mfa [get]
+func (ir IdentityRoutes) profileGetMFAs(c *gin.Context) {
+	sessionData, exists := c.Get("session")
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+		return
+	}
+
+	sessionObj, ok := sessionData.(map[string]any)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
+		return
+	}
+
+	userData, exists := sessionObj["user"]
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
+		return
+	}
+
+	user, ok := userData.(object.User)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+		return
+	}
+
+	pagination, ok := c.Get("pagination")
+	if !ok {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: "pagination parameter is missing",
+		})
+		return
+	}
+
+	paginationObj, ok := pagination.(object.Pagination)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("pagination parameter cant be converted to object.Pagination"))
+		return
+	}
+
+	mfas, err := ir.service.FindMFAs(c, user.TenantID, user.ID, paginationObj)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, HttpResponse{
+		Data: mfas,
+	})
+}
+
+// @Summary	List all MFA from a profile
+// @Tags		Profile API
+// @Accept		json
+// @Produce	json
+//
+//	@Param		page		query		string									false	"Page"
+//	@Param		page_limit	query		string									false	"Page Limit"
+//
+// @Failure	204
+// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+// @Router		/api/v1/profile/mfa [get]
+func (ir IdentityRoutes) profileKillMFAs(c *gin.Context) {
+	mfaID := c.Param("mfa_id")
+	sessionData, exists := c.Get("session")
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+		return
+	}
+
+	sessionObj, ok := sessionData.(map[string]any)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
+		return
+	}
+
+	userData, exists := sessionObj["user"]
+
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
+		return
+	}
+
+	user, ok := userData.(object.User)
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+		return
+	}
+
+	err := ir.service.KillMFA(c, user.TenantID, user.ID, mfaID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
