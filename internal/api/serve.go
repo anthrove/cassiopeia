@@ -61,6 +61,14 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.PUT("/tenant/:tenant_id/user/:user_id", identityRoutes.updateUser)
 	v1.DELETE("/tenant/:tenant_id/user/:user_id", identityRoutes.killUser)
 
+	// TODO: Add VerifieMFA endpoint
+	v1.POST("/tenant/:tenant_id/user/:user_id/mfa", identityRoutes.createMFA)
+	v1.GET("/tenant/:tenant_id/user/:user_id/mfa", Pagination(), identityRoutes.findMFAs)
+	v1.GET("/tenant/:tenant_id/user/:user_id/mfa/:mfa_id", identityRoutes.findMFA)
+	v1.PUT("/tenant/:tenant_id/user/:user_id/mfa/:mfa_id", identityRoutes.updateMFA)
+	v1.POST("/tenant/:tenant_id/user/:user_id/mfa/:mfa_id/verify", identityRoutes.verifyMFA)
+	v1.DELETE("/tenant/:tenant_id/user/:user_id/mfa/:mfa_id", identityRoutes.killMFA)
+
 	v1.POST("/tenant/:tenant_id/provider", identityRoutes.createProvider)
 	v1.GET("/tenant/:tenant_id/provider", Pagination(), identityRoutes.findProviders)
 	v1.GET("/tenant/:tenant_id/provider/category", Pagination(), identityRoutes.findProviderCategories)
@@ -122,6 +130,13 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
+
+	// GET /profile - get profile information
+	v1.POST("/profile/mfa", identityRoutes.Authorization(), identityRoutes.profileCreateMFA)
+	v1.POST("/profile/mfa/:mfa_id/verify", identityRoutes.Authorization(), identityRoutes.profileVerifyMFA)
+	v1.POST("/profile/mfa/:mfa_id", identityRoutes.Authorization(), identityRoutes.profileUpdateMFA)
+	v1.GET("/profile/mfa", identityRoutes.Authorization(), Pagination(), identityRoutes.profileGetMFAs)
+	v1.DELETE("/profile/mfa/:mfa_id", identityRoutes.Authorization(), identityRoutes.profileGetMFAs)
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 

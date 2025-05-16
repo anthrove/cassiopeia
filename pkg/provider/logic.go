@@ -20,6 +20,7 @@ import (
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/provider/auth"
 	"github.com/anthrove/identity/pkg/provider/email"
+	"github.com/anthrove/identity/pkg/provider/mfa"
 	"github.com/anthrove/identity/pkg/provider/storage"
 )
 
@@ -31,6 +32,8 @@ func ConfigurationFields(category string, providerType string) []object.Provider
 		return email.ConfigurationFields(providerType)
 	case "storage":
 		return storage.ConfigurationFields(providerType)
+	case "mfa":
+		return mfa.ConfigurationFields(providerType)
 	}
 
 	return nil
@@ -44,6 +47,8 @@ func Types(category string) []string {
 		return email.GetEMailTypes()
 	case "storage":
 		return storage.GetStorageTypes()
+	case "mfa":
+		return mfa.GetMfaTypes()
 	}
 
 	return nil

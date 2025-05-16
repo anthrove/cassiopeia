@@ -24,6 +24,7 @@ import (
 	"github.com/anthrove/identity/pkg/provider"
 	"github.com/anthrove/identity/pkg/provider/auth"
 	"github.com/anthrove/identity/pkg/provider/email"
+	"github.com/anthrove/identity/pkg/provider/mfa"
 	"github.com/anthrove/identity/pkg/provider/storage"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
@@ -111,7 +112,7 @@ func (is IdentityService) FindProviders(ctx context.Context, tenantID string, pa
 }
 
 func (is IdentityService) FindProviderCategories(ctx context.Context, tenantID string) ([]string, error) {
-	return []string{"email", "storage", "auth"}, nil
+	return []string{"email", "storage", "auth", "mfa"}, nil
 }
 
 func (is IdentityService) FindProviderTypes(ctx context.Context, tenantID string, category string) []string {
@@ -133,6 +134,8 @@ func validateProvider(providerObj object.Provider) error {
 		provider, err = email.GetEMailProvider(providerObj)
 	case "storage":
 		provider, err = storage.GetStorageProvider(providerObj)
+	case "mfa":
+		provider, err = mfa.GetMFAProvider(providerObj)
 	case "auth":
 		provider, err = auth.GetAuthProvider(providerObj)
 	default:

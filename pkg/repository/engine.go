@@ -77,6 +77,7 @@ func Migrate(engine *gorm.DB) error {
 		&object.Provider{},
 		&object.Certificate{},
 		&object.MessageTemplate{},
+		&object.Resource{},
 		&object.Application{},
 		&object.AuthRequest{},
 		&object.Token{},
@@ -84,5 +85,7 @@ func Migrate(engine *gorm.DB) error {
 		&object.Model{},
 		&object.Enforcer{},
 		&object.Permission{},
-		&object.Credentials{})
+		&object.Credentials{},
+		&object.MFA{},
+	)
 }
