@@ -25,7 +25,7 @@ type Model struct {
 	ID       string `json:"id" gorm:"primaryKey;type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 	TenantID string `json:"tenant_id" gorm:"type:char(25)" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
-	Name        string `json:"name"`
+	Name        string `json:"display_name"`
 	Description string `json:"description"`
 	Model       string `json:"model"`
 }
@@ -44,13 +44,13 @@ func (base *Model) BeforeCreate(db *gorm.DB) error {
 }
 
 type CreateModel struct {
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description" validate:"required"`
+	Name        string `json:"display_name" validate:"required"`
+	Description string `json:"description"`
 	Model       string `json:"model" validate:"required"`
 }
 
 type UpdateModel struct {
-	Name        string `json:"name" validate:"required"`
-	Description string `json:"description" validate:"required"`
+	Name        string `json:"display_name" validate:"required"`
+	Description string `json:"description"`
 	Model       string `json:"model" validate:"required"`
 }
