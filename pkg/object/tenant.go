@@ -88,6 +88,7 @@ type ProfileField struct {
 	Identifier  string     `json:"identifier" validate:"required,max=100" maxLength:"100"`
 	DisplayName string     `json:"display_name"`
 	Regex       string     `json:"regex"`
+	Required    bool       `json:"required"`
 	ModifyBy    ModifyType `json:"modify_by"`
 	ViewBy      AllowView  `json:"view_by"`
 }

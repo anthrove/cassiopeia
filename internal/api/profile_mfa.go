@@ -69,7 +69,7 @@ func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
 		return
 	}
 
-	mfa, err := ir.service.CreateMFA(c, user.TenantID, user.TenantID, body)
+	mfa, err := ir.service.CreateMFA(c, user.TenantID, user.ID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -129,7 +129,7 @@ func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.VerifyMFA(c, user.TenantID, user.TenantID, mfaID, body)
+	err = ir.service.VerifyMFA(c, user.TenantID, user.ID, mfaID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -189,7 +189,7 @@ func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateMFA(c, user.TenantID, user.TenantID, mfaID, body)
+	err = ir.service.UpdateMFA(c, user.TenantID, user.ID, mfaID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),

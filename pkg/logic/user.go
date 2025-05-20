@@ -35,7 +35,7 @@ import (
 // If validation passes, it calls the repository to create the user in the database.
 //
 // Parameters:
-//   - ctx: context for managing request-scoped values, cancelation, and deadlines.
+//   - ctx: context for managing request-scoped values, cancellation, and deadlines.
 //   - tenantID: unique identifier of the tenant to which the user belongs.
 //   - createUser: object containing the details of the user to be created.
 //

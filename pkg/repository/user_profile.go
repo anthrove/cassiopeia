@@ -28,7 +28,7 @@ func CreateUserProfile(ctx context.Context, db *gorm.DB, tenantId string, userID
 		Fields: createUserProfile.Fields,
 	}
 
-	err := db.WithContext(ctx).Model(&object.ProfileField{}).Create(&page).Error
+	err := db.WithContext(ctx).Model(&object.ProfilePage{}).Create(&page).Error
 
 	return page, err
 }
@@ -39,7 +39,7 @@ func UpdatePageProfile(ctx context.Context, db *gorm.DB, tenantID string, userID
 		Fields: updateUserProfile.Fields,
 	}
 
-	err := db.WithContext(ctx).Model(&object.ProfilePageField{}).Where("user_id = ?", userID).Updates(&profilePage).Error
+	err := db.WithContext(ctx).Model(&object.ProfilePage{}).Where("user_id = ?", userID).Updates(&profilePage).Error
 
 	return err
 }
