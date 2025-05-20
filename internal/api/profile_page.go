@@ -17,7 +17,6 @@
 package api
 
 import (
-	"errors"
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -36,31 +35,10 @@ type ProfileFieldValue struct {
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/profile [get]
 func (ir IdentityRoutes) getProfileFields(c *gin.Context) {
-	sessionData, exists := c.Get("session")
+	user, err := sessionConvert(c)
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
-		return
-	}
-
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -113,35 +91,14 @@ profilePage:
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/profile [put]
 func (ir IdentityRoutes) upsertProfileFields(c *gin.Context) {
-	sessionData, exists := c.Get("session")
+	user, err := sessionConvert(c)
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
-		return
-	}
-
-	_, err := ir.service.FindProfilePage(c, user.TenantID, user.ID)
+	_, err = ir.service.FindProfilePage(c, user.TenantID, user.ID)
 
 	if err == nil {
 		// Update
