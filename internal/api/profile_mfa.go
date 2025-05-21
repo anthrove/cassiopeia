@@ -31,36 +31,15 @@ import (
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/profile/mfa [post]
 func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
-	sessionData, exists := c.Get("session")
+	user, err := sessionConvert(c)
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
-		return
-	}
-
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
 	var body object.CreateMFA
-	err := c.ShouldBind(&body)
+	err = c.ShouldBind(&body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -69,7 +48,7 @@ func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
 		return
 	}
 
-	mfa, err := ir.service.CreateMFA(c, user.TenantID, user.TenantID, body)
+	mfa, err := ir.service.CreateMFA(c, user.TenantID, user.ID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -91,36 +70,15 @@ func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
 // @Router		/api/v1/profile/mfa/{mfa_id}/verify [post]
 func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
 	mfaID := c.Param("mfa_id")
-	sessionData, exists := c.Get("session")
+	user, err := sessionConvert(c)
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
-		return
-	}
-
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
 	var body map[string]any
-	err := c.ShouldBind(&body)
+	err = c.ShouldBind(&body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -129,7 +87,7 @@ func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.VerifyMFA(c, user.TenantID, user.TenantID, mfaID, body)
+	err = ir.service.VerifyMFA(c, user.TenantID, user.ID, mfaID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -151,36 +109,16 @@ func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
 // @Router		/api/v1/profile/mfa/{mfa_id} [post]
 func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
 	mfaID := c.Param("mfa_id")
-	sessionData, exists := c.Get("session")
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
-		return
-	}
+	user, err := sessionConvert(c)
 
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
 	var body object.UpdateMFA
-	err := c.ShouldBind(&body)
+	err = c.ShouldBind(&body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -189,7 +127,7 @@ func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
 		return
 	}
 
-	err = ir.service.UpdateMFA(c, user.TenantID, user.TenantID, mfaID, body)
+	err = ir.service.UpdateMFA(c, user.TenantID, user.ID, mfaID, body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
 			Error: err.Error(),
@@ -214,31 +152,10 @@ func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
 // @Router		/api/v1/profile/mfa [get]
 func (ir IdentityRoutes) profileGetMFAs(c *gin.Context) {
-	sessionData, exists := c.Get("session")
+	user, err := sessionConvert(c)
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
-		return
-	}
-
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
@@ -283,35 +200,14 @@ func (ir IdentityRoutes) profileGetMFAs(c *gin.Context) {
 // @Router		/api/v1/profile/mfa [get]
 func (ir IdentityRoutes) profileKillMFAs(c *gin.Context) {
 	mfaID := c.Param("mfa_id")
-	sessionData, exists := c.Get("session")
+	user, err := sessionConvert(c)
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("this should never happen. Contact an Administrator"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	sessionObj, ok := sessionData.(map[string]any)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("session should be of type session.Session! Contact an Administrator"))
-		return
-	}
-
-	userData, exists := sessionObj["user"]
-
-	if !exists {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get userData. Contact an Administrator"))
-		return
-	}
-
-	user, ok := userData.(object.User)
-
-	if !ok {
-		c.JSON(http.StatusInternalServerError, errors.New("don't get user. Contact an Administrator"))
-		return
-	}
-
-	err := ir.service.KillMFA(c, user.TenantID, user.ID, mfaID)
+	err = ir.service.KillMFA(c, user.TenantID, user.ID, mfaID)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, HttpResponse{

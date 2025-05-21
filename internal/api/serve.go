@@ -131,7 +131,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
-	// GET /profile - get profile information
+	v1.GET("/profile", identityRoutes.Authorization(), identityRoutes.getProfileFields)
+	v1.POST("/profile", identityRoutes.Authorization(), identityRoutes.upsertProfileFields)
 	v1.POST("/profile/mfa", identityRoutes.Authorization(), identityRoutes.profileCreateMFA)
 	v1.POST("/profile/mfa/:mfa_id/verify", identityRoutes.Authorization(), identityRoutes.profileVerifyMFA)
 	v1.POST("/profile/mfa/:mfa_id", identityRoutes.Authorization(), identityRoutes.profileUpdateMFA)

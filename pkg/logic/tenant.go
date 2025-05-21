@@ -96,6 +96,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		DisplayName:          tenant.DisplayName,
 		PasswordType:         tenant.PasswordType,
 		SigningCertificateID: certificate.ID(),
+		ProfileFields:        tenant.ProfileFields,
 	})
 
 	if err != nil {

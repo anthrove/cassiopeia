@@ -34,9 +34,10 @@ import (
 //   - Error if there is any issue during creation.
 func CreateTenant(ctx context.Context, db *gorm.DB, createTenant object.CreateTenant, opt ...string) (object.Tenant, error) {
 	tenant := object.Tenant{
-		ID:           getIDOrEmpty(opt...),
-		DisplayName:  createTenant.DisplayName,
-		PasswordType: createTenant.PasswordType,
+		ID:            getIDOrEmpty(opt...),
+		DisplayName:   createTenant.DisplayName,
+		PasswordType:  createTenant.PasswordType,
+		ProfileFields: createTenant.ProfileFields,
 	}
 
 	err := db.WithContext(ctx).Model(&object.Tenant{}).Create(&tenant).Error
@@ -58,6 +59,7 @@ func UpdateTenant(ctx context.Context, db *gorm.DB, tenantID string, updateTenan
 	tenant := object.Tenant{
 		DisplayName:          updateTenant.DisplayName,
 		PasswordType:         updateTenant.PasswordType,
+		ProfileFields:        updateTenant.ProfileFields,
 		SigningCertificateID: &updateTenant.SigningCertificateID,
 	}
 

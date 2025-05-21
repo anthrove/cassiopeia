@@ -87,5 +87,6 @@ func Migrate(engine *gorm.DB) error {
 		&object.Permission{},
 		&object.Credentials{},
 		&object.MFA{},
+		&object.ProfilePage{},
 	)
 }
