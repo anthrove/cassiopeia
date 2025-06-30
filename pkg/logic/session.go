@@ -50,5 +50,5 @@ func (is IdentityService) FindSession(ctx context.Context, sessionID string) map
 		return session
 	}
 
-	return make(map[string]any)
+	return nil
 }

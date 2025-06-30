@@ -127,7 +127,7 @@ func (ir IdentityRoutes) findResource(c *gin.Context) {
 	})
 }
 
-// @Summary	Get existing Groups
+// @Summary	Get existing Resources
 // @Tags		Group API
 // @Accept		json
 // @Produce	json

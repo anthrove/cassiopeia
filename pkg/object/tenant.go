@@ -35,6 +35,8 @@ type Tenant struct {
 
 	SigningCertificateID *string `json:"signing_certificate_id" gorm:"type:char(25)" maxLength:"25" minLength:"25" example:"BsOOg4igppKxYwhAQQrD3GCRZ"`
 
+	ProfileFields []ProfileField `json:"profile_fields" gorm:"serializer:json"`
+
 	Groups       []Group           `json:"-" swaggerignore:"true"`
 	Providers    []Provider        `json:"-" swaggerignore:"true"`
 	Templates    []MessageTemplate `json:"-" swaggerignore:"true"`
@@ -68,14 +70,39 @@ func (base *Tenant) BeforeCreate(db *gorm.DB) error {
 // CreateTenant represents the data required to create a new tenant.
 // It includes the display name and password type, both of which are required and have a maximum length of 100 characters.
 type CreateTenant struct {
-	DisplayName  string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	PasswordType string `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	DisplayName   string         `json:"display_name" validate:"required,max=100" maxLength:"100"`
+	PasswordType  string         `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	ProfileFields []ProfileField `json:"profile_fields" validate:"required"`
 }
 
 // UpdateTenant represents the data required to update an existing tenant.
 // It includes the display name and password type, both of which are required and have a maximum length of 100 characters.
 type UpdateTenant struct {
-	DisplayName          string `json:"display_name" validate:"required,max=100" maxLength:"100"`
-	PasswordType         string `json:"password_type" validate:"required,max=100" maxLength:"100"`
-	SigningCertificateID string `json:"signing_certificate_id" validate:"required,max=25" maxLength:"25"`
+	DisplayName          string         `json:"display_name" validate:"required,max=100" maxLength:"100"`
+	PasswordType         string         `json:"password_type" validate:"required,max=100" maxLength:"100"`
+	SigningCertificateID string         `json:"signing_certificate_id" validate:"required,max=25" maxLength:"25"`
+	ProfileFields        []ProfileField `json:"profile_fields" validate:"required"`
 }
+
+type ProfileField struct {
+	Identifier  string     `json:"identifier" validate:"required,max=100" maxLength:"100"`
+	DisplayName string     `json:"display_name"`
+	Regex       string     `json:"regex"`
+	Required    bool       `json:"required"`
+	ModifyBy    ModifyType `json:"modify_by"`
+	ViewBy      AllowView  `json:"view_by"`
+}
+
+type ModifyType string
+
+const (
+	ModifyTypeImmutable ModifyType = "immutable"
+	ModifyTypeSelf      ModifyType = "self"
+)
+
+type AllowView string
+
+const (
+	AllowViewPublic AllowView = "public"
+	AllowViewSelf   AllowView = "self"
+)

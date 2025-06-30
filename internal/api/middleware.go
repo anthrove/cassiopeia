@@ -69,6 +69,11 @@ func (ir IdentityRoutes) Authorization() gin.HandlerFunc {
 		sessionID, err := c.Cookie("identity_session_id")
 
 		if err != nil {
+			if errors.Is(err, http.ErrNoCookie) {
+				c.AbortWithStatus(http.StatusUnauthorized)
+				return
+			}
+
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
 		}

@@ -168,6 +168,11 @@ func (is IdentityService) SignInSubmit(ctx context.Context, tenantID string, app
 	}
 
 	session := is.FindSession(ctx, sessionID)
+
+	if session == nil {
+		session = map[string]any{}
+	}
+
 	session["tenant_id"] = tenantID
 	session["application_id"] = applicationID
 	session["user"] = user
