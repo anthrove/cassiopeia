@@ -106,6 +106,112 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		return object.Tenant{}, err
 	}
 
+	adminGroup, err := is.CreateGroup(ctx, tenant.ID, object.CreateGroup{
+		DisplayName:   "Admin Group",
+		ParentGroupID: nil,
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
+	restApiModal, err := is.CreateModel(ctx, tenant.ID, object.CreateModel{
+		Name:        "rest_api_model",
+		Description: "The Modal used for the internal API Enforcement",
+		Model: `
+			[request_definition]
+			r = tenant, sub, obj, act
+			
+			[policy_definition]
+			p = sub, obj, act
+			
+			[policy_effect]
+			e = some(where (p.eft == allow))
+			
+			[matchers]
+			m = r.sub == p.sub && keyGet2(r.obj, p.obj, "tenant_id") === r.tenant && regexMatch(r.act, p.act)
+		`})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
+	restApiAdapter, err := is.CreateAdapter(ctx, tenant.ID, object.CreateAdapter{
+		DisplayName: "rest_api_adapter",
+		TableName:   tenant.ID + "_rest_api_db",
+		ExternalDB:  false,
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
+	restApiEnforcer, err := is.CreateEnforcer(ctx, tenant.ID, object.CreateEnforcer{
+		DisplayName: "rest_api_enforcer",
+		Description: "The Enforcer used for the internal API Enforcement",
+		ModelID:     restApiModal.ID,
+		AdapterID:   restApiAdapter.ID,
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
+	_, err = is.CreatePermission(ctx, tenant.ID, object.CreatePermission{
+		Name:        "rest_api_admin",
+		Description: "The Admin Permission to allow everything",
+		EnforcerID:  restApiEnforcer.ID,
+		Users:       nil,
+		Groups:      []string{adminGroup.ID},
+		V1:          []string{"/api/v1/tenant/:tenant_id", "/api/v1/tenant/:tenant_id/*"},
+		V2:          []string{"get", "post", "put", "delete"},
+		V3:          nil,
+		V4:          nil,
+		V5:          nil,
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
+	adminUser, err := is.CreateUser(ctx, tenant.ID, object.CreateUser{
+		Username:    "admin",
+		DisplayName: "Admin User",
+		Email:       "admin@tenant.intern",
+		Password:    "admin",
+	})
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
+	err = is.AppendUserToGroup(ctx, tenant.ID, adminUser.ID, adminGroup.ID)
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
 	if !nested {
 		err = tx.Commit().Error
 		if err != nil {

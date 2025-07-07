@@ -22,6 +22,8 @@ import (
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 func (is IdentityService) GetCasbinEnforcer(ctx context.Context, tenantID string, modelID string, adapterID string) (*casbin.Enforcer, error) {
@@ -41,7 +43,17 @@ func (is IdentityService) GetCasbinEnforcer(ctx context.Context, tenantID string
 	if adapter.ExternalDB {
 		casAdapter, err = gormadapter.NewAdapter(adapter.Driver, "mysql_username:mysql_password@tcp(127.0.0.1:3306)/", adapter.TableName)
 	} else {
-		casAdapter, err = gormadapter.NewAdapterByDBUseTableName(is.db, "", adapter.TableName)
+		if is.db.Dialector.Name() == "sqlite" {
+			db, err := gorm.Open(sqlite.Open(adapter.TableName + ".db"))
+
+			if err != nil {
+				return nil, err
+			}
+
+			casAdapter, err = gormadapter.NewAdapterByDBUseTableName(db, "", adapter.TableName)
+		} else {
+			casAdapter, err = gormadapter.NewAdapterByDBUseTableName(is.db, "", adapter.TableName)
+		}
 	}
 
 	casModel, err := model.NewModelFromString(dbModel.Model)

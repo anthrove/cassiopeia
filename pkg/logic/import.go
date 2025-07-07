@@ -43,9 +43,10 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	}()
 
 	tenant, err := is.ImportTenant(ctx, object.ImportTenant{
-		ID:           "_____admin_____",
-		DisplayName:  "Admin Tenant",
-		PasswordType: "bcrypt",
+		ID:            "_____admin_____",
+		DisplayName:   "Admin Tenant",
+		PasswordType:  "bcrypt",
+		ProfileFields: make([]object.ProfileField, 0),
 	})
 
 	if err != nil {
@@ -124,8 +125,9 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.ImportTenant) (object.Tenant, error) {
 	if importTenant.ID == "" {
 		return is.CreateTenant(ctx, object.CreateTenant{
-			DisplayName:  importTenant.DisplayName,
-			PasswordType: importTenant.PasswordType,
+			DisplayName:   importTenant.DisplayName,
+			PasswordType:  importTenant.PasswordType,
+			ProfileFields: importTenant.ProfileFields,
 		})
 	}
 
@@ -134,8 +136,9 @@ func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return is.CreateTenant(ctx, object.CreateTenant{
-				DisplayName:  importTenant.DisplayName,
-				PasswordType: importTenant.PasswordType,
+				DisplayName:   importTenant.DisplayName,
+				PasswordType:  importTenant.PasswordType,
+				ProfileFields: importTenant.ProfileFields,
 			}, importTenant.ID)
 		}
 
@@ -146,6 +149,7 @@ func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.
 		DisplayName:          importTenant.DisplayName,
 		PasswordType:         importTenant.PasswordType,
 		SigningCertificateID: *importTenant.SigningCertificateID,
+		ProfileFields:        importTenant.ProfileFields,
 	})
 
 	if err != nil {
@@ -155,6 +159,7 @@ func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.
 	tenant.DisplayName = importTenant.DisplayName
 	tenant.PasswordType = importTenant.PasswordType
 	tenant.SigningCertificateID = importTenant.SigningCertificateID
+	tenant.ProfileFields = importTenant.ProfileFields
 	return tenant, nil
 }
 
