@@ -26,7 +26,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, createEnforcer object.CreateEnforcer) (object.Enforcer, error) {
+func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, createEnforcer object.CreateEnforcer, opt ...string) (object.Enforcer, error) {
 	dbConn, _ := is.getDBConn(ctx)
 
 	err := validate.Struct(createEnforcer)
@@ -38,7 +38,7 @@ func (is IdentityService) CreateEnforcer(ctx context.Context, tenantID string, c
 		}
 	}
 
-	return repository.CreateEnforcer(ctx, dbConn, tenantID, createEnforcer)
+	return repository.CreateEnforcer(ctx, dbConn, tenantID, createEnforcer, opt...)
 }
 
 func (is IdentityService) UpdateEnforcer(ctx context.Context, tenantID string, enforcerID string, updateEnforcer object.UpdateEnforcer) error {

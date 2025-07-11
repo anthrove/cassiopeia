@@ -78,6 +78,20 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		return object.Tenant{}, err
 	}
 
+	_, err = is.CreateProvider(ctx, tenant.ID, object.CreateProvider{
+		DisplayName:  "Password Provider",
+		Category:     "auth",
+		ProviderType: "password",
+		Parameter:    []byte(`{"min_password_length":4,"max_password_length":50,"min_lowercase_length":0,"min_uppercase_letter":0,"min_digit_letter":0,"min_special_letter":0}`),
+	}, tenant.ID)
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
+	}
+
 	certificate, err := is.CreateCertificate(ctx, tenant.ID, object.CreateCertificate{
 		DisplayName: fmt.Sprintf("Signing Key for %s", tenant.DisplayName),
 		Algorithm:   string(jose.RS256),
@@ -132,7 +146,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 			e = some(where (p.eft == allow))
 			
 			[matchers]
-			m = r.sub == p.sub && keyGet2(r.obj, p.obj, "tenant_id") === r.tenant && regexMatch(r.act, p.act)
+			m = r.sub == p.sub && keyGet2(r.obj, p.obj, "tenant_id") == r.tenant && regexMatch(r.act, p.act)
 		`})
 
 	if err != nil {
@@ -160,7 +174,7 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		Description: "The Enforcer used for the internal API Enforcement",
 		ModelID:     restApiModal.ID,
 		AdapterID:   restApiAdapter.ID,
-	})
+	}, tenant.ID)
 
 	if err != nil {
 		if !nested {
@@ -217,6 +231,15 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 		if err != nil {
 			return object.Tenant{}, err
 		}
+	}
+
+	err = is.SyncCasbinPermissions(ctx, tenant.ID, tenant.ID)
+
+	if err != nil {
+		if !nested {
+			tx.Rollback()
+		}
+		return object.Tenant{}, err
 	}
 
 	tenant.SigningCertificateID = &certificate.IDs

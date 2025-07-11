@@ -45,7 +45,7 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1 := r.Group("/api/v1")
 	v1.POST("/tenant", identityRoutes.createTenant)
 	v1.GET("/tenant", Pagination(), identityRoutes.findTenants)
-	v1.GET("/tenant/:tenant_id", identityRoutes.findTenant)
+	v1.GET("/tenant/:tenant_id", identityRoutes.Authorization(), identityRoutes.findTenant)
 	v1.PUT("/tenant/:tenant_id", identityRoutes.updateTenant)
 	v1.DELETE("/tenant/:tenant_id", identityRoutes.killTenant)
 
@@ -128,7 +128,7 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killEnforcer)
 	v1.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
 
-	v1.GET("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInBegin)
+	v1.GET("/tenant/:tenant_id/application/:application_id/login/begin", identityRoutes.signInBegin)
 	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
 	v1.GET("/profile", identityRoutes.Authorization(), identityRoutes.getProfileFields)
