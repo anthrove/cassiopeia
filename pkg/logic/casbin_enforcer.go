@@ -103,10 +103,38 @@ func (is IdentityService) SyncCasbinPermissions(ctx context.Context, tenantID st
 
 	casbinEnforcer.ClearPolicy()
 	for _, policy := range policies {
-		_, err := casbinEnforcer.AddPolicy(policy)
+		_, err = casbinEnforcer.AddPolicy(policy)
 
 		if err != nil {
 			return err
+		}
+	}
+
+	if _, groupDefExists := casbinEnforcer.GetModel()["g"]; groupDefExists {
+		if _, groupDefGroupExists := casbinEnforcer.GetModel()["g"]["g"]; groupDefGroupExists {
+			users, err := is.FindUsers(ctx, tenantID, object.MaxPagination)
+
+			if err != nil {
+				return err
+			}
+
+			for _, user := range users {
+				if len(user.Groups) == 0 {
+					continue
+				}
+
+				var userGroups []string
+
+				for _, group := range user.Groups {
+					userGroups = append(userGroups, group.ID)
+				}
+
+				_, err = casbinEnforcer.AddRolesForUser(user.ID, userGroups)
+
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 
@@ -114,25 +142,7 @@ func (is IdentityService) SyncCasbinPermissions(ctx context.Context, tenantID st
 }
 
 func (is IdentityService) propergatePermissionToPolicies(ctx context.Context, permission object.Permission) ([][]string, error) {
-	users := make([]string, 0)
-	groups := make([]string, 0)
-
-	for _, user := range permission.Users {
-		users = append(users, user)
-	}
-
-	for _, group := range permission.Groups {
-		uIDs, gIDs, err := is.propergateGroupToUsers(ctx, permission.TenantID, group)
-
-		if err != nil {
-			return nil, err
-		}
-
-		users = append(users, uIDs...)
-		groups = append(groups, gIDs...)
-	}
-
-	rules := crossJoin(append(users, groups...), permission.V1, permission.V2, permission.V3, permission.V4, permission.V5)
+	rules := crossJoin(append(permission.Users, permission.Groups...), permission.V1, permission.V2, permission.V3, permission.V4, permission.V5)
 
 	return rules, nil
 }

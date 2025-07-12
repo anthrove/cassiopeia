@@ -142,11 +142,14 @@ func (is IdentityService) CreateTenant(ctx context.Context, createTenant object.
 			[policy_definition]
 			p = sub, obj, act
 			
+			[role_definition]
+			g = _, _
+			
 			[policy_effect]
 			e = some(where (p.eft == allow))
 			
 			[matchers]
-			m = r.sub == p.sub && keyGet2(r.obj, p.obj, "tenant_id") == r.tenant && regexMatch(r.act, p.act)
+			m = g(r.sub, p.sub) && keyGet2(r.obj, p.obj, "tenant_id") == r.tenant && regexMatch(r.act, p.act)
 		`})
 
 	if err != nil {
