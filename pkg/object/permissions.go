@@ -29,14 +29,14 @@ type Permission struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 
-	Users  []string `json:"users" gorm:"type:text[]; serializer:json"`
-	Groups []string `json:"groups" gorm:"type:text[]; serializer:json"`
+	Users  []string `json:"users" gorm:"serializer:json"`
+	Groups []string `json:"groups" gorm:"serializer:json"`
 
-	V1 []string `json:"v1" gorm:"type:text[]; serializer:json"`
-	V2 []string `json:"v2" gorm:"type:text[]; serializer:json"`
-	V3 []string `json:"v3" gorm:"type:text[]; serializer:json"`
-	V4 []string `json:"v4" gorm:"type:text[]; serializer:json"`
-	V5 []string `json:"v5" gorm:"type:text[]; serializer:json"`
+	V1 []string `json:"v1" gorm:"serializer:json"`
+	V2 []string `json:"v2" gorm:"serializer:json"`
+	V3 []string `json:"v3" gorm:"serializer:json"`
+	V4 []string `json:"v4" gorm:"serializer:json"`
+	V5 []string `json:"v5" gorm:"serializer:json"`
 }
 
 func (base *Permission) BeforeCreate(db *gorm.DB) error {

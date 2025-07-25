@@ -27,13 +27,13 @@ type ProfileFieldValue struct {
 	Value any                 `json:"value"`
 }
 
-// @Summary	Get Profile fields
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
-// @Failure	200	{object}	HttpResponse{data=[]ProfileFieldValue{}}	"Profile"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile [get]
+//	@Summary	Get Profile fields
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
+//	@Failure	200	{object}	HttpResponse{data=[]ProfileFieldValue{}}	"Profile"
+//	@Failure	400	{object}	HttpResponse{data=nil}						"Bad Request"
+//	@Router		/api/v1/profile [get]
 func (ir IdentityRoutes) getProfileFields(c *gin.Context) {
 	user, err := sessionConvert(c)
 
@@ -82,14 +82,14 @@ profilePage:
 	})
 }
 
-// @Summary	Upsert Profile fields
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
-// @Param		"Profile Pages"	body	object.UpdateProfilePage	true	"Create Provider Data"
-// @Success	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile [put]
+//	@Summary	Upsert Profile fields
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
+//	@Param		"Profile Pages"	body	object.UpdateProfilePage	true	"Create Provider Data"
+//	@Success	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/profile [put]
 func (ir IdentityRoutes) upsertProfileFields(c *gin.Context) {
 	user, err := sessionConvert(c)
 

@@ -43,9 +43,10 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	}()
 
 	tenant, err := is.ImportTenant(ctx, object.ImportTenant{
-		ID:           "_____admin_____",
-		DisplayName:  "Admin Tenant",
-		PasswordType: "bcrypt",
+		ID:            "_____admin_____",
+		DisplayName:   "Admin Tenant",
+		PasswordType:  "bcrypt",
+		ProfileFields: make([]object.ProfileField, 0),
 	})
 
 	if err != nil {
@@ -53,29 +54,7 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 		return object.Tenant{}, err
 	}
 
-	passProvider, err := is.ImportProvider(ctx, tenant.ID, object.ImportProvider{
-		DisplayName: "Password Provider",
-		Category:    "auth",
-		Type:        "password",
-		Parameter:   []byte(`{"min_password_length":4,"max_password_length":50,"min_lowercase_length":0,"min_uppercase_letter":0,"min_digit_letter":0,"min_special_letter":0}`),
-	})
-
-	if err != nil {
-		tx.Rollback()
-		return object.Tenant{}, err
-	}
-
-	adminGroup, err := is.ImportGroup(ctx, tenant.ID, object.ImportGroup{
-		ID:          "admin_____group",
-		DisplayName: "Admin Group",
-	})
-
-	if err != nil {
-		tx.Rollback()
-		return object.Tenant{}, err
-	}
-
-	adminApplication, err := is.ImportApplication(ctx, tenant.ID, object.ImportApplication{
+	app, err := is.ImportApplication(ctx, tenant.ID, object.ImportApplication{
 		ID:           "admin_____appli",
 		DisplayName:  "Admin Application",
 		Logo:         "", // we need a default logo
@@ -91,27 +70,7 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 		return object.Tenant{}, err
 	}
 
-	err = is.AppendAuthProviderToApplication(ctx, tenant.ID, adminApplication.ID, passProvider.ID)
-
-	if err != nil {
-		tx.Rollback()
-		return object.Tenant{}, err
-	}
-
-	adminUser, err := is.ImportUser(ctx, tenant.ID, object.ImportUser{
-		ID:          "admin_____user1",
-		Username:    "admin",
-		Email:       "admin@admin.intern",
-		DisplayName: "Admin User",
-		Password:    "admin",
-	})
-
-	if err != nil {
-		tx.Rollback()
-		return object.Tenant{}, err
-	}
-
-	err = is.AppendUserToGroup(ctx, tenant.ID, adminUser.ID, adminGroup.ID)
+	err = is.AppendAuthProviderToApplication(ctx, tenant.ID, app.ID, tenant.ID)
 
 	if err != nil {
 		tx.Rollback()
@@ -124,8 +83,9 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.ImportTenant) (object.Tenant, error) {
 	if importTenant.ID == "" {
 		return is.CreateTenant(ctx, object.CreateTenant{
-			DisplayName:  importTenant.DisplayName,
-			PasswordType: importTenant.PasswordType,
+			DisplayName:   importTenant.DisplayName,
+			PasswordType:  importTenant.PasswordType,
+			ProfileFields: importTenant.ProfileFields,
 		})
 	}
 
@@ -134,8 +94,9 @@ func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return is.CreateTenant(ctx, object.CreateTenant{
-				DisplayName:  importTenant.DisplayName,
-				PasswordType: importTenant.PasswordType,
+				DisplayName:   importTenant.DisplayName,
+				PasswordType:  importTenant.PasswordType,
+				ProfileFields: importTenant.ProfileFields,
 			}, importTenant.ID)
 		}
 
@@ -146,6 +107,7 @@ func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.
 		DisplayName:          importTenant.DisplayName,
 		PasswordType:         importTenant.PasswordType,
 		SigningCertificateID: *importTenant.SigningCertificateID,
+		ProfileFields:        importTenant.ProfileFields,
 	})
 
 	if err != nil {
@@ -155,6 +117,7 @@ func (is IdentityService) ImportTenant(ctx context.Context, importTenant object.
 	tenant.DisplayName = importTenant.DisplayName
 	tenant.PasswordType = importTenant.PasswordType
 	tenant.SigningCertificateID = importTenant.SigningCertificateID
+	tenant.ProfileFields = importTenant.ProfileFields
 	return tenant, nil
 }
 

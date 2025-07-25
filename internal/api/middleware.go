@@ -22,6 +22,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Pagination is a middleware function for handling pagination in HTTP requests.
@@ -90,5 +91,34 @@ func (ir IdentityRoutes) Authorization() gin.HandlerFunc {
 		}
 
 		c.Set("session", session)
+
+		tenantID := c.Param("tenant_id")
+
+		if tenantID == "" {
+			// Endpoint without tenant id!!!
+			c.Next()
+			return
+		}
+
+		user := session["user"].(object.User)
+
+		access, err := ir.service.Enforce(c, tenantID, tenantID, []any{
+			strings.Trim(user.TenantID, " "),
+			user.ID,
+			c.Request.URL.Path,
+			strings.ToLower(c.Request.Method),
+		})
+
+		if err != nil {
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+
+		if !access {
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+
+		c.Next()
 	}
 }

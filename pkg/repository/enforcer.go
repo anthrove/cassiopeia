@@ -22,8 +22,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateEnforcer(ctx context.Context, db *gorm.DB, tenantId string, createEnforcer object.CreateEnforcer) (object.Enforcer, error) {
+func CreateEnforcer(ctx context.Context, db *gorm.DB, tenantId string, createEnforcer object.CreateEnforcer, opt ...string) (object.Enforcer, error) {
 	enforcer := object.Enforcer{
+		ID:          getIDOrEmpty(opt...),
 		TenantID:    tenantId,
 		DisplayName: createEnforcer.DisplayName,
 		Description: createEnforcer.Description,
