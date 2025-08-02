@@ -80,6 +80,6 @@ func FindPermissions(ctx context.Context, db *gorm.DB, tenantID string, paginati
 
 func FindPermissionsByEnforcer(ctx context.Context, db *gorm.DB, tenantID string, enforcerID string) ([]object.Permission, error) {
 	var data []object.Permission
-	err := db.WithContext(ctx).Where("tenant_id = ? AND enforcer_id", tenantID, enforcerID).Find(&data).Error
+	err := db.WithContext(ctx).Where("tenant_id = ? AND enforcer_id = ?", tenantID, enforcerID).Find(&data).Error
 	return data, err
 }

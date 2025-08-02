@@ -46,6 +46,8 @@ func CreateUser(ctx context.Context, db *gorm.DB, tenantId string, createUser ob
 
 	err := db.WithContext(ctx).Model(&object.User{}).Create(&user).Error
 
+	user.Groups = []object.Group{}
+
 	return user, err
 }
 
@@ -113,7 +115,7 @@ func KillUser(ctx context.Context, db *gorm.DB, tenantID string, userID string) 
 //   - Error if there is any issue during retrieval.
 func FindUser(ctx context.Context, db *gorm.DB, tenantID string, userID string) (object.User, error) {
 	var user object.User
-	err := db.WithContext(ctx).Take(&user, "id = ? AND tenant_id = ?", userID, tenantID).Error
+	err := db.WithContext(ctx).Preload("Groups").Take(&user, "id = ? AND tenant_id = ?", userID, tenantID).Error
 	return user, err
 }
 
@@ -130,7 +132,7 @@ func FindUser(ctx context.Context, db *gorm.DB, tenantID string, userID string) 
 //   - Error if there is any issue during retrieval.
 func FindUsers(ctx context.Context, db *gorm.DB, tenantID string, pagination object.Pagination) ([]object.User, error) {
 	var data []object.User
-	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Where("tenant_id = ?", tenantID).Find(&data).Error
+	err := db.WithContext(ctx).Scopes(Pagination(pagination)).Preload("Groups").Where("tenant_id = ?", tenantID).Find(&data).Error
 	return data, err
 }
 
@@ -147,7 +149,7 @@ func FindUsers(ctx context.Context, db *gorm.DB, tenantID string, pagination obj
 //   - Error if there is any issue during retrieval.
 func FindUserByUsername(ctx context.Context, db *gorm.DB, tenantID string, username string) (object.User, error) {
 	var user object.User
-	err := db.WithContext(ctx).Take(&user, "tenant_id = ? AND username = ?", tenantID, username).Error
+	err := db.WithContext(ctx).Preload("Groups").Take(&user, "tenant_id = ? AND username = ?", tenantID, username).Error
 	return user, err
 }
 
@@ -164,6 +166,6 @@ func FindUserByUsername(ctx context.Context, db *gorm.DB, tenantID string, usern
 //   - Error if there is any issue during retrieval.
 func FindUsersByEmail(ctx context.Context, db *gorm.DB, tenantID string, email string) ([]object.User, error) {
 	var users []object.User
-	err := db.WithContext(ctx).Model(object.User{}).Where("tenant_id = ? AND email = ?", tenantID, email).Scan(&users).Error
+	err := db.WithContext(ctx).Model(object.User{}).Preload("Groups").Where("tenant_id = ? AND email = ?", tenantID, email).Scan(&users).Error
 	return users, err
 }

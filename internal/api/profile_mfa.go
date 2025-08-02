@@ -23,13 +23,13 @@ import (
 	"net/http"
 )
 
-// @Summary	Creates a MFA from a profile
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
-// @Failure	200	{object}	HttpResponse{data=object.MFA{}}	"Profile"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile/mfa [post]
+//	@Summary	Creates a MFA from a profile
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
+//	@Failure	200	{object}	HttpResponse{data=object.MFA{}}	"Profile"
+//	@Failure	400	{object}	HttpResponse{data=nil}			"Bad Request"
+//	@Router		/api/v1/profile/mfa [post]
 func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
 	user, err := sessionConvert(c)
 
@@ -61,13 +61,13 @@ func (ir IdentityRoutes) profileCreateMFA(c *gin.Context) {
 	})
 }
 
-// @Summary	Verify MFA from a profile
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
-// @Failure	200	{object}	HttpResponse{data=nil}	"Profile"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile/mfa/{mfa_id}/verify [post]
+//	@Summary	Verify MFA from a profile
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
+//	@Failure	200	{object}	HttpResponse{data=nil}	"Profile"
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/profile/mfa/{mfa_id}/verify [post]
 func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
 	mfaID := c.Param("mfa_id")
 	user, err := sessionConvert(c)
@@ -100,13 +100,13 @@ func (ir IdentityRoutes) profileVerifyMFA(c *gin.Context) {
 	})
 }
 
-// @Summary	Update MFA from a profile
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
-// @Failure	200	{object}	HttpResponse{data=nil}	"Profile"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile/mfa/{mfa_id} [post]
+//	@Summary	Update MFA from a profile
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
+//	@Failure	200	{object}	HttpResponse{data=nil}	"Profile"
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/profile/mfa/{mfa_id} [post]
 func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
 	mfaID := c.Param("mfa_id")
 
@@ -140,17 +140,17 @@ func (ir IdentityRoutes) profileUpdateMFA(c *gin.Context) {
 	})
 }
 
-// @Summary	List all MFA from a profile
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
+//	@Summary	List all MFA from a profile
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
 //
-//	@Param		page		query		string									false	"Page"
-//	@Param		page_limit	query		string									false	"Page Limit"
+//	@Param		page		query		string								false	"Page"
+//	@Param		page_limit	query		string								false	"Page Limit"
 //
-// @Failure	200	{object}	HttpResponse{data=[]object.MFA{}}	"Get all Profiles"
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile/mfa [get]
+//	@Failure	200			{object}	HttpResponse{data=[]object.MFA{}}	"Get all Profiles"
+//	@Failure	400			{object}	HttpResponse{data=nil}				"Bad Request"
+//	@Router		/api/v1/profile/mfa [get]
 func (ir IdentityRoutes) profileGetMFAs(c *gin.Context) {
 	user, err := sessionConvert(c)
 
@@ -187,17 +187,17 @@ func (ir IdentityRoutes) profileGetMFAs(c *gin.Context) {
 	})
 }
 
-// @Summary	List all MFA from a profile
-// @Tags		Profile API
-// @Accept		json
-// @Produce	json
+//	@Summary	List all MFA from a profile
+//	@Tags		Profile API
+//	@Accept		json
+//	@Produce	json
 //
-//	@Param		page		query		string									false	"Page"
-//	@Param		page_limit	query		string									false	"Page Limit"
+//	@Param		page		query	string	false	"Page"
+//	@Param		page_limit	query	string	false	"Page Limit"
 //
-// @Failure	204
-// @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/profile/mfa [get]
+//	@Failure	204
+//	@Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
+//	@Router		/api/v1/profile/mfa [get]
 func (ir IdentityRoutes) profileKillMFAs(c *gin.Context) {
 	mfaID := c.Param("mfa_id")
 	user, err := sessionConvert(c)

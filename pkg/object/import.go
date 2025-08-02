@@ -19,10 +19,11 @@ package object
 import "encoding/json"
 
 type ImportTenant struct {
-	ID                   string  `json:"id"`
-	DisplayName          string  `json:"display_name"`
-	PasswordType         string  `json:"password_type"`
-	SigningCertificateID *string `json:"signing_certificate_id"`
+	ID                   string         `json:"id"`
+	DisplayName          string         `json:"display_name"`
+	PasswordType         string         `json:"password_type"`
+	SigningCertificateID *string        `json:"signing_certificate_id"`
+	ProfileFields        []ProfileField `json:"profile_fields"`
 }
 
 type ImportProvider struct {
