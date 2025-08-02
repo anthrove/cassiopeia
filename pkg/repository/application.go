@@ -18,6 +18,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/anthrove/identity/pkg/object"
 	"gorm.io/gorm"
 )
@@ -74,7 +75,7 @@ func FindApplications(ctx context.Context, db *gorm.DB, tenantID string, paginat
 
 func FindApplicationByDomain(ctx context.Context, db *gorm.DB, domain string) (object.Application, error) {
 	var data object.Application
-	err := db.WithContext(ctx).Take(&data, "sign_in_url LIKE '%' || ? || '%' OR sign_up_url LIKE '%' || ? || '%' OR forget_url LIKE '%' || ? || '%'", domain, domain, domain).Error
+	err := db.WithContext(ctx).Preload("AuthProvider").Take(&data, "sign_in_url LIKE '%' || ? || '%' OR sign_up_url LIKE '%' || ? || '%' OR forget_url LIKE '%' || ? || '%'", domain, domain, domain).Error
 	return data, err
 }
 

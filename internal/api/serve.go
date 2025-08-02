@@ -142,6 +142,8 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 
 	v1.GET("/cdn/:tenant_id/*file_path", identityRoutes.cdnGetFile)
 
+	v1.GET("/application/domain", identityRoutes.findApplicatioByDomain)
+
 	r.Any("/favicon.ico", func(context *gin.Context) {})
 
 	r.Any("/:tenant_id/*any", identityRoutes.OIDCEndpoints)

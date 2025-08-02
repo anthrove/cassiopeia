@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/anthrove/identity/pkg/object"
 	"github.com/anthrove/identity/pkg/repository"
 	"github.com/anthrove/identity/pkg/util"
@@ -91,5 +92,9 @@ func (is IdentityService) RemoveAuthProviderFromApplication(ctx context.Context,
 }
 
 func (is IdentityService) FindApplicationByDomain(ctx context.Context, domain string) (object.Application, error) {
+	if len(domain) == 0 {
+		return object.Application{}, errors.New("domain is required")
+	}
+
 	return repository.FindApplicationByDomain(ctx, is.db, domain)
 }
