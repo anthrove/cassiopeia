@@ -27,17 +27,12 @@ import (
 // @Tags		Authentication API
 // @Accept		json
 // @Produce	json
-// @Param		tenant_id		path	string	true	"Tenant ID"
-// @Param		application_id	path	string	true	"Application ID"
 // @Param		username		query	string	true	"Username"
 // @Param		type			query	string	true	"Type"
 // @Success	200
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login/begin [get]
+// @Router		/api/v1/auth/login/begin [get]
 func (ir IdentityRoutes) signInBegin(c *gin.Context) {
-	tenantID := c.Param("tenant_id")
-	applicationID := c.Param("application_id")
-
 	username := c.Query("username")
 	if len(username) == 0 {
 		c.JSON(http.StatusBadRequest, HttpResponse{
@@ -54,13 +49,22 @@ func (ir IdentityRoutes) signInBegin(c *gin.Context) {
 		return
 	}
 
-	data, err := ir.service.SignInStart(c, tenantID, applicationID, object.SignInRequest{
+	application, err := ir.service.FindApplicationByDomain(c, c.Request.Host)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	data, err := ir.service.SignInStart(c, application.TenantID, application.ID, object.SignInRequest{
 		Username: username,
 		Type:     credentialType,
 	})
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, HttpResponse{
+		c.JSON(http.StatusInternalServerError, HttpResponse{
 			Error: err.Error(),
 		})
 		return
@@ -75,15 +79,11 @@ func (ir IdentityRoutes) signInBegin(c *gin.Context) {
 // @Tags		Authentication API
 // @Accept		json
 // @Produce	json
-// @Param		tenant_id		path	string					true	"Tenant ID"
-// @Param		application_id	path	string					true	"Application ID"
 // @Param		"Sign In"		body	object.SignInRequest	true	"SignIn Data"
 // @Success	200
 // @Failure	400	{object}	HttpResponse{data=nil}	"Bad Request"
-// @Router		/api/v1/tenant/{tenant_id}/application/{application_id}/login [post]
+// @Router		/api/v1/tenant/auth/login [post]
 func (ir IdentityRoutes) signInSubmit(c *gin.Context) {
-	tenantID := c.Param("tenant_id")
-	applicationID := c.Param("application_id")
 
 	var body object.SignInRequest
 	err := c.ShouldBind(&body)
@@ -95,7 +95,16 @@ func (ir IdentityRoutes) signInSubmit(c *gin.Context) {
 		return
 	}
 
-	session, user, err := ir.service.SignInSubmit(c, tenantID, applicationID, body)
+	application, err := ir.service.FindApplicationByDomain(c, c.Request.Host)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, HttpResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	session, user, err := ir.service.SignInSubmit(c, application.TenantID, application.ID, body)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, HttpResponse{
