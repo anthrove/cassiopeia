@@ -19,12 +19,13 @@ package logic
 import (
 	"context"
 	"errors"
+
 	"github.com/anthrove/identity/pkg/object"
 	"gorm.io/gorm"
 )
 
 func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, error) {
-	adminTenant, err := is.FindTenant(ctx, "_____admin_____")
+	adminTenant, err := is.FindTenant(ctx, "admin_____admin_____admin")
 
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -43,7 +44,7 @@ func (is IdentityService) SetupAdminTenant(ctx context.Context) (object.Tenant, 
 	}()
 
 	tenant, err := is.ImportTenant(ctx, object.ImportTenant{
-		ID:            "_____admin_____",
+		ID:            "admin_____admin_____admin",
 		DisplayName:   "Admin Tenant",
 		PasswordType:  "bcrypt",
 		ProfileFields: make([]object.ProfileField, 0),

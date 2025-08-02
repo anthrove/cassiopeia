@@ -93,6 +93,9 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1Auth.DELETE("/tenant/:tenant_id/template/:template_id", identityRoutes.killMessageTemplate)
 	v1Auth.POST("/tenant/:tenant_id/template/:template_id/fill", identityRoutes.fillMessageTemplate)
 
+	v1.GET("/tenant/:tenant_id/application/:application_id/login/begin", identityRoutes.signInBegin)
+	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
+
 	v1Auth.POST("/tenant/:tenant_id/application", identityRoutes.createApplication)
 	v1Auth.GET("/tenant/:tenant_id/application", Pagination(), identityRoutes.findApplications)
 	v1Auth.GET("/tenant/:tenant_id/application/:application_id", identityRoutes.findApplication)
@@ -128,9 +131,6 @@ func SetupRoutes(r *gin.Engine, service logic.IdentityService) {
 	v1Auth.PUT("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.updateEnforcer)
 	v1Auth.DELETE("/tenant/:tenant_id/enforcer/:enforcer_id", identityRoutes.killEnforcer)
 	v1Auth.POST("/tenant/:tenant_id/enforcer/:enforcer_id/enforce", identityRoutes.enforce)
-
-	v1.GET("/tenant/:tenant_id/application/:application_id/login/begin", identityRoutes.signInBegin)
-	v1.POST("/tenant/:tenant_id/application/:application_id/login", identityRoutes.signInSubmit)
 
 	v1Auth.GET("/profile", identityRoutes.getProfileFields)
 	v1Auth.POST("/profile", identityRoutes.upsertProfileFields)

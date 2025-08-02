@@ -18,7 +18,6 @@ package api
 
 import (
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/anthrove/identity/pkg/object"
@@ -214,7 +213,6 @@ func (ir IdentityRoutes) findApplicatioByDomain(c *gin.Context) {
 		return
 	}
 
-	log.Println(c.Request.Host)
 	application, err := ir.service.FindApplicationByDomain(c, c.Request.Host)
 	if err != nil {
 		if errors.Is(gorm.ErrRecordNotFound, err) {
